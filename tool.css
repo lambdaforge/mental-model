@@ -1,0 +1,24 @@
+body {
+    font-family: Verdana, Arial;
+    font-size: 16px;
+    height: 99%!important;
+    margin: 0;
+    padding: 0;
+    background-color: gray;
+}
+.screen {
+    height: 800px;
+    display: none;
+    margin: auto;
+    width: 1280px;
+    background-color: rgba(255, 255, 255, 1);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.screen#menu {
+    padding: 50px;
+}
+button {
+    font-size: 16px;
+    height: 30px;
+}
