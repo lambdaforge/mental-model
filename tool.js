@@ -114,7 +114,7 @@ showScreen = function(screenName, param) {
             $("#negarrows")[0].checked = settings.useNegativeArrows;
             break;
         case "menu":
-            console.log("Menu");
+          //  console.log("Menu");
             break;
         default:
             console.log("Name of screen unknown!");
@@ -736,13 +736,13 @@ window.onload = function() {
         showScreen("show-data", "");
     });
     $("#btn-download").on("click", function(a) { // TODO: fix
-        var data = localStorage.getItem("mmetool");
-        //  download(data, "filename.csv", "text/csv");
-        const selectedFile = document.getElementById('input').files[0];
-        console.log(selectedFile);
-    //    download(data, "filename.csv", "application/octet-stream");
+        var csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += localStorage.getItem("mmetool");
+
         console.log("download clicked");
-        // get data and download to csv
+        var encodedUri = encodeURI(csvContent);
+        window.open(encodedUri);
+
     });
     $("#btn-settings").on("click", function(a) {
         showScreen("settings", "");
