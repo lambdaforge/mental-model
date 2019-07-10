@@ -24,10 +24,11 @@ uistate = {
 var canvas = null;
 
 // Load saved settings or use defaults
-settings = defaultSettings;
+settings = defaultSettings; // settings needs to be global
 var data = localStorage.getItem("mmetool_settings");
+console.log(data);
 if( data ) {
-    settings = data;
+    settings = JSON.parse(data);
     console.log("use stored settings");
 }
 else       console.log("Default settings used");
@@ -94,8 +95,11 @@ showScreen = function(screenName, param) {
             setupMapping(param);
             if (param === "main") {
                 uistate.session.start = new Date();
+                $("#audio")[0].src = "audio/" + settings.mainMappingAudio;
             }
-            $("#audio")[0].src = "audio/" + settings.mappingAudio[param];
+            else {
+                $("#audio")[0].src = "audio/" + settings.practiceMappingAudio;
+            }
             break;
         case "display-image":
             $("#display-image").css("background-image", "url(images/" + param + ")");
@@ -106,7 +110,11 @@ showScreen = function(screenName, param) {
        /* case "download-data": // TODO: fix!
             localStorage.getItem("mmetool");
             break;**/
+        case "settings":
+            $("#negarrows")[0].checked = settings.useNegativeArrows;
+            break;
         case "menu":
+            console.log("Menu");
             break;
         default:
             console.log("Name of screen unknown!");
@@ -732,13 +740,59 @@ window.onload = function() {
         //  download(data, "filename.csv", "text/csv");
         const selectedFile = document.getElementById('input').files[0];
         console.log(selectedFile);
-        download(data, "filename.csv", "application/octet-stream");
+    //    download(data, "filename.csv", "application/octet-stream");
         console.log("download clicked");
         // get data and download to csv
     });
     $("#btn-settings").on("click", function(a) {
         showScreen("settings", "");
     });
+    $("#btn-save-settings").on("click", function(a) { // on settings screen
+        saveSettings();
+        showScreen("menu", "");
+    });
+    $("#btn-cancel-settings").on("click", function(a) { // on settings screen
+        showScreen("menu", "");
+    });
     showScreen("menu", "");
 };
 
+saveSettings = function () {
+    var mediaList = [
+        {id: "#instructionvid",  setting: "instructionVideo"     },
+        {id: "#introductionvid", setting: "introductionVideo"    },
+        {id: "#thankyouimg",     setting: "thankYouImage"        },
+        {id: "#thankyouaud",     setting: "thankYouAudio"        },
+        {id: "#mappingaud",      setting: "mainMappingAudio"     },
+        {id: "#practiceaud",     setting: "practiceMappingAudio" },
+    ];
+
+    if ($("#negarrows")[0]) {
+        settings.useNegativeArrows = $("#negarrows")[0].checked;
+    }
+    console.log("neg arrows",$("#negarrows")[0].checked);
+
+    /*  console.log("save settings");
+     console.log($("#instructionvid")[0].value);
+     console.log($("#introductionvid")[0].value);*/
+
+    /*
+
+    console.log("testfile"); // Problem: fake path gets shown
+    console.log($("#test")[0]);
+    for (var item of mediaList) {
+        var mediaFile = $(item.id)[0].value;
+
+        if (mediaFile) {
+            settings[item.setting] = mediaFile;
+            console.log($(item.id)[0]);
+            console.log(mediaFile);
+        }
+
+    }*/
+
+
+    console.log("settings");
+    console.log(settings);
+    localStorage.setItem("mmetool_settings", JSON.stringify(settings));
+};

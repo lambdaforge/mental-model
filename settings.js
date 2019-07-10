@@ -20,7 +20,7 @@ defaultSettings = {
 	useNegativeArrows: true,
 
 	arrowHead: [20, 20],
-	arrowWeights: [3, 2, 1, -1, -2, -3],
+	arrowWeights: [3, 2, 1, -1, -2, -3], // choose (limited) amount?
 	arrowColor: { positive: "blue", negative: "red", neutral: "black" }, // use neutral? for 0? when not using neg?
 
 	factors: {
@@ -81,10 +81,8 @@ defaultSettings = {
 	instructionVideo: "instructions.mp4",
 	introductionVideo: "introduction.mp4",
 
-	mappingAudio: {
-		practice:  "practice.m4a",
-		main: "main.m4a",
-	},
+	practiceMappingAudio: "practice.m4a",
+	mainMappingAudio: "main.m4a",
 
 	thankYouImage: "thank_you.png",
 	thankYouAudio: "thank_you.m4a",

@@ -18,7 +18,8 @@
                     <table cellspacing="10">
                         <tr>
                             <td>Session:</td><td><input id="session" type="text" length="20"/></td>
-                        </tr><tr>
+                        </tr>
+                        <tr>
                             <td>Comment:</td><td><input id="comment" type="text" length="20"/></td>
                         </tr>
                     </table>
@@ -28,6 +29,7 @@
                     <button id="btn-instructions" type="button">Instructions</button>
                     <button id="btn-mapping" type="button">Mapping</button>
                     <button id="btn-data" type="button">Show Data</button>
+                    <button id="btn-settings" type="button">Settings</button>
                 </form>
             </div>
             <div id="display-video" class="screen">
@@ -40,6 +42,48 @@
             </div>
             <div id="show-data" class="screen">
                 <pre></pre>
+            </div>
+            <div id="settings" class="screen">
+                <h2><i>Settings</i></h2>
+                <form>
+                    <table cellspacing="10">
+                        <tr>
+                            <td><label for="test">Test:</label></td>
+                            <td><input id="test" type="file" size="50" accept="text/*"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="introductionvid">Introduction video:</label></td>
+                            <td><input id="introductionvid" type="file" size="50" accept="video/*"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="practiceaud">Practice audio:</label></td>
+                            <td><input id="practiceaud" type="file" size="50" accept="audio/*"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="instructionvid">Instruction video:</label></td>
+                            <td><input id="instructionvid" type="file" size="50" accept="video/*"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="mappingaud">Test:</label>Mapping audio:</td>
+                            <td><input id="mappingaud" type="file" size="50" accept="audio/*"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="thankyouaud">Thank you audio:</label></td>
+                            <td><input id="thankyouaud" type="file" size="50" accept="audio/*"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="thankyouimg">Thank you image:</label></td>
+                            <td><input id="thankyouimg" type="file" size="50" accept="image/*"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="negarrows">Add negative arrows?</label></td>
+                            <td><input id="negarrows" type="checkbox"></td>
+                        </tr>
+                    </table>
+                    <br>
+                    <button id="btn-save-settings" type="button">Apply</button>
+                    <button id="btn-cancel-settings" type="button">Cancel</button>
+                </form>
             </div>
         </div>
     </body>
