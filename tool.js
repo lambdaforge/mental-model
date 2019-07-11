@@ -29,7 +29,7 @@ var data = localStorage.getItem("mmetool_settings");
 //console.log(data);
 if( data ) {
     settings = JSON.parse(data);
-    console.log("use stored settings");
+    console.log("Use stored settings");
 }
 else       console.log("Default settings used");
 //console.log(settings);
@@ -78,6 +78,7 @@ resetUIstate = function() {
     removeHighlight();
     uistate.newArrow.state = "select-arrow";
     uistate.newArrow.weight = 0;
+    uistate.newArrow.startIcon = "";
     uistate.audioCue = false;
 };
 
@@ -101,15 +102,14 @@ showScreen = function(screenName, param) {
                 $("#audio")[0].src = "audio/" + settings.practiceMappingAudio;
             }
             break;
-        case "display-image":
-            $("#display-image").css("background-image", "url(images/" + param + ")");
+        case "thank-you":
+            var url = "images/" + settings.thankYouImage;
+            $("#thank-you").css("background-image", "url(" + url + ")");
+            $("#audio")[0].src = "audio/" + settings.thankYouAudio;
             break;
         case "show-data":
             $("#show-data pre").text(localStorage.getItem("mmetool"));
             break;
-       /* case "download-data": // TODO: fix!
-            localStorage.getItem("mmetool");
-            break;**/
         case "settings":
             $("#negarrows")[0].checked = settings.useNegativeArrows;
             break;
@@ -193,7 +193,7 @@ drawMenuArrow = function(arrowInd, arrowWeight, arrowMenu) {
 
     var icon = new fabric.Group([arrow, arrowBox]);
     icon.iconType = "button";
-    icon.iconName = "addconnection" + arrowWeight;
+    icon.iconName = "addConnection" + arrowWeight;
     icon.connectionWeight = arrowWeight;
     icon.selectable = false;
     icon.on("mousedown", function() {
@@ -221,6 +221,7 @@ drawMenuArrow = function(arrowInd, arrowWeight, arrowMenu) {
 drawArrowMenu = function() {
 
     // Only use negative arrows if specified in settings
+
     var arrows = settings.arrowWeights;
     if (!settings.useNegativeArrows) {
         console.log("no neg");
@@ -228,6 +229,8 @@ drawArrowMenu = function() {
             return value >= 0;
         });
     }
+
+    // Draw right side of canvas
 
     var rightSide = new fabric.Rect({
         top: 0,
@@ -237,6 +240,7 @@ drawArrowMenu = function() {
         fill: "#EAEAEA",
         selectable: false
     });
+
     var border = new fabric.Rect({
         top: 0,
         left: 1120,
@@ -247,6 +251,8 @@ drawArrowMenu = function() {
     });
     canvas.add(rightSide);
     canvas.add(border);
+
+    // Draw arrow area
 
     var arrowMenuBB = {
         left: 1150,
@@ -276,7 +282,7 @@ drawFactorIcon = function(iconName, xLeft, yTop, fixed) {
         icon.originX = "center";
         icon.originY = "middle";
         icon.on("mousedown", function() {
-            factorIconClick(this)
+            factorIconClick(this);
         });
         if (fixed) {
             icon.iconName = "fg:" + iconName;
@@ -289,7 +295,12 @@ drawFactorIcon = function(iconName, xLeft, yTop, fixed) {
                 repositionFactorIcon(this);
             });
             icon.on("moving", function(e) {
-                factorIconMoving(this);
+                if (icon.iconName === uistate.newArrow.startIcon) {
+                    undoArrowStartSelection();
+                }
+                else {
+                    factorIconMoving(this);
+                }
             });
         }
 
@@ -372,40 +383,62 @@ getFactorConnectionIcons = function(icon) {
 };
 
 
+undoArrowStartSelection = function() {
+    uistate.newArrow.state = "select-start";
+    uistate.newArrow.startIcon = "";
+    var arrow = getIconByName("addConnection" + uistate.newArrow.weight);
+    drawHighlight(arrow);
+};
+
+
+
 // Behaviour on icon click
 factorIconClick = function(icon) {
+    console.log("Clicked factor: " + icon.iconName);
     uistate.iconPositions = [
         [icon.left, icon.top]
     ];
 
     if (uistate.audioCue) {
+        console.log("Playing factor audio for: " + icon.iconName);
         $("audio")[0].src = "audio/factors/" + settings.factorMedia[icon.iconName]["audio"];
-        removeHighlight();
         drawHighlight(icon);
         setTimeout(function() {
             removeHighlight();
         }, 1000);
         uistate.audioCue = false;
-        return
+        return;
     }
 
-    switch (uistate.newArrow.state) {
-        case "select-arrow":
-            break;
-        case "select-start":
-            console.log("select start: " + icon.iconName);
-            uistate.newArrow.state = "select-end";
-            uistate.newArrow.startIcon = icon.iconName;
-            drawHighlight(icon);
-            break;
-        case "select-end":
-            console.log("create connection from " + uistate.newArrow.startIcon + " to " + icon.iconName);
-            drawConnection(uistate.newArrow.startIcon, icon.iconName, uistate.newArrow.weight);
-            resetUIstate();
-            break;
-        default:
-            console.log("Connection state is unknown");
-            break;
+    if (icon.left > settings.mappingArea.left2 ) {
+        console.log("Factor is on canvas");
+        switch (uistate.newArrow.state) {
+            case "select-arrow":
+                break;
+            case "select-start":
+                console.log("select start: " + icon.iconName);
+                uistate.newArrow.state = "select-end";
+                uistate.newArrow.startIcon = icon.iconName;
+                drawHighlight(icon);
+                break;
+            case "select-end":
+                if (uistate.newArrow.startIcon === icon.iconName) {
+                    console.log("Undo start selection");
+                    undoArrowStartSelection();
+                }
+                else {
+                    console.log("create connection from " + uistate.newArrow.startIcon + " to " + icon.iconName);
+                    drawConnection(uistate.newArrow.startIcon, icon.iconName, uistate.newArrow.weight);
+                    resetUIstate();
+                }
+                break;
+            default:
+                console.log("Connection state is unknown");
+                break;
+        }
+    }
+    else {
+        console.log("Factor is not on canvas");
     }
 };
 
@@ -435,6 +468,7 @@ iconPassOverDistance = function(icon) {
 
 // Behaviour when icon is moved
 factorIconMoving = function(icon) {
+
     uistate.moving = icon.iconName;
     uistate.iconPositions.push([icon.left, icon.top]); // save position (of mouse? not after passOvercheck?) for repositioning later
 
@@ -485,24 +519,24 @@ drawConnection = function(startIconName, endIconName, weight) {
     if (startIconName !== endIconName) {
         var style = arrowStyle(weight);
 
-        var a = getIconAnchor(startIconName);
-        var f = getIconAnchor(endIconName);
+        var startPos = getIconAnchor(startIconName);
+        var endPos = getIconAnchor(endIconName);
 
-        var p = getDirv(a, f);
-        var n = getDist(a, f);
+        var dirVec = getDirv(startPos, endPos);
+        var distance = getDist(startPos, endPos);
 
-        if (n > settings.minIconDistance + settings.arrowMargin) {
+        if (distance > settings.minIconDistance + settings.arrowMargin) {
             var g = settings.iconSize / 2 + settings.arrowMargin;
         } else {
-            var g = (n / 2 - 10)
+            var g = (distance / 2 - 10)
         }
         var leftAnchor = {
-            x: a.x + g * p.x,
-            y: a.y + g * p.y + settings.arrowHead[0] / 2
+            x: startPos.x + g * dirVec.x,
+            y: startPos.y + g * dirVec.y + settings.arrowHead[0] / 2
         };
         var e = {
-            x: f.x - g * p.x,
-            y: f.y - g * p.y + settings.arrowHead[0] / 2
+            x: endPos.x - g * dirVec.x,
+            y: endPos.y - g * dirVec.y + settings.arrowHead[0] / 2
         };
         var c = getDist(leftAnchor, e);
         c = c < 20 ? 20 : c;
@@ -514,7 +548,7 @@ drawConnection = function(startIconName, endIconName, weight) {
         var arrowOutline = arrowPath(leftAnchor, rightAnchor, style.lineWidth);
         var arrow = new fabric.Polygon(arrowOutline, { fill: style.color });
         arrow.centeredRotation = false;
-        arrow.rotate(180 * Math.atan2(p.y, p.x) / Math.PI);
+        arrow.rotate(180 * Math.atan2(dirVec.y, dirVec.x) / Math.PI);
         arrow.borderColor = "transparent";
         arrow.hasControls = false;
         arrow.movable = true;
@@ -583,22 +617,23 @@ setupMapping = function(type) {
     setupSelection(dynamicFactors);
     drawArrowMenu();
 
-    // Setup menu buttons
+    // Setup "question" button
 
     drawButton("question", 100, 700, function() {
+        resetUIstate();
         uistate.audioCue = true;
         var questionIcon = getIconByName("question");
         drawHighlight(questionIcon);
     });
 
+    // Setup "next" button
     drawButton("next", 1170, 700, function() {
         if (type === "practice") {
             if (practiceSolutionCorrect()) {
                 showScreen("display-video", settings.instructionVideo);
             }
         } else {
-            showScreen("display-image", settings.thankYouImage);
-            $("#audio")[0].src = "audio/" + settings.thankYouAudio;
+            showScreen("thank-you", "");
             saveResult();
         }
     });
@@ -699,6 +734,21 @@ arrowPath = function(leftAnchor, rightAnchor, lineWidth) {
     return [m, l, k, h, g, e, d]
 };
 
+// Download data, as defined in browser
+downloadData = function() {
+    var csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += localStorage.getItem("mmetool");
+
+    console.log("download clicked");
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "mmetool_data.csv");
+    document.body.appendChild(link); // Required for firefox
+
+    link.click();
+
+};
 
 // Behaviour on startUp
 window.onload = function() {
@@ -709,9 +759,9 @@ window.onload = function() {
     $("body").on("click", function(a) { // changed
         if (settings.fullScreen) {
             var screen = document.getElementById("mme-tool").children[0]; // correct????
-            if (screen.webkitRequestFullscreen) { // TODO: fix
+        /*    if (screen.webkitRequestFullscreen) { // TODO: fix
                 screen.webkitRequestFullscreen();
-            }
+            }*/
         }
     });
     $("#audio").on("loadeddata", function(a) {
@@ -720,45 +770,34 @@ window.onload = function() {
     $("#video").on("ended", function(a) { // ?????
         showScreen("mapping-task", a.target.currentSrc.indexOf("introduction") !== -1 ? "practice" : "main");
     });
-    $("#btn-introduction").on("click", function(a) {
+    $("#btn-introduction").on("click", function() {
         showScreen("display-video", settings.introductionVideo);
     });
-    $("#btn-practice").on("click", function(a) {
+    $("#btn-practice").on("click", function() {
         showScreen("mapping-task", "practice")
     });
-    $("#btn-instructions").on("click", function(a) {
+    $("#btn-instructions").on("click", function() {
         showScreen("display-video", settings.instructionVideo);
     });
-    $("#btn-mapping").on("click", function(a) {
+    $("#btn-mapping").on("click", function() {
         uistate.sessionName = $("#session")[0].value;
         uistate.sessionComment = $("#comment")[0].value;
         showScreen("mapping-task", "main");
     });
-    $("#btn-data").on("click", function(a) {
+    $("#btn-data").on("click", function() {
         showScreen("show-data", "");
     });
-    $("#btn-download").on("click", function(a) { // TODO: fix
-        var csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += localStorage.getItem("mmetool");
-
-        console.log("download clicked");
-        var encodedUri = encodeURI(csvContent);
-        var link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "mmetool_data.csv");
-        document.body.appendChild(link); // Required for FF
-
-        link.click();
-
+    $("#btn-download").on("click", function() {
+        downloadData();
     });
-    $("#btn-settings").on("click", function(a) {
+    $("#btn-settings").on("click", function() {
         showScreen("settings", "");
     });
-    $("#btn-save-settings").on("click", function(a) { // on settings screen
+    $("#btn-save-settings").on("click", function() { // on settings screen
         saveSettings();
         showScreen("menu", "");
     });
-    $("#btn-cancel-settings").on("click", function(a) { // on settings screen
+    $("#btn-cancel-settings").on("click", function() { // on settings screen
         showScreen("menu", "");
     });
     showScreen("menu", "");

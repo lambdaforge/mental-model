@@ -16,7 +16,6 @@ defaultSettings = {
 	},
 
 	audioBlock: true,
-
 	useNegativeArrows: true,
 
 	arrowHead: [20, 20],
@@ -81,11 +80,13 @@ defaultSettings = {
 	instructionVideo: "instructions.mp4",
 	introductionVideo: "introduction.mp4",
 
-	practiceMappingAudio: "practice.m4a",
+	//practiceMappingAudio: "practice.m4a",
+	practiceMappingAudio: "",
 	//mainMappingAudio: "main.m4a",
 	mainMappingAudio: "",
 
 	thankYouImage: "thank_you.png",
-	thankYouAudio: "thank_you.m4a",
+//	thankYouAudio: "thank_you.m4a",
+	thankYouAudio: "",
 
 };
