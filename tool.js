@@ -114,7 +114,6 @@ showScreen = function(screenName, param) {
             $("#negarrows")[0].checked = settings.useNegativeArrows;
             break;
         case "menu":
-          //  console.log("Menu");
             break;
         default:
             console.log("Name of screen unknown!");
@@ -399,7 +398,7 @@ factorIconClick = function(icon) {
         [icon.left, icon.top]
     ];
 
-    if (uistate.audioCue) {
+    if (uistate.audioCue) { // when question mark clicked
         console.log("Playing factor audio for: " + icon.iconName);
         $("audio")[0].src = "audio/factors/" + settings.factorMedia[icon.iconName]["audio"];
         drawHighlight(icon);
@@ -783,6 +782,9 @@ window.onload = function() {
         uistate.sessionName = $("#session")[0].value;
         uistate.sessionComment = $("#comment")[0].value;
         showScreen("mapping-task", "main");
+    });
+    $("#btn-ty-back").on("click", function() { // on thank you screen
+        showScreen("mapping-task", "");
     });
     $("#btn-data").on("click", function() {
         showScreen("show-data", "");
