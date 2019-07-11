@@ -82,7 +82,8 @@ defaultSettings = {
 	introductionVideo: "introduction.mp4",
 
 	practiceMappingAudio: "practice.m4a",
-	mainMappingAudio: "main.m4a",
+	//mainMappingAudio: "main.m4a",
+	mainMappingAudio: "",
 
 	thankYouImage: "thank_you.png",
 	thankYouAudio: "thank_you.m4a",

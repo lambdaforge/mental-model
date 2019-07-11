@@ -26,13 +26,13 @@ var canvas = null;
 // Load saved settings or use defaults
 settings = defaultSettings; // settings needs to be global
 var data = localStorage.getItem("mmetool_settings");
-console.log(data);
+//console.log(data);
 if( data ) {
     settings = JSON.parse(data);
     console.log("use stored settings");
 }
 else       console.log("Default settings used");
-console.log(settings);
+//console.log(settings);
 
 
 // Compares practice solution with drawn diagram
@@ -220,14 +220,16 @@ drawMenuArrow = function(arrowInd, arrowWeight, arrowMenu) {
 // Draw Arrow selection on right side of canvas
 drawArrowMenu = function() {
 
+    // Only use negative arrows if specified in settings
     var arrows = settings.arrowWeights;
-    if (!uistate.useNegativeArrows) {
+    if (!settings.useNegativeArrows) {
+        console.log("no neg");
         arrows = settings.arrowWeights.filter(function(value) {
             return value >= 0;
         });
     }
 
-    var k = new fabric.Rect({
+    var rightSide = new fabric.Rect({
         top: 0,
         left: 1121,
         width: 259,
@@ -243,13 +245,13 @@ drawArrowMenu = function() {
         fill: "#AAAAAA",
         selectable: false
     });
-    canvas.add(k);
+    canvas.add(rightSide);
     canvas.add(border);
 
     var arrowMenuBB = {
         left: 1150,
         right: 1250,
-        spacing: arrows.length < 4 ? 100 : (300 / arrows.length)
+        spacing: arrows.length < 6 ? 100 : (500 / arrows.length)
     };
 
     arrowMenuBB.height = arrowMenuBB.spacing * ( arrows.length - 1) + settings.arrowHead[0];
