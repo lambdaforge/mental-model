@@ -1,26 +1,100 @@
 package com.example.mmeandroid
 
-import android.app.DownloadManager
-import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.net.Uri
 import android.os.Environment
 import android.webkit.*
 import androidx.appcompat.app.AlertDialog
-import android.content.Intent
 import android.media.MediaScannerConnection
-import android.provider.OpenableColumns
 import android.util.Log
-import android.webkit.DownloadListener
-import androidx.core.content.ContextCompat.getSystemService
-import android.media.MediaScannerConnection.OnScanCompletedListener
 import java.io.*
 
 
 class MainActivity : AppCompatActivity() {
-    fun isExternalStorageWritable(): Boolean {
+    private fun isExternalStorageWritable(): Boolean {
         return Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
+    }
+
+    private fun copyAssetsTo(assetPath: String, targetDir: String) {
+        val assetManager = this.assets
+        var assets: Array<String>? = null
+        try {
+            assets = assetManager.list(assetPath)
+            if (assets!!.isEmpty()) {
+                copyFile(assetPath, targetDir)
+            } else {
+                val fullPath = "$targetDir/$assetPath"
+                val dir = File(fullPath)
+                if (!dir.exists())
+                    dir.mkdir()
+                for (i in assets.indices) {
+                    copyAssetsTo(assetPath + "/" + assets[i], targetDir)
+                }
+            }
+        } catch (ex: IOException) {
+            Log.e("tag", "I/O Exception", ex)
+        }
+
+    }
+
+    private fun copyFile(filename: String, targetDir: String) {
+        val assetManager = this.assets
+
+        var inStream: InputStream? = null
+        var outStream: OutputStream? = null
+        try {
+            inStream = assetManager.open(filename)
+            val newFileName =  "$targetDir/$filename"
+            outStream = FileOutputStream(newFileName)
+
+            val buffer = ByteArray(1024)
+            var read: Int
+            while (true) {
+                val bf = inStream.read(buffer)
+                if (bf == -1) break
+                outStream.write(buffer, 0, bf)
+            }
+            inStream.close()
+            outStream.flush()
+            outStream.close()
+        } catch (e: Exception) {
+            Log.e("tag", e.message)
+        }
+
+    }
+
+    @Throws(IOException::class)
+    private fun copyFile(inStream: InputStream, out: OutputStream) {
+        val buffer = ByteArray(1024)
+        while (true) {
+            val read = inStream.read(buffer)
+            if (read == -1) break
+            out.write(buffer, 0, read)
+        }
+    }
+
+    private fun readFile(fileName: String): String {
+        val fileContent = StringBuffer("")
+        val fis: FileInputStream
+        try {
+            Log.i("rf", fileName)
+            fis = FileInputStream(fileName)
+            try {
+                while (true) {
+                    val ch = fis.read()
+                    if (ch == -1) break
+                    fileContent.append(ch.toChar())
+                }
+
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        }
+
+        return String(fileContent)
     }
 
 
@@ -37,9 +111,14 @@ class MainActivity : AppCompatActivity() {
         webView.settings.allowFileAccess = true
 
         webView.webViewClient = WebViewClient()
-        webView.loadUrl("file:///android_asset/index.html")
 
-        webView.setDownloadListener { url, _, _, _, cLength -> // Check if working in actual app
+
+        val dir = this.filesDir.absolutePath
+        copyAssetsTo("www", dir)
+
+        webView.loadUrl("file:$dir/www/index.html")
+
+        webView.setDownloadListener { url, _, _, _, _ -> // Check if working in actual app
 
             val filename = "mmetool_data.csv"
             val builder = AlertDialog.Builder(this@MainActivity)
