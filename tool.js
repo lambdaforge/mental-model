@@ -1,10 +1,8 @@
 uistate = {
 
-    iconPositions: [],
-    highlight: "",
-    audioCue: false,
-    blockUI: false,
-    mousePosition: [],
+    mapping: "main", // "main" or "practice"
+ //   current: "main", // introduction, practice, instructions, mapping, show-data, setings
+    video: "", // "introduction", "instructions"
 
     session: {
         start: null,
@@ -12,12 +10,28 @@ uistate = {
         comment: ""
     },
 
+    // Canvas state, adjust on startup
+    height: 800,
+    width: 1280,
+    availableHeight: 600, // (- 200)for arrow and factor selection
+ //   availableWidth: 734, // on mapping area (-546)
+    yCenter: 400,
+    maxFactors: 15,
+
+    xFixedFactor: 1000,
+    yFixedFactor: { main: 400, practice: 600 },
+
+
     newArrow: {
         state: "select-arrow", // select-start, select-end
         startIcon: "",
         weight: 0
     },
 
+    iconPositions: [],
+    highlight: "",
+    audioCue: false,
+    blockUI: false
 
 };
 
@@ -49,14 +63,14 @@ practiceSolutionCorrect = function() {
 drawHighlight = function(icon) {
     removeHighlight();
     var b = icon.getBoundingRect();
-    var d = 10;
+    var d = canvasStyle.highlightMargin;
     var a = new fabric.Rect({
         top: b.top - d / 2,
         left: b.left - d / 2,
         width: b.width + d,
         height: b.height + d,
         selectable: false,
-        fill: settings.highlightColor
+        fill: canvasStyle.highlightColor
     });
     a.iconName = "highlight";
     canvas.add(a);
@@ -67,7 +81,7 @@ drawHighlight = function(icon) {
 
 // Remove bounding box from icon
 removeHighlight = function() {
-    var icon = getIconByName("highlight"); // only call "highlight?"
+    var icon = getIconByName("highlight");
     canvas.remove(icon);
     uistate.highlight = "none";
 };
@@ -84,22 +98,25 @@ resetUIstate = function() {
 
 
 // Choose shown screen
-showScreen = function(screenName, param) {
+showScreen = function(screenName) {
     $(".screen").hide();
-    $("#" + screenName).show();
+    var screen = $("#" + screenName)
+    screen.show();
 
     switch (screenName) {
         case "display-video":
-            $("#video")[0].src = "video/" + param;
+            if(uistate.video === "introduction")
+                $("#video")[0].src = "video/" + settings.introductionVideo;
+            else
+                $("#video")[0].src = "video/" + settings.instructionVideo;
             break;
         case "mapping-task":
-            setupMapping(param);
-            if (param === "main") {
+            setupMapping();
+            if (uistate.mapping === "practice")
+                $("#audio")[0].src = "audio/" + settings.practiceMappingAudio;
+            else {
                 uistate.session.start = new Date();
                 $("#audio")[0].src = "audio/" + settings.mainMappingAudio;
-            }
-            else {
-                $("#audio")[0].src = "audio/" + settings.practiceMappingAudio;
             }
             break;
         case "thank-you":
@@ -147,6 +164,8 @@ saveResult = function() {
 // Add button
 drawButton = function(name, xLeft, yTop, onmousedown) {
     fabric.Image.fromURL("buttons/" + name + ".png", function(icon) {
+        icon.scaleToHeight(canvasStyle.buttonSize);
+        icon.scaleToWidth(canvasStyle.buttonSize);
         icon.top = yTop;
         icon.left = xLeft;
         icon.selectable = false;
@@ -160,7 +179,8 @@ drawButton = function(name, xLeft, yTop, onmousedown) {
 
 // Get color and line width from arrow weight
 arrowStyle = function(arrowWeight) {
-    var width = Math.floor(Math.abs(arrowWeight)*2.5);
+    var factor = canvasStyle.arrowWeightLinewidthFactor;
+    var width = Math.floor(Math.abs(arrowWeight)*factor);
     var cChoice = settings.arrowColor;
     var color =  arrowWeight < 0 ? cChoice.negative : cChoice.positive;
     return {"color": color, "lineWidth": width}
@@ -172,25 +192,27 @@ drawMenuArrow = function(arrowInd, arrowWeight, arrowMenu) {
 
     var style = arrowStyle(arrowWeight);
 
-    var yPos = arrowMenu.top + arrowInd * arrowMenu.spacing;
+    var xCenter = arrowMenu.left + (arrowMenu.right - arrowMenu.left) / 2 ;
+    var yCenter = arrowMenu.top + (arrowInd + 0.5) * arrowMenu.spacing;
 
-    var leftTop = { x: arrowMenu.left, y: yPos };
-    var rightTop = { x: arrowMenu.right, y: yPos };
+    var left = { x: arrowMenu.left, y: yCenter };
+    var right = { x: arrowMenu.right, y: yCenter };
 
-    var arrowOutline = arrowPath(leftTop, rightTop, style.lineWidth);
+    var arrowOutline = arrowPath(left, right, style.lineWidth);
     var arrowAttributes =  { fill: style.color, originY: "center" };
 
     var arrow = new fabric.Polygon(arrowOutline, arrowAttributes);
-    var arrowBox = new fabric.Rect({
-        top: arrowMenu.top + arrowInd * arrowMenu.spacing - 36,
-        left: 1140,
-        width: 120,
-        height: 50,
+    var arrowButton = new fabric.Rect({
+       // top: arrowMenu.top + arrowInd * arrowMenu.spacing - 36,
+        top: yCenter -  canvasStyle.arrowButtonHeight / 2,
+        left: xCenter - canvasStyle.arrowButtonWidth / 2,
+        width: canvasStyle.arrowButtonWidth,
+        height: canvasStyle.arrowButtonHeight,
         stroke: "transparent",
         fill: "transparent"
     });
 
-    var icon = new fabric.Group([arrow, arrowBox]);
+    var icon = new fabric.Group([arrow, arrowButton]);
     icon.iconType = "button";
     icon.iconName = "addConnection" + arrowWeight;
     icon.connectionWeight = arrowWeight;
@@ -217,50 +239,32 @@ drawMenuArrow = function(arrowInd, arrowWeight, arrowMenu) {
 
 
 // Draw Arrow selection on right side of canvas
-drawArrowMenu = function() {
+setupArrows = function() {
 
     // Only use negative arrows if specified in settings
 
     var arrows = settings.arrowWeights;
     if (!settings.useNegativeArrows) {
-        console.log("no neg");
         arrows = settings.arrowWeights.filter(function(value) {
             return value >= 0;
         });
     }
 
-    // Draw right side of canvas
-
-    var rightSide = new fabric.Rect({
-        top: 0,
-        left: 1121,
-        width: 259,
-        height: 800,
-        fill: "#EAEAEA",
-        selectable: false
-    });
-
-    var border = new fabric.Rect({
-        top: 0,
-        left: 1120,
-        width: 1,
-        height: 800,
-        fill: "#AAAAAA",
-        selectable: false
-    });
-    canvas.add(rightSide);
-    canvas.add(border);
-
     // Draw arrow area
 
+    var maxSpace = canvasStyle.arrowMaxVertSpacing;
     var arrowMenuBB = {
-        left: 1150,
-        right: 1250,
-        spacing: arrows.length < 6 ? 100 : (500 / arrows.length)
+        right:  uistate.width - canvasStyle.arrowSideSpacing,
+        width: canvasStyle.rightSideWidth - 2*canvasStyle.arrowSideSpacing,
+      //  spacing: arrows.length < 6 ? 100 : (500 / arrows.length)
+        spacing: Math.min((maxSpace, uistate.availableHeight / arrows.length))
     };
 
-    arrowMenuBB.height = arrowMenuBB.spacing * ( arrows.length - 1) + settings.arrowHead[0];
-    arrowMenuBB.top = (420 - arrowMenuBB.height / 2);
+   // arrowMenuBB.height = arrowMenuBB.spacing * ( arrows.length - 1) + settings.arrowHead[0];
+    arrowMenuBB.height = arrowMenuBB.spacing * arrows.length;
+    arrowMenuBB.left = arrowMenuBB.right - arrowMenuBB.width;
+    //arrowMenuBB.top = (420 - arrowMenuBB.height / 2);
+    arrowMenuBB.top = uistate.yCenter - arrowMenuBB.height / 2;
 
     for (var arrowInd = 0; arrowInd < arrows.length; arrowInd++) {
         drawMenuArrow(arrowInd, arrows[arrowInd], arrowMenuBB);
@@ -270,9 +274,10 @@ drawArrowMenu = function() {
 
 // Draw icon on canvas
 drawFactorIcon = function(iconName, xLeft, yTop, fixed) {
-    var factorImage = "images/factors/" + settings.factorMedia[iconName]["img"];
+    //var factorImage = "images/factors/" + settings.factorMedia[iconName]["img"];
+    var factorImage = "images/" + settings.factorMedia[iconName]["img"];
     fabric.Image.fromURL( factorImage, function(icon) {
-        icon.scale(settings.iconSize / (icon.height > icon.width ? icon.height : icon.width));
+        icon.scale(settings.iconSize / (icon.height > icon.width ? icon.height : icon.width)); // scaling already working!! check if float division!
         icon.hasControls = false;
         icon.borderColor = "transparent";
         icon.top = yTop;
@@ -312,16 +317,16 @@ drawFactorIcon = function(iconName, xLeft, yTop, fixed) {
 belowMinimumDistance = function(icon) {
     var factors = getIconsOfType("factor");
 
-    var selectionBorder = settings.mappingArea.left2;
+    var selectionBorder = canvasStyle.leftSideWidth;
     for (var factor of factors) {
 
         if ( icon.iconName !== factor.iconName ) {
             var distance = getDist(icon, factor);
             if (icon.left > selectionBorder && factor.left > selectionBorder) { // both icons on canvas
-                if (distance < settings.minIconDistance) return true;
+                if (distance < canvasStyle.minIconDistance) return true;
             } else {
                 if (icon.left <= selectionBorder && factor.left < selectionBorder) { // both in selection
-                    if (distance < settings.iconSize) return true;
+                    if (distance < canvasStyle.iconSize) return true;
                 }
             }
         }
@@ -409,7 +414,7 @@ factorIconClick = function(icon) {
         return;
     }
 
-    if (icon.left > settings.mappingArea.left2 ) {
+    if (icon.left > canvasStyle.leftSideWidth ) {
         console.log("Factor is on canvas");
         switch (uistate.newArrow.state) {
             case "select-arrow":
@@ -449,12 +454,11 @@ iconPassOverDistance = function(icon) {
     var offset = settings.iconSize / 2;
     var hasConnection = getFactorConnectionIcons(icon).length > 0;
 
-    var bottomLimit = settings.mappingArea.bottom - offset;
-    var topLimit    = settings.mappingArea.top    + offset;
-    var rightLimit  = settings.mappingArea.right  - offset;
+    var bottomLimit = uistate.height - offset;
+    var topLimit    = offset;
+    var rightLimit  = uistate.width - canvasStyle.rightSideWidth - offset;
     var leftLimit   = offset;
-    if (hasConnection) leftLimit +=  settings.mappingArea.left2;
-    else               leftLimit +=  settings.mappingArea.left1;
+    if (hasConnection) leftLimit +=  canvasStyle.leftSideWidth;
 
     if      (icon.left < leftLimit)   passOver.left = icon.left - leftLimit;
     else if (icon.left > rightLimit)  passOver.left = icon.left - rightLimit;
@@ -524,18 +528,18 @@ drawConnection = function(startIconName, endIconName, weight) {
         var dirVec = getDirv(startPos, endPos);
         var distance = getDist(startPos, endPos);
 
-        if (distance > settings.minIconDistance + settings.arrowMargin) {
-            var g = settings.iconSize / 2 + settings.arrowMargin;
+        if (distance > settings.minIconDistance + canvasStyle.arrowMargin) {
+            var d = settings.iconSize / 2 + canvasStyle.arrowMargin;
         } else {
-            var g = (distance / 2 - 10)
+            var d = (distance / 2 - 10);
         }
         var leftAnchor = {
-            x: startPos.x + g * dirVec.x,
-            y: startPos.y + g * dirVec.y + settings.arrowHead[0] / 2
+            x: startPos.x + d * dirVec.x,
+            y: startPos.y + d * dirVec.y + canvasStyle.arrowHead / 2
         };
         var e = {
-            x: endPos.x - g * dirVec.x,
-            y: endPos.y - g * dirVec.y + settings.arrowHead[0] / 2
+            x: endPos.x - d * dirVec.x,
+            y: endPos.y - d * dirVec.y + canvasStyle.arrowHead / 2
         };
         var c = getDist(leftAnchor, e);
         c = c < 20 ? 20 : c;
@@ -555,8 +559,9 @@ drawConnection = function(startIconName, endIconName, weight) {
         arrow.iconName = startIconName + "-" + endIconName;
         arrow.connectionWeight = weight;
         arrow.on("mouseup", function() {
-            // if right of mapping area
-            if (arrow.oCoords.mr.x > settings.mappingArea.right + 10 || arrow.oCoords.ml.x > settings.mappingArea.right + 10) {
+            // if right of mapping area remove arrow
+            var rightLimit = uistate.width - canvasStyle.leftSideWidth + canvasStyle.arrowDeletionToleranceMargin;
+            if (arrow.oCoords.mr.x > rightLimit || arrow.oCoords.ml.x > rightLimit) {
                 canvas.remove(arrow);
             } else {
                 canvas.remove(arrow);
@@ -568,57 +573,89 @@ drawConnection = function(startIconName, endIconName, weight) {
 };
 
 
-// Layout of factor menu on left side of screen
-setupSelection = function(factors) {
-    var factorMenu = new fabric.Rect({
+// Divide canvas into 3 areas
+divideCanvas = function() {
+    var leftSide = new fabric.Rect({
         top: 0,
         left: 0,
-        width: 285,
-        height: 800,
+        width: canvasStyle.leftSideWidth,
+        height: uistate.height,
         fill: "#EAEAEA",
         selectable: false
     });
-    var border = new fabric.Rect({
+    var leftBorder = new fabric.Rect({
         top: 0,
-        left: 285,
-        width: 1,
-        height: 800,
+        left: canvasStyle.leftSideWidth,
+        width: canvasStyle.borderWidth,
+        height: uistate.height,
         fill: "#BBBBBB",
         selectable: false
     });
-    canvas.add(factorMenu);
-    canvas.add(border);
+    var rightSide = new fabric.Rect({
+        top: 0,
+        left: uistate.width - canvasStyle.rightSideWidth,
+        width: canvasStyle.rightSideWidth,
+        height: uistate.height,
+        fill: "#EAEAEA",
+        selectable: false
+    });
+    var rightBorder = new fabric.Rect({
+        top: 0,
+        left: uistate.width - canvasStyle.rightSideWidth - canvasStyle.borderWidth,
+        width: canvasStyle.borderWidth,
+        height: uistate.height,
+        fill: "#AAAAAA",
+        selectable: false
+    });
 
-    var c = Math.ceil(factors.length / 5);
+    canvas.add(rightSide);
+    canvas.add(rightBorder);
+    canvas.add(leftSide);
+    canvas.add(leftBorder);
+};
+
+
+// Layout of factor menu on left side of screen
+setupFactorMenu = function(factors) {
+
+    var nCols = canvasStyle.factorsPerRow;
+    var nRows = Math.ceil(factors.length / nCols);
+    var horIconSpace = nCols * canvasStyle.iconSize + canvasStyle.factorXPadding * (nCols - 1);
+    var vertIconSpace = nRows * canvasStyle.iconSize + canvasStyle.factorYPadding * (nRows - 1);
+    var xOffset = (canvasStyle.leftSideWidth - horIconSpace)/2;
+    var yOffset = canvasStyle.buttonSize + (uistate.availableHeight - vertIconSpace)/2;
+    console.log( xOffset);
+    console.log(yOffset);
     for (var factorInd = 0; factorInd < factors.length; factorInd++) {
-        var xLeft = (5 + ((4 - c) * settings.iconSize / 2)) + ((10 + settings.iconSize) * (factorInd % c));
-        var yTop = (100 + settings.iconSize / 2) + ((30 + settings.iconSize) * Math.floor(factorInd / c));
+        var col = factorInd % nCols;
+        var row = Math.floor(factorInd / nCols);
+    //    var xLeft = (5 + ((4 - c) * settings.iconSize / 2)) + ((10 + settings.iconSize) * col);
+        var xLeft = xOffset + ((canvasStyle.factorXPadding + canvasStyle.iconSize) * col) + canvasStyle.iconSize/2;
+      //  var yTop = (100 + settings.iconSize / 2) + ((30 + settings.iconSize) * row);
+        var yTop = yOffset + (canvasStyle.factorYPadding + canvasStyle.iconSize) * row + canvasStyle.iconSize/2;
         drawFactorIcon(factors[factorInd], xLeft, yTop, false);
     }
 };
 
 
 // Layout and behaviour of drawing screen
-setupMapping = function(type) {
-    console.log("Setting up: " + type);
+setupMapping = function() {
+    console.log("Setting up: " + uistate.mapping);
 
-    var factors =  settings.factors[type];
-
+    var factors =  settings.factors[uistate.mapping];
     var dynamicFactors = factors["dynamic"];
     var fixedFactor = factors["fixed"];
-    var ffpos = factors["fixedPos"];
 
     canvas.clear();
 
-    // Set up icons and arrows
-
-    drawFactorIcon(fixedFactor, ffpos.xLeft, ffpos.yTop, true);
-    setupSelection(dynamicFactors);
-    drawArrowMenu();
+    // Set up arrows and factors
+    divideCanvas();
+    setupArrows();
+    setupFactorMenu(dynamicFactors);
+    drawFactorIcon(fixedFactor, uistate.xFixedFactor,  uistate.yFixedFactor[uistate.mapping], true);
 
     // Setup "question" button
-
-    drawButton("question", 100, 700, function() {
+    drawButton("question", 100, uistate.height - canvasStyle.buttonSize , function() {
         resetUIstate();
         uistate.audioCue = true;
         var questionIcon = getIconByName("question");
@@ -626,40 +663,32 @@ setupMapping = function(type) {
     });
 
     // Setup "next" button
-    drawButton("next", 1170, 700, function() {
-        if (type === "practice") {
+    drawButton("next", uistate.width - 110, uistate.height - canvasStyle.buttonSize, function() {
+        if (uistate.mapping === "practice") {
             if (practiceSolutionCorrect()) {
-                showScreen("display-video", settings.instructionVideo);
+                uistate.video = "instructions"
+                showScreen("display-video");
             }
         } else {
-            showScreen("thank-you", "");
+            showScreen("thank-you");
             saveResult();
         }
     });
 
-    if (type === "practice") {
+
+    if (uistate.mapping === "practice") {
         fabric.Image.fromURL("images/" + settings.solutionImage, function(image) {
             image.scale(0.2);
-            image.top = 10;
+         //   image.top = 10;
+            image.top = uistate.height/4 - 170; // 170 is image height now
             image.originX = "right";
-            image.left = 1110;
+            image.left = uistate.width - canvasStyle.rightSideWidth;
             image.selectable = false;
             image.opacity = 0.5;
             canvas.add(image)
         })
     }
 };
-
-/*
-function download(content, filename, contentType) // TODO: rewrite
-{
-    if(!contentType) contentType = 'application/octet-stream';
-    var a = document.createElement('a');
-    var blob = new Blob([content], {'type':contentType});
-    a.href = window.URL.createObjectURL(blob);
-    a.download = filename;
-    a.click();
-}*/
 
 // Get Euclidean distance of two vectors
 getDist = function(d, c) {
@@ -700,43 +729,46 @@ getOrtho = function(d, c) {
 // Calculate vertices for arrow path
 arrowPath = function(leftAnchor, rightAnchor, lineWidth) {
 
-    var o = settings.arrowHead[0];
-    var c = settings.arrowHead[1];
+    var headSize = canvasStyle.arrowHead;
+    var dLR = getDirv(leftAnchor, rightAnchor);
+    var dTB = getOrtho(leftAnchor, rightAnchor);
 
-    var n = getDirv(leftAnchor, rightAnchor);
-    var j = getOrtho(leftAnchor, rightAnchor);
-    var m = rightAnchor;
-    var l = {
-        x: rightAnchor.x - n.x * c / 2 + j.x * o / 2,
-        y: rightAnchor.y - n.y * c / 2 + j.y * o / 2
+    var arrowTip = rightAnchor;
+    var headB = {
+        x: rightAnchor.x + dTB.x * headSize / 2  - dLR.x * headSize / 2,
+        y: rightAnchor.y + dTB.y * headSize / 2  - dLR.y * headSize / 2
     };
-    var d = {
-        x: rightAnchor.x - n.x * c / 2 - j.x * o / 2,
-        y: rightAnchor.y - n.y * c / 2 - j.y * o / 2
+    var headT = {
+        x: rightAnchor.x - dTB.x * headSize / 2  - dLR.x * headSize / 2,
+        y: rightAnchor.y - dTB.y * headSize / 2  - dLR.y * headSize / 2
     };
-    var k = {
-        x: rightAnchor.x - n.x * c / 2 + j.x * lineWidth / 2,
-        y: rightAnchor.y - n.y * c / 2 + j.y * lineWidth / 2
+    var br = {
+        x: rightAnchor.x + dTB.x * lineWidth / 2 - dLR.x * headSize / 2,
+        y: rightAnchor.y + dTB.y * lineWidth / 2 - dLR.y * headSize / 2
     };
-    var e = {
-        x: rightAnchor.x - n.x * c / 2 - j.x * lineWidth / 2,
-        y: rightAnchor.y - n.y * c / 2 - j.y * lineWidth / 2
+    var tr = {
+        x: rightAnchor.x - dTB.x * lineWidth / 2 - dLR.x * headSize / 2,
+        y: rightAnchor.y - dTB.y * lineWidth / 2 - dLR.y * headSize / 2
     };
-    var h = {
-        x: leftAnchor.x + j.x * lineWidth / 2,
-        y: leftAnchor.y + j.y * lineWidth / 2
+    var bl = {
+        x: leftAnchor.x  + dTB.x * lineWidth / 2,
+        y: leftAnchor.y  + dTB.y * lineWidth / 2
     };
-    var g = {
-        x: leftAnchor.x - j.x * lineWidth / 2,
-        y: leftAnchor.y - j.y * lineWidth / 2
+    var tl = {
+        x: leftAnchor.x  - dTB.x * lineWidth / 2,
+        y: leftAnchor.y  - dTB.y * lineWidth / 2
     };
-    return [m, l, k, h, g, e, d]
+    return [arrowTip, headB, br, bl, tl, tr, headT]
 };
+
 
 // Download data, as defined in browser
 downloadData = function() {
     var csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += localStorage.getItem("mmetool");
+
+    var data = localStorage.getItem("mmetool")
+    data = data? data : "No data"
+    csvContent += data;
 
     console.log("download clicked");
     var encodedUri = encodeURI(csvContent);
@@ -749,45 +781,82 @@ downloadData = function() {
 
 };
 
+adjustCanvasToScreen = function() {
+    uistate.height = $(window).height();
+    console.log("height", uistate.height)
+    console.log("width", uistate.width)
+    console.log("height", screen.height)
+    console.log("width", screen.width)
+    uistate.width = $(window).width();
+    uistate.availableHeight = uistate.height - 2*canvasStyle.buttonSize;
+    uistate.yCenter = uistate.height/2;
+   // uistate.availableWidth = uistate.width - 546;
+    uistate.maxFactors = Math.floor(uistate.availableHeight/canvasStyle.minIconDistance) * canvasStyle.factorsPerRow;
+
+  //  uistate.
+
+    uistate.xFixedFactor = uistate.width - canvasStyle.rightSideWidth - canvasStyle.iconSize - canvasStyle.fixedFactorDist;
+    uistate.yFixedFactor.main = uistate.height/2 - canvasStyle.iconSize/2 ;
+    uistate.yFixedFactor.practice = uistate.height * 3.0/4 - canvasStyle.iconSize/2;
+
+};
+
+setupCanvas = function() {
+
+    adjustCanvasToScreen();
+
+    canvas = new fabric.Canvas("mapping-canvas", {
+        width: uistate.width,
+        height: uistate.height
+        });
+    canvas.selection = false;
+    canvas.hoverCursor = "default";
+};
+/*
+resizeCanvas = function() { // test!!!
+    canvas.setWidth( $(window).width());
+    canvas.setHeight($(window).height());
+    canvas.renderAll();
+};
+*/
+
+//window.addEventListener("resize", resizeCanvas);
+
 // Behaviour on startUp
 window.onload = function() {
 
-    canvas = new fabric.Canvas("mapping-canvas");
-    canvas.selection = false;
-    canvas.hoverCursor = "default";
-    $("body").on("click", function(a) { // changed
-        if (settings.fullScreen) {
-            var screen = document.getElementById("mme-tool").children[0]; // correct????
-        /*    if (screen.webkitRequestFullscreen) { // TODO: fix
-                screen.webkitRequestFullscreen();
-            }*/
-        }
-    });
+    setupCanvas();
+
     $("#audio").on("loadeddata", function(a) {
         a.target.play();
     });
-    $("#video").on("ended", function(a) { // ?????
-        showScreen("mapping-task", a.target.currentSrc.indexOf("introduction") !== -1 ? "practice" : "main");
+    $("#video").on("ended", function(a) {
+        uistate.mapping = (uistate.video === "introduction")? "practice" : "main"
+        showScreen("mapping-task");
     });
     $("#btn-introduction").on("click", function() {
+        uistate.video = "introduction";
         showScreen("display-video", settings.introductionVideo);
     });
     $("#btn-practice").on("click", function() {
-        showScreen("mapping-task", "practice")
+        uistate.mapping = "practice";
+        showScreen("mapping-task")
     });
     $("#btn-instructions").on("click", function() {
+        uistate.video = "instructions";
         showScreen("display-video", settings.instructionVideo);
     });
     $("#btn-mapping").on("click", function() {
         uistate.sessionName = $("#session")[0].value;
         uistate.sessionComment = $("#comment")[0].value;
-        showScreen("mapping-task", "main");
+        uistate.mapping = "main"
+        showScreen("mapping-task");
     });
     $("#btn-ty-back").on("click", function() { // on thank you screen
-        showScreen("mapping-task", "");
+        showScreen("mapping-task"); // check if data still drawn, otherwise skip setup
     });
     $("#btn-data").on("click", function() {
-        showScreen("show-data", "");
+        showScreen("show-data");
     });
     $("#btn-download").on("click", function() {
         downloadData();
@@ -797,12 +866,12 @@ window.onload = function() {
     });
     $("#btn-save-settings").on("click", function() { // on settings screen
         saveSettings();
-        showScreen("menu", "");
+        showScreen("menu");
     });
     $("#btn-cancel-settings").on("click", function() { // on settings screen
-        showScreen("menu", "");
+        showScreen("menu");
     });
-    showScreen("menu", "");
+    showScreen("menu");
 };
 
 saveSettings = function () {
@@ -824,10 +893,11 @@ saveSettings = function () {
      console.log($("#instructionvid")[0].value);
      console.log($("#introductionvid")[0].value);*/
 
-    /*
+
 
     console.log("testfile"); // Problem: fake path gets shown
     console.log($("#test")[0]);
+     /*
     for (var item of mediaList) {
         var mediaFile = $(item.id)[0].value;
 
