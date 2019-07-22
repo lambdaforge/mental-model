@@ -15,64 +15,7 @@ class MainActivity : AppCompatActivity() {
         return Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
     }
 
-    private fun copyAssetsTo(assetPath: String, targetDir: String) {
-        val assetManager = this.assets
-        var assets: Array<String>? = null
-        try {
-            assets = assetManager.list(assetPath)
-            if (assets!!.isEmpty()) {
-                copyFile(assetPath, targetDir)
-            } else {
-                val fullPath = "$targetDir/$assetPath"
-                val dir = File(fullPath)
-                if (!dir.exists())
-                    dir.mkdir()
-                for (i in assets.indices) {
-                    copyAssetsTo(assetPath + "/" + assets[i], targetDir)
-                }
-            }
-        } catch (ex: IOException) {
-            Log.e("tag", "I/O Exception", ex)
-        }
-
-    }
-
-    private fun copyFile(filename: String, targetDir: String) {
-        val assetManager = this.assets
-
-        var inStream: InputStream? = null
-        var outStream: OutputStream? = null
-        try {
-            inStream = assetManager.open(filename)
-            val newFileName =  "$targetDir/$filename"
-            outStream = FileOutputStream(newFileName)
-
-            val buffer = ByteArray(1024)
-            var read: Int
-            while (true) {
-                val bf = inStream.read(buffer)
-                if (bf == -1) break
-                outStream.write(buffer, 0, bf)
-            }
-            inStream.close()
-            outStream.flush()
-            outStream.close()
-        } catch (e: Exception) {
-            Log.e("tag", e.message)
-        }
-
-    }
-
-    @Throws(IOException::class)
-    private fun copyFile(inStream: InputStream, out: OutputStream) {
-        val buffer = ByteArray(1024)
-        while (true) {
-            val read = inStream.read(buffer)
-            if (read == -1) break
-            out.write(buffer, 0, read)
-        }
-    }
-
+/*
     private fun readFile(fileName: String): String {
         val fileContent = StringBuffer("")
         val fis: FileInputStream
@@ -95,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         return String(fileContent)
-    }
+    }*/
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -114,7 +57,6 @@ class MainActivity : AppCompatActivity() {
 
 
         val dir = this.filesDir.absolutePath
-        copyAssetsTo("www", dir)
 
         webView.loadUrl("file:$dir/www/index.html")
 

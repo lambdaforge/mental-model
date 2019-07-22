@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_centerVertical="true"
+        android:layout_height="match_parent">
+
+    <Button
+            android:id="@+id/upload"
+            android:text="Upload Files"
+            android:onClick="changeToUpload"
+
+            android:layout_centerVertical="true"
+            android:layout_width="200dip"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@+id/centerPoint"
+            android:layout_toLeftOf="@+id/centerPoint" />
+
+    <TextView
+            android:id="@+id/centerPoint"
+            android:text=""
+            android:layout_centerVertical="true"
+            android:layout_width="100dip"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true" />
+
+    <Button
+            android:id="@+id/startSession"
+            android:text="Start Session"
+            android:onClick="changeToMain"
+            android:layout_centerVertical="true"
+            android:layout_width="200dip"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/centerPoint"
+            android:layout_toRightOf="@+id/centerPoint" />
+
+</RelativeLayout>
