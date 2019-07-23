@@ -128,7 +128,6 @@ showScreen = function(screenName) {
             $("#show-data pre").text(localStorage.getItem("mmetool"));
             break;
         case "settings":
-            $("#negarrows")[0].checked = settings.useNegativeArrows;
             break;
         case "menu":
             break;
@@ -783,17 +782,10 @@ downloadData = function() {
 
 adjustCanvasToScreen = function() {
     uistate.height = $(window).height();
-    console.log("height", uistate.height)
-    console.log("width", uistate.width)
-    console.log("height", screen.height)
-    console.log("width", screen.width)
     uistate.width = $(window).width();
     uistate.availableHeight = uistate.height - 2*canvasStyle.buttonSize;
     uistate.yCenter = uistate.height/2;
-   // uistate.availableWidth = uistate.width - 546;
     uistate.maxFactors = Math.floor(uistate.availableHeight/canvasStyle.minIconDistance) * canvasStyle.factorsPerRow;
-
-  //  uistate.
 
     uistate.xFixedFactor = uistate.width - canvasStyle.rightSideWidth - canvasStyle.iconSize - canvasStyle.fixedFactorDist;
     uistate.yFixedFactor.main = uistate.height/2 - canvasStyle.iconSize/2 ;
@@ -822,9 +814,37 @@ resizeCanvas = function() { // test!!!
 
 //window.addEventListener("resize", resizeCanvas);
 
+
+populateSelectionForClass = function(className, mediaType) {
+
+    var element = document.getElementsByClassName(className);
+
+    for (var i = 0; i< element.length; i++) {
+        var defaultValue = settings[element[i].id];
+        for (var filename of mediaSources[mediaType]) {
+            var option = document.createElement("option");
+            option.value = filename;
+            option.textContent = filename;
+            element[i].appendChild(option);
+            if (filename === defaultValue) option.selected = true;
+        }
+    }
+};
+
+
+initSettings = function() {
+    populateSelectionForClass("videoChooser", "video");
+    populateSelectionForClass("audioChooser", "audio");
+    populateSelectionForClass("imageChooser", "images");
+
+    $("#negativeArrows")[0].checked = settings.useNegativeArrows;
+};
+
+
 // Behaviour on startUp
 window.onload = function() {
 
+    initSettings();
     setupCanvas();
 
     $("#audio").on("loadeddata", function(a) {
@@ -862,7 +882,7 @@ window.onload = function() {
         downloadData();
     });
     $("#btn-settings").on("click", function() {
-        showScreen("settings", "");
+        showScreen("settings");
     });
     $("#btn-save-settings").on("click", function() { // on settings screen
         saveSettings();
@@ -874,43 +894,25 @@ window.onload = function() {
     showScreen("menu");
 };
 
+
 saveSettings = function () {
-    var mediaList = [
-        {id: "#instructionvid",  setting: "instructionVideo"     },
-        {id: "#introductionvid", setting: "introductionVideo"    },
-        {id: "#thankyouimg",     setting: "thankYouImage"        },
-        {id: "#thankyouaud",     setting: "thankYouAudio"        },
-        {id: "#mappingaud",      setting: "mainMappingAudio"     },
-        {id: "#practiceaud",     setting: "practiceMappingAudio" },
-    ];
+    var mediaList = [ "instructionVideo", "introductionVideo", "thankYouImage",
+                      "thankYouAudio", "mainMappingAudio", "practiceMappingAudio"];
 
-    if ($("#negarrows")[0]) {
-        settings.useNegativeArrows = $("#negarrows")[0].checked;
-    }
-    console.log("neg arrows",$("#negarrows")[0].checked);
+    var arrowOption = document.getElementById("negativeArrows");
+    if (arrowOption) settings.useNegativeArrows = arrowOption.checked;
 
-    /*  console.log("save settings");
-     console.log($("#instructionvid")[0].value);
-     console.log($("#introductionvid")[0].value);*/
-
-
-
-    console.log("testfile"); // Problem: fake path gets shown
-    console.log($("#test")[0]);
-     /*
     for (var item of mediaList) {
-        var mediaFile = $(item.id)[0].value;
+        var element = document.getElementById(item);
+        var mediaFile = element.options[element.selectedIndex].value;
 
         if (mediaFile) {
-            settings[item.setting] = mediaFile;
-            console.log($(item.id)[0]);
+            settings[item] = mediaFile;
+            console.log(item);
             console.log(mediaFile);
         }
 
-    }*/
+    }
 
-
-    console.log("settings");
-    console.log(settings);
     localStorage.setItem("mmetool_settings", JSON.stringify(settings));
 };

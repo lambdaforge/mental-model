@@ -1,0 +1,53 @@
+mediaSources = {
+    "video": [
+        "instructions.mp4",
+        "introduction.mp4"
+    ],
+    "audio": [
+        "main.m4a",
+        "practice.m4a",
+        "thank_you.m4a",
+        "awareness.m4a",
+        "food.m4a",
+        "pollution.m4a",
+        "breeding_grounds.m4a",
+        "friendship.m4a",
+        "poverty.m4a",
+        "climate_change.m4a",
+        "money.m4a",
+        "sleep.m4a",
+        "corruption.m4a",
+        "monitoring.m4a",
+        "water_hyacinth.m4a",
+        "demand.m4a",
+        "open_access.m4a",
+        "water_level.m4a",
+        "destructive_gear.m4a",
+        "overfishing.m4a",
+        "work.m4a",
+        "fishing_regulations.m4a",
+        "overpopulation.m4a"
+    ],
+    "images": [
+        "awareness.png",
+        "friends.png",
+        "sleep.png",
+        "breeding_grounds.png",
+        "money.png",
+        "smile.png",
+        "climate_change.png",
+        "monitoring.png",
+        "demand.png",
+        "open_access.png",
+        "thank_you.png",
+        "destructive_gear.png",
+        "overfishing.png",
+        "water_hyacinth.png",
+        "overpopulation.png  water_level.png",
+        "fishing_regulations.png",
+        "pollution.png",
+        "work.png",
+        "food.png",
+        "poverty.png"
+    ]
+}

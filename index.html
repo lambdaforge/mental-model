@@ -6,12 +6,12 @@
         <link rel="stylesheet" type="text/css" href="tool.css" media="screen" />
     </head>
     <body>
-        <audio id="audio" src=""></audio>
         <div id="mme-tool">
+            <audio id="audio" ></audio>
             <div id="menu" class="screen">
                 <h1><i>Mental Model Elicitation Tool</i></h1>
                 <form name="start" action="">
-                    <table cellspacing="10">
+                    <table>
                         <tr>
                             <td><label for="session">Session:</label></td>
                             <td><input id="session" type="text" length="20"/></td>
@@ -32,52 +32,49 @@
                 </form>
             </div>
             <div id="display-video" class="screen">
-                <video id="video" src="" width="1280" controls></video>
+                <video id="video" controls></video>
             </div>
             <div id="thank-you" class="screen">
                 <button id="btn-ty-back" type="button">Back to Mapping</button>
             </div>
             <div id="mapping-task" class="screen">
-              <canvas id="mapping-canvas" width="1280" height="800"></canvas>
+                <canvas id="mapping-canvas" ></canvas>
             </div>
             <div id="show-data" class="screen">
                 <pre></pre>
             </div>
-            <div id="settings" class="screen">
+             <div id="settings" class="screen">
                 <h2><i>Settings</i></h2>
                 <form>
                     <table cellspacing="10">
-      <!--                  <tr>
-                            <td><label for="test">Test:</label></td>
-                            <td><input id="test" type="file" size="50" accept="text/*"></td>
+
+                        <tr>
+                            <td><label for="introductionVideo">Introduction video:</label></td>
+                            <td><select id="introductionVideo" class="videoChooser"></select></td>
                         </tr>
                         <tr>
-                            <td><label for="introductionvid">Introduction video:</label></td>
-                            <td><input id="introductionvid" type="file" size="50" accept="video/*"></td>
+                            <td><label for="instructionVideo">Instruction video:</label></td>
+                            <td><select id="instructionVideo" class="videoChooser"></select></td>
                         </tr>
                         <tr>
-                            <td><label for="practiceaud">Practice audio:</label></td>
-                            <td><input id="practiceaud" type="file" size="50" accept="audio/*"></td>
+                            <td><label for="practiceMappingAudio">Practice audio:</label></td>
+                            <td><select id="practiceMappingAudio" class="audioChooser"></select></td>
                         </tr>
                         <tr>
-                            <td><label for="instructionvid">Instruction video:</label></td>
-                            <td><input id="instructionvid" type="file" size="50" accept="video/*"></td>
+                            <td><label for="mainMappingAudio">Mapping audio:</label></td>
+                            <td><select id="mainMappingAudio" class="audioChooser"></select></td>
                         </tr>
                         <tr>
-                            <td><label for="mappingaud">Test:</label>Mapping audio:</td>
-                            <td><input id="mappingaud" type="file" size="50" accept="audio/*"></td>
+                            <td><label for="thankYouAudio">Thank you audio:</label></td>
+                            <td><select id="thankYouAudio" class="audioChooser"></select></td>
                         </tr>
                         <tr>
-                            <td><label for="thankyouaud">Thank you audio:</label></td>
-                            <td><input id="thankyouaud" type="file" size="50" accept="audio/*"></td>
+                            <td><label for="thankYouImage">Thank you image:</label></td>
+                            <td><select id="thankYouImage" class="imageChooser"></select></td>
                         </tr>
                         <tr>
-                            <td><label for="thankyouimg">Thank you image:</label></td>
-                            <td><input id="thankyouimg" type="file" size="50" accept="image/*"></td>
-                        </tr>-->
-                        <tr>
-                            <td><label for="negarrows">Add negative arrows?</label></td>
-                            <td><input id="negarrows" type="checkbox"></td>
+                            <td><label for="negativeArrows">Add negative arrows?</label></td>
+                            <td><input id="negativeArrows" type="checkbox"></td>
                         </tr>
                     </table>
                     <br>
@@ -90,5 +87,7 @@
     <script src="jquery-1.9.1.js" type="text/javascript"></script>
     <script src="fabric-2.2.3.min.js" type="text/javascript"></script>
     <script src="settings.js" type="text/javascript"></script>
+    <script src="canvasStyle.js" type="text/javascript"></script>
+    <script src="mediaSources.js" type="text/javascript"></script>
     <script src="tool.js" type="text/javascript"></script>
 </html>

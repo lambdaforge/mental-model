@@ -61,13 +61,10 @@ defaultSettings = {
     instructionVideo: "instructions.mp4",
     introductionVideo: "introduction.mp4",
 
-    //practiceMappingAudio: "practice.m4a",
-    practiceMappingAudio: "",
-    //mainMappingAudio: "main.m4a",
-    mainMappingAudio: "",
+    practiceMappingAudio: "practice.m4a",
+    mainMappingAudio: "main.m4a",
+    thankYouAudio: "thank_you.m4a",
 
     thankYouImage: "thank_you.png",
-//  thankYouAudio: "thank_you.m4a",
-    thankYouAudio: "",
 
 };
