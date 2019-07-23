@@ -13,7 +13,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.TextView
 import java.io.*
-
+import org.json.*;
 
 
 private const val TEXT_IMPORT_CODE: Int = 0
@@ -101,7 +101,7 @@ class UploadActivity : AppCompatActivity() {
         return result
     }
 
-/*
+
     private fun readFile(fileName: String): String {
         val fileContent = StringBuffer("")
         val fis: FileInputStream
@@ -124,7 +124,7 @@ class UploadActivity : AppCompatActivity() {
         }
 
         return String(fileContent)
-    }*/
+    }
 
     private fun copyFile(inStream: InputStream, outStream: FileOutputStream) {
         val buffer = ByteArray(1024)
@@ -139,45 +139,58 @@ class UploadActivity : AppCompatActivity() {
     }
 
 
+    private fun saveToMediaList(fileName: String, mediaType: String) {
+        val path = this.filesDir.absolutePath + "/www/mediaSources.js"
+        val content = readFile(path)
+        val json = content.substringAfter('=')
+        val prefix = content.substringBefore("{")
+
+        Log.i("mlist", json)
+
+        var jsonObj = JSONObject(json)
+        var jsonList = jsonObj.getJSONArray(mediaType)
+        jsonList.put(fileName)
+        val newContent = prefix + jsonObj.toString(2)
+
+        Log.i("mlist", newContent)
+
+        val file = FileWriter(path)
+        file.write(newContent)
+        file.flush()
+        file.close()
+
+    }
+
+
+    private fun handleSingleFile(uri: Uri, fileType: String) {
+        val webDir = this.filesDir.absolutePath + "/www/"
+        val fileDir = "$webDir$fileType/"
+
+        Log.i("File Chooser", "Read $uri")
+        val inStream = contentResolver.openInputStream(uri)!!
+
+        val fileName = getFileName(uri)
+        val newFileName = "$fileDir$fileName"
+
+        Log.i("File Chooser", "Write $newFileName")
+        val outStream = FileOutputStream(newFileName)
+
+        copyFile(inStream, outStream)
+        Log.i("File Chooser", "Written $newFileName")
+
+        saveToMediaList(fileName, fileType)
+    }
+
+
     private fun handleFileImport(data: Intent?, fileType: String) {
-        val fileDir = this.filesDir.absolutePath + "/www/" + fileType + "/"
         if (data != null) {
             if (data.clipData != null) {
                 val uris = data.clipData!!
                 val count = uris.itemCount
-                for (i in 0..count) {
-                    //val uri = getImageFilePath(uris.getItemAt(i).uri)
-                    val uri = uris.getItemAt(i).uri
-                    Log.i("File Chooser", "Read $uri")
-                    val inStream = contentResolver.openInputStream(uri)!!
-
-                    val fileName = getFileName(uri)
-                    val newFileName = "$fileDir$fileName"
-                    Log.i("File Chooser", "Write $newFileName")
-                    val outStream = FileOutputStream(newFileName)
-
-                    copyFile(inStream, outStream)
-                    Log.i("File Chooser", "Written $newFileName")
-
-                }
-
+                for (i in 0..count) handleSingleFile(uris.getItemAt(i).uri, fileType)
             } else {
-                if (data.data != null) {
-                    val uri = data.data!!
-                    Log.i("File Chooser", "Read $uri")
-                    val inStream = contentResolver.openInputStream(uri)!!
-
-                    val fileName = getFileName(uri)
-                    val newFileName = "$fileDir$fileName"
-                    Log.i("File Chooser", "Write $newFileName")
-                    val outStream = FileOutputStream(newFileName)
-
-                    copyFile(inStream, outStream)
-                    Log.i("File Chooser", "Written $newFileName")
-
-                } else {
-                    Log.i("File Chooser", "No File selected")
-                }
+                if (data.data != null)  handleSingleFile(data.data!!, fileType)
+                else Log.i("File Chooser", "No File selected")
             }
         }
     }
