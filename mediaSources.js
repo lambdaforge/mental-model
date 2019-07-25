@@ -49,6 +49,7 @@ mediaSources = {
         "pollution.png",
         "work.png",
         "food.png",
-        "poverty.png"
+        "poverty.png",
+        "nile_perch.png"
     ]
 }

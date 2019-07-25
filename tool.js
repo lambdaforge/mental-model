@@ -1,7 +1,7 @@
 uistate = {
 
     mapping: "main", // "main" or "practice"
- //   current: "main", // introduction, practice, instructions, mapping, show-data, setings
+ //   current: "main", // introduction, practice, instructions, mapping, show-data, settings
     video: "", // "introduction", "instructions"
 
     session: {
@@ -31,7 +31,7 @@ uistate = {
     iconPositions: [],
     highlight: "",
     audioCue: false,
-    blockUI: false
+    blockUI: false,
 
 };
 
@@ -40,14 +40,15 @@ var canvas = null;
 // Load saved settings or use defaults
 settings = defaultSettings; // settings needs to be global
 var data = localStorage.getItem("mmetool_settings");
-//console.log(data);
+
+
 if( data ) {
     settings = JSON.parse(data);
     console.log("Use stored settings");
 }
 else       console.log("Default settings used");
-//console.log(settings);
 
+console.log(settings);
 
 // Compares practice solution with drawn diagram
 practiceSolutionCorrect = function() {
@@ -62,18 +63,18 @@ practiceSolutionCorrect = function() {
 // Only one highlight at a time possible
 drawHighlight = function(icon) {
     removeHighlight();
-    var b = icon.getBoundingRect();
-    var d = canvasStyle.highlightMargin;
-    var a = new fabric.Rect({
-        top: b.top - d / 2,
-        left: b.left - d / 2,
-        width: b.width + d,
-        height: b.height + d,
+    var bbox = icon.getBoundingRect();
+    var margin = canvasStyle.highlightMargin;
+    var highlight = new fabric.Rect({
+        top: bbox.top - margin / 2,
+        left: bbox.left - margin / 2,
+        width: bbox.width + margin,
+        height: bbox.height + margin,
         selectable: false,
         fill: canvasStyle.highlightColor
     });
-    a.iconName = "highlight";
-    canvas.add(a);
+    highlight.iconName = "highlight";
+    canvas.add(highlight);
     canvas.bringToFront(icon);
     uistate.highlight = icon.iconName;
 };
@@ -100,7 +101,7 @@ resetUIstate = function() {
 // Choose shown screen
 showScreen = function(screenName) {
     $(".screen").hide();
-    var screen = $("#" + screenName)
+    var screen = $("#" + screenName);
     screen.show();
 
     switch (screenName) {
@@ -121,7 +122,10 @@ showScreen = function(screenName) {
             break;
         case "thank-you":
             var url = "images/" + settings.thankYouImage;
-            $("#thank-you").css("background-image", "url(" + url + ")");
+            var sel = $("#thank-you");
+            sel.css("background-image", "url(" + url + ")");
+            sel.css("height", uistate.height);
+            sel.css("background-position", "center");
             $("#audio")[0].src = "audio/" + settings.thankYouAudio;
             break;
         case "show-data":
@@ -178,7 +182,7 @@ drawButton = function(name, xLeft, yTop, onmousedown) {
 
 // Get color and line width from arrow weight
 arrowStyle = function(arrowWeight) {
-    var factor = canvasStyle.arrowWeightLinewidthFactor;
+    var factor = canvasStyle.arrowWeightLineWidthFactor;
     var width = Math.floor(Math.abs(arrowWeight)*factor);
     var cChoice = settings.arrowColor;
     var color =  arrowWeight < 0 ? cChoice.negative : cChoice.positive;
@@ -203,11 +207,13 @@ drawMenuArrow = function(arrowInd, arrowWeight, arrowMenu) {
     var arrow = new fabric.Polygon(arrowOutline, arrowAttributes);
     var arrowButton = new fabric.Rect({
        // top: arrowMenu.top + arrowInd * arrowMenu.spacing - 36,
-        top: yCenter -  canvasStyle.arrowButtonHeight / 2,
+     //   top: yCenter -  canvasStyle.arrowButtonHeight / 2,
+        top: yCenter ,
         left: xCenter - canvasStyle.arrowButtonWidth / 2,
         width: canvasStyle.arrowButtonWidth,
         height: canvasStyle.arrowButtonHeight,
         stroke: "transparent",
+        originY: "center",
         fill: "transparent"
     });
 
@@ -255,14 +261,11 @@ setupArrows = function() {
     var arrowMenuBB = {
         right:  uistate.width - canvasStyle.arrowSideSpacing,
         width: canvasStyle.rightSideWidth - 2*canvasStyle.arrowSideSpacing,
-      //  spacing: arrows.length < 6 ? 100 : (500 / arrows.length)
-        spacing: Math.min((maxSpace, uistate.availableHeight / arrows.length))
+        spacing: Math.min(maxSpace, uistate.availableHeight / arrows.length)
     };
 
-   // arrowMenuBB.height = arrowMenuBB.spacing * ( arrows.length - 1) + settings.arrowHead[0];
     arrowMenuBB.height = arrowMenuBB.spacing * arrows.length;
     arrowMenuBB.left = arrowMenuBB.right - arrowMenuBB.width;
-    //arrowMenuBB.top = (420 - arrowMenuBB.height / 2);
     arrowMenuBB.top = uistate.yCenter - arrowMenuBB.height / 2;
 
     for (var arrowInd = 0; arrowInd < arrows.length; arrowInd++) {
@@ -270,13 +273,14 @@ setupArrows = function() {
     }
 };
 
-
 // Draw icon on canvas
 drawFactorIcon = function(iconName, xLeft, yTop, fixed) {
-    //var factorImage = "images/factors/" + settings.factorMedia[iconName]["img"];
+    console.log(xLeft, yTop, fixed, iconName);
+    console.log(uistate.width, uistate.height);
     var factorImage = "images/" + settings.factorMedia[iconName]["img"];
+    console.log(factorImage);
     fabric.Image.fromURL( factorImage, function(icon) {
-        icon.scale(settings.iconSize / (icon.height > icon.width ? icon.height : icon.width)); // scaling already working!! check if float division!
+        icon.scale(canvasStyle.iconSize / (icon.height > icon.width ? icon.height : icon.width)); // scaling already working!! check if float division!
         icon.hasControls = false;
         icon.borderColor = "transparent";
         icon.top = yTop;
@@ -284,13 +288,14 @@ drawFactorIcon = function(iconName, xLeft, yTop, fixed) {
         icon.iconType = "factor";
         icon.originX = "center";
         icon.originY = "middle";
+        console.log("scale");
+        console.log(canvasStyle.iconSize / (icon.height > icon.width ? icon.height : icon.width));
         icon.on("mousedown", function() {
             factorIconClick(this);
         });
         if (fixed) {
             icon.iconName = "fg:" + iconName;
             icon.selectable = false;
-            //  getIconByName("fg:" + fixedFactor).bringToFront()?
         }
         else {
             icon.iconName = iconName;
@@ -308,9 +313,11 @@ drawFactorIcon = function(iconName, xLeft, yTop, fixed) {
         }
 
         canvas.add(icon);
-    })
-};
 
+     //   icon.bringToFront();
+    });
+    console.log(canvas.getObjects());
+};
 
 // Check if factor icon are too close
 belowMinimumDistance = function(icon) {
@@ -348,7 +355,7 @@ repositionFactorIcon = function(icon) {
 
 
 // Retrieve icons from canvas. Types are "factor", "connection", "button"
-getIconsOfType = function(type) { // TODO: use!
+getIconsOfType = function(type) {
     var icons = [];
     $.each(canvas.getObjects(), function(c, obj) {
         if (obj.hasOwnProperty("iconType") && obj.iconType === type) {
@@ -402,9 +409,11 @@ factorIconClick = function(icon) {
         [icon.left, icon.top]
     ];
 
-    if (uistate.audioCue) { // when question mark clicked
+    var factorMedia = settings.factorMedia[icon.iconName];
+    if (uistate.audioCue && factorMedia.audio) { // when question mark clicked
+
         console.log("Playing factor audio for: " + icon.iconName);
-        $("audio")[0].src = "audio/factors/" + settings.factorMedia[icon.iconName]["audio"];
+        $("audio")[0].src = "audio/" + factorMedia.audio;
         drawHighlight(icon);
         setTimeout(function() {
             removeHighlight();
@@ -628,9 +637,7 @@ setupFactorMenu = function(factors) {
     for (var factorInd = 0; factorInd < factors.length; factorInd++) {
         var col = factorInd % nCols;
         var row = Math.floor(factorInd / nCols);
-    //    var xLeft = (5 + ((4 - c) * settings.iconSize / 2)) + ((10 + settings.iconSize) * col);
         var xLeft = xOffset + ((canvasStyle.factorXPadding + canvasStyle.iconSize) * col) + canvasStyle.iconSize/2;
-      //  var yTop = (100 + settings.iconSize / 2) + ((30 + settings.iconSize) * row);
         var yTop = yOffset + (canvasStyle.factorYPadding + canvasStyle.iconSize) * row + canvasStyle.iconSize/2;
         drawFactorIcon(factors[factorInd], xLeft, yTop, false);
     }
@@ -651,6 +658,7 @@ setupMapping = function() {
     divideCanvas();
     setupArrows();
     setupFactorMenu(dynamicFactors);
+    console.log("Draw factors", dynamicFactors);
     drawFactorIcon(fixedFactor, uistate.xFixedFactor,  uistate.yFixedFactor[uistate.mapping], true);
 
     // Setup "question" button
@@ -665,7 +673,7 @@ setupMapping = function() {
     drawButton("next", uistate.width - 110, uistate.height - canvasStyle.buttonSize, function() {
         if (uistate.mapping === "practice") {
             if (practiceSolutionCorrect()) {
-                uistate.video = "instructions"
+                uistate.video = "instructions";
                 showScreen("display-video");
             }
         } else {
@@ -765,8 +773,8 @@ arrowPath = function(leftAnchor, rightAnchor, lineWidth) {
 downloadData = function() {
     var csvContent = "data:text/csv;charset=utf-8,";
 
-    var data = localStorage.getItem("mmetool")
-    data = data? data : "No data"
+    var data = localStorage.getItem("mmetool");
+    data = data? data : "No data";
     csvContent += data;
 
     console.log("download clicked");
@@ -777,10 +785,11 @@ downloadData = function() {
     document.body.appendChild(link); // Required for firefox
 
     link.click();
-
 };
 
-adjustCanvasToScreen = function() {
+
+// Use current window size to determine positions on canvas
+adjustCanvasSizesToScreen = function() {
     uistate.height = $(window).height();
     uistate.width = $(window).width();
     uistate.availableHeight = uistate.height - 2*canvasStyle.buttonSize;
@@ -795,7 +804,7 @@ adjustCanvasToScreen = function() {
 
 setupCanvas = function() {
 
-    adjustCanvasToScreen();
+    adjustCanvasSizesToScreen();
 
     canvas = new fabric.Canvas("mapping-canvas", {
         width: uistate.width,
@@ -814,30 +823,203 @@ resizeCanvas = function() { // test!!!
 
 //window.addEventListener("resize", resizeCanvas);
 
+// Add elements to media selection
+populateSelection = function(element, mediaType, defaultValue, optional=false) {
 
+    if (optional) {
+        var option = document.createElement("option");
+        option.value = "";
+        option.textContent = "None";
+        option.selected = true;
+        element.appendChild(option);
+    }
+
+    for (var filename of mediaSources[mediaType]) {
+        var option = document.createElement("option");
+        option.value = filename;
+        option.textContent = filename;
+        element.appendChild(option);
+        if (filename === defaultValue) option.selected = true;
+    }
+};
+
+
+// Add elements to media selection of given type
 populateSelectionForClass = function(className, mediaType) {
 
     var element = document.getElementsByClassName(className);
 
     for (var i = 0; i< element.length; i++) {
         var defaultValue = settings[element[i].id];
-        for (var filename of mediaSources[mediaType]) {
-            var option = document.createElement("option");
-            option.value = filename;
-            option.textContent = filename;
-            element[i].appendChild(option);
-            if (filename === defaultValue) option.selected = true;
+        populateSelection(element[i], mediaType, defaultValue);
+    }
+};
+
+
+// Draw
+factorRow = function(factorKey, used, fixed, defaultName, defaultImg, defaultAudio) {
+    var tr = document.createElement("tr");
+    tr.className = "factorRow";
+    tr.name = factorKey;
+
+    // use?
+    var td = document.createElement("td");
+    var input = document.createElement("input");
+    input.type = "checkbox";
+    input.className = "useFactor";
+    input.name = factorKey;
+    input.checked = used;
+    td.append(input);
+    tr.appendChild(td);
+
+    // fixed?
+    var td1 = document.createElement("td");
+    var input1 = document.createElement("input");
+    input1.type = "checkbox"; // only one may be checked
+    input1.className = "fixedFactor";
+    input1.name = factorKey;
+    if (fixed) input1.checked = true;
+    input1.onclick = function(v) {
+        var box = v.target;
+        if (box.checked === true) {
+            $(".fixedFactor").prop("checked", false);
+            box.checked = true;
+            var f = $(".useFactor[name="+ box.name +"]")[0];
+            f.checked = true;
+        } else {
+            console.log("false");
+            box.checked = false;
+        }
+    };
+    td1.append(input1);
+    tr.appendChild(td1);
+
+    // name
+    var td5 = document.createElement("td");
+    var input5 = document.createElement("input");
+    input5.type = "text";
+    input5.className = "factorName";
+    input5.name = factorKey;
+    input5.defaultValue = defaultName;
+    td5.append(input5);
+    tr.appendChild(td5);
+
+    // Image
+    var td2 = document.createElement("td");
+    var input2 = document.createElement("select");
+    input2.name = factorKey;
+    input2.className = "factorImg";
+    populateSelection(input2, "images", defaultImg);
+    td2.append(input2);
+    tr.appendChild(td2);
+
+    // Sound
+    var td3 = document.createElement("td");
+    var input3 = document.createElement("select");
+    input3.name = factorKey;
+    input3.className = "factorAudio";
+    populateSelection(input3, "audio", defaultAudio, true);
+    td3.append(input3);
+    tr.appendChild(td3);
+
+    // Delete
+    var td4 = document.createElement("td");
+    var input4 = document.createElement("button");
+    input4.name = factorKey;
+    input4.onclick = function(v) {
+        var row = v.target.parentElement.parentElement;
+        row.hidden = true;
+    };
+    input4.append("Delete");
+    td4.append(input4);
+    tr.appendChild(td4);
+
+    return tr;
+};
+
+
+// Get list of factors present
+listFactors = function() {
+    var factorTable = document.getElementById("factorMedia");
+    for (var factorKey in settings.factorMedia){
+        var factor = settings.factorMedia[factorKey];
+
+        if (!factor.practice) {
+            var fixed = settings.factors.main.fixed === factorKey;
+            var used = settings.factors.main.dynamic.includes(factorKey) || fixed;
+            var tr = factorRow(factorKey, used, fixed, factor["name"], factor["img"], factor["audio"]);
+
+            factorTable.appendChild(tr);
         }
     }
 };
 
 
+// New factor row
+addFactorRow = function () {
+
+    var factorTable = document.getElementById("factorMedia");
+    var key = "custom_key_" + settings.customFactorNumber;
+    var tr = factorRow(key, false,false, key,"", "");
+    factorTable.appendChild(tr);
+    settings.customFactorNumber += 1;
+};
+
+
+// Set up settings screen
 initSettings = function() {
+
+    listFactors();
     populateSelectionForClass("videoChooser", "video");
     populateSelectionForClass("audioChooser", "audio");
     populateSelectionForClass("imageChooser", "images");
 
     $("#negativeArrows")[0].checked = settings.useNegativeArrows;
+
+};
+
+
+// Apply given changes
+saveSettings = function () {
+
+    // Set negative arrows option
+    var arrowOption = document.getElementById("negativeArrows");
+    if (arrowOption) settings.useNegativeArrows = arrowOption.checked;
+
+    // Set media
+    var mediaList = [ "instructionVideo", "introductionVideo", "thankYouImage",
+        "thankYouAudio", "mainMappingAudio", "practiceMappingAudio"];
+    for (var item of mediaList) {
+        var element = document.getElementById(item);
+        var mediaFile = element.options[element.selectedIndex].value;
+        if (mediaFile && mediaFile !== "") settings[item] = mediaFile;
+    }
+
+    // Set used factors
+    settings.factors.main.fixed = "";
+    settings.factors.main.dynamic = [];
+    var factorRows = document.getElementsByClassName("factorRow");
+    for (var row of factorRows) {
+        var factorKey = row.name;
+        if (!row.hidden) {
+            var use = $("input.useFactor[name=" + factorKey + "]")[0].checked;
+            var fixed = $("input.fixedFactor[name=" + factorKey + "]")[0].checked;
+            var name = $("select.factorName[name=" + factorKey + "]")[0].value;
+            var img = $("select.factorImg[name=" + factorKey + "]")[0].value;
+            var audio = $("select.factorAudio[name=" + factorKey + "]")[0].value;
+
+            settings.factorMedia[factorKey] = {"name": name, "img": img};
+            if(audio) settings.factorMedia[factorKey]["audio"] = audio;
+
+            if    (fixed) settings.factors.main.fixed = factorKey;
+            else if (use) settings.factors.main.dynamic.push(factorKey);
+        }
+        else {
+            delete settings.factorMedia[factorKey];
+        }
+    }
+
+    localStorage.setItem("mmetool_settings", JSON.stringify(settings));
 };
 
 
@@ -851,7 +1033,7 @@ window.onload = function() {
         a.target.play();
     });
     $("#video").on("ended", function(a) {
-        uistate.mapping = (uistate.video === "introduction")? "practice" : "main"
+        uistate.mapping = (uistate.video === "introduction")? "practice" : "main";
         showScreen("mapping-task");
     });
     $("#btn-introduction").on("click", function() {
@@ -869,7 +1051,7 @@ window.onload = function() {
     $("#btn-mapping").on("click", function() {
         uistate.sessionName = $("#session")[0].value;
         uistate.sessionComment = $("#comment")[0].value;
-        uistate.mapping = "main"
+        uistate.mapping = "main";
         showScreen("mapping-task");
     });
     $("#btn-ty-back").on("click", function() { // on thank you screen
@@ -891,28 +1073,9 @@ window.onload = function() {
     $("#btn-cancel-settings").on("click", function() { // on settings screen
         showScreen("menu");
     });
+    $("#btn-add-factor").on("click", function() { // on settings screen
+        addFactorRow();
+    });
     showScreen("menu");
 };
 
-
-saveSettings = function () {
-    var mediaList = [ "instructionVideo", "introductionVideo", "thankYouImage",
-                      "thankYouAudio", "mainMappingAudio", "practiceMappingAudio"];
-
-    var arrowOption = document.getElementById("negativeArrows");
-    if (arrowOption) settings.useNegativeArrows = arrowOption.checked;
-
-    for (var item of mediaList) {
-        var element = document.getElementById(item);
-        var mediaFile = element.options[element.selectedIndex].value;
-
-        if (mediaFile) {
-            settings[item] = mediaFile;
-            console.log(item);
-            console.log(mediaFile);
-        }
-
-    }
-
-    localStorage.setItem("mmetool_settings", JSON.stringify(settings));
-};

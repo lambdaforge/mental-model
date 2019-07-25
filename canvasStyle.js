@@ -14,7 +14,7 @@ canvasStyle = {
 
     arrowHead: 20,
     arrowMargin: 5,
-    arrowWeightLinewidthFactor: 2.5,
+    arrowWeightLineWidthFactor: 2.5,
     arrowDeletionToleranceMargin: 10,
     arrowColor: { positive: "blue", negative: "red" },
 
@@ -28,4 +28,4 @@ canvasStyle = {
 
     highlightColor: "lightskyblue",
     highlightMargin: 10
-}
+};

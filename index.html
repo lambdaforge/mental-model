@@ -10,7 +10,6 @@
             <audio id="audio" ></audio>
             <div id="menu" class="screen">
                 <h1><i>Mental Model Elicitation Tool</i></h1>
-                <form name="start" action="">
                     <table>
                         <tr>
                             <td><label for="session">Session:</label></td>
@@ -29,7 +28,6 @@
                     <button id="btn-data" type="button">Show Data</button>
                     <button id="btn-settings" type="button">Settings</button>
                     <button id="btn-download" type="button">Download</button>
-                </form>
             </div>
             <div id="display-video" class="screen">
                 <video id="video" controls></video>
@@ -45,9 +43,11 @@
             </div>
              <div id="settings" class="screen">
                 <h2><i>Settings</i></h2>
-                <form>
                     <table cellspacing="10">
-
+                        <tr>
+                            <td><label for="negativeArrows">Add negative arrows?</label></td>
+                            <td><input id="negativeArrows" type="checkbox"></td>
+                        </tr>
                         <tr>
                             <td><label for="introductionVideo">Introduction video:</label></td>
                             <td><select id="introductionVideo" class="videoChooser"></select></td>
@@ -72,15 +72,16 @@
                             <td><label for="thankYouImage">Thank you image:</label></td>
                             <td><select id="thankYouImage" class="imageChooser"></select></td>
                         </tr>
-                        <tr>
-                            <td><label for="negativeArrows">Add negative arrows?</label></td>
-                            <td><input id="negativeArrows" type="checkbox"></td>
-                        </tr>
                     </table>
-                    <br>
+                    <h4>Factors: </h4>
+                    <table id="factorMedia" cellspacing="10">
+                        <tr><td>Use?</td><td>Fixed?</td><td>Name</td><td>Image</td><td>Explanation (optional)</td></tr>
+                    </table>
+                    <button id="btn-add-factor" type="button">Add Factor</button>
+                    <br><br>
                     <button id="btn-save-settings" type="button">Apply</button>
                     <button id="btn-cancel-settings" type="button">Cancel</button>
-                </form>
+
             </div>
         </div>
     </body>
