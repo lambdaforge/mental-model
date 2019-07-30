@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="fill_parent"
+             android:layout_height="fill_parent">
+
+    <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+        <TextView
+                android:text="Text Document"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="20dp"
+                android:layout_column="1" />
+
+        <TextView
+                android:id="@+id/textFilename"
+                android:text=""
+                android:layout_width="200dip"
+                android:layout_height="wrap_content"
+                android:paddingRight="20dp"
+                android:gravity="center"
+                android:layout_column="1" />
+
+        <Button
+                android:id="@+id/uploadText"
+                android:text="Choose File"
+                android:onClick="uploadText"
+
+                android:layout_centerVertical="true"
+                android:layout_width="200dip"
+                android:layout_height="wrap_content" />
+
+    </TableRow>
+
+    <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+        <TextView
+                android:text="Video File"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="20dp"
+                android:layout_column="1" />
+
+        <TextView
+                android:id="@+id/videoFilename"
+                android:text=""
+                android:layout_width="200dip"
+                android:layout_height="wrap_content"
+                android:paddingRight="20dp"
+                android:gravity="center"
+                android:layout_column="1" />
+
+        <Button
+                android:id="@+id/uploadVideo"
+                android:text="Choose File"
+                android:onClick="uploadVideo"
+
+                android:layout_centerVertical="true"
+                android:layout_width="200dip"
+                android:layout_height="wrap_content" />
+
+    </TableRow>
+
+    <TableRow
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+    <TextView
+            android:text="Audio File"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="20dp"
+            android:layout_column="1" />
+
+    <TextView
+            android:id="@+id/audioFilename"
+            android:text=""
+            android:layout_width="200dip"
+            android:layout_height="wrap_content"
+            android:paddingRight="20dp"
+            android:gravity="center"
+            android:layout_column="1" />
+
+    <Button
+            android:id="@+id/uploadAudio"
+            android:text="Choose File"
+            android:onClick="uploadAudio"
+
+            android:layout_centerVertical="true"
+            android:layout_width="200dip"
+            android:layout_height="wrap_content" />
+
+    </TableRow>
+
+    <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+        <TextView
+                android:text="Image File"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="20dp"
+                android:layout_column="1" />
+
+        <TextView
+                android:id="@+id/imageFilename"
+                android:text=""
+                android:layout_width="200dip"
+                android:layout_height="wrap_content"
+                android:paddingRight="20dp"
+                android:gravity="center"
+                android:layout_column="1" />
+
+        <Button
+                android:id="@+id/uploadImage"
+                android:text="Choose File"
+                android:onClick="uploadImage"
+
+                android:layout_centerVertical="true"
+                android:layout_width="200dip"
+                android:layout_height="wrap_content" />
+
+    </TableRow>
+
+</TableLayout>
