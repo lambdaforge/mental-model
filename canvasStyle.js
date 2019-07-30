@@ -2,18 +2,18 @@
 canvasStyle = {
 
     leftSideWidth: 285,
-    rightSideWidth: 260,
+    rightSideWidth: 160,
     borderWidth: 1,
 
     buttonSize: 100, // sideLength of "next" and "question" buttons
 
     arrowSideSpacing: 30,
-    arrowButtonHeight: 50,
-    arrowButtonWidth: 120,
+    arrowButtonMargin: 10,
     arrowMaxVertSpacing: 100,
 
     arrowHead: 20,
     arrowMargin: 5,
+    arrowMinLength: 20,
     arrowWeightLineWidthFactor: 2.5,
     arrowDeletionToleranceMargin: 10,
     arrowColor: { positive: "blue", negative: "red" },

@@ -8,37 +8,43 @@ import androidx.appcompat.app.AlertDialog
 import android.media.MediaScannerConnection
 import android.util.Log
 import java.io.*
+import android.R.attr.path
+import android.R.attr.mimeType
+import android.R.attr.description
+import androidx.core.content.ContextCompat.getSystemService
+import android.app.DownloadManager
+import android.content.ContentResolver
+import android.content.ContentValues
+import android.content.Context
+import android.provider.MediaStore
+import androidx.core.content.ContextCompat.getSystemService
+
+
 
 
 class MainActivity : AppCompatActivity() {
     private fun isExternalStorageWritable(): Boolean {
         return Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
     }
-
 /*
-    private fun readFile(fileName: String): String {
-        val fileContent = StringBuffer("")
-        val fis: FileInputStream
-        try {
-            Log.i("rf", fileName)
-            fis = FileInputStream(fileName)
-            try {
-                while (true) {
-                    val ch = fis.read()
-                    if (ch == -1) break
-                    fileContent.append(ch.toChar())
-                }
 
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
+    private fun downloadFile(fileData: String, filename: String, title: String) {
 
-        } catch (e: FileNotFoundException) {
-            e.printStackTrace()
-        }
+            var values = ContentValues()
+            MediaStore.Downloads.MIME_TYPE
 
-        return String(fileContent)
-    }*/
+            values.put(MediaStore.Downloads.TITLE, filename);
+            values.put((MediaStore.Downloads.DISPLAY_NAME, title)
+            values.put(MediaStore.Downloads.MIME_TYPE, "text/plain")
+
+
+            var uri = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
+            var outputStream = contentResolver.openOutputStream(uri!!)
+            val writer = outputStream.bufferedWriter()
+            writer.write(fileData)
+            writer.close()
+
+        }*/
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,7 +68,8 @@ class MainActivity : AppCompatActivity() {
 
         webView.setDownloadListener { url, _, _, _, _ -> // Check if working in actual app
 
-            val filename = "mmetool_data.csv"
+            val fileName = "mmetool_data.csv"
+            val title = "MME tool data"
             val builder = AlertDialog.Builder(this@MainActivity)
 
             Log.i("File Download", "Url:")
@@ -76,13 +83,35 @@ class MainActivity : AppCompatActivity() {
             builder.setTitle("Download")
             if (isExternalStorageWritable()) {
 
-                builder.setMessage("Do you want to save $filename?")
+                builder.setMessage("Do you want to save $fileName?")
 
                 builder.setPositiveButton("Yes") { _, _ ->
 
-                    //val dir = this.getExternalFilesDir(null) // application directory -> save here? or downloads?
-                    val dir = this.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
-                    val file = File(dir, filename)
+                    // getExternalStoragePublicDirectory deprecated
+                    // addCompletedDownload deprecated
+                    // Apps should instead contribute files to MediaStore.Downloads collection to make them available to user as part of Downloads
+                    // content resolver
+
+         /*           val dir = File("//sdcard//Download//")
+
+                    val file = File(dir, fileName)
+
+                    val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+
+                    downloadManager.addCompletedDownload(
+                        file.name,
+                        file.name,
+                        true,
+                        "text/plain",
+                        file.absolutePath,
+                        file.length(),
+                        true
+                    )*/
+
+
+
+                    // val dir = this.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
+                    val file = File(dir, fileName)
 
                     file.createNewFile()
 
@@ -91,14 +120,9 @@ class MainActivity : AppCompatActivity() {
                     writer.write(fileData)
                     writer.close()
 
-                    // Refresh file display
-                    MediaScannerConnection.scanFile(this, arrayOf(file.absolutePath),null)
-                    {  path, uri ->
-                        Log.v(
-                            "File Download",
-                            "file $path was scanned successfully: $uri"
-                        )
-                    }
+              //      downloadFile(fileData, fileName, title)
+
+
                 }
                 builder.setNegativeButton("Cancel") { dialog, _ ->
                     dialog.cancel()

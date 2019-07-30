@@ -1,19 +1,16 @@
 package com.example.mmeandroid
 
-import android.app.Activity
-import android.content.ClipData
 import android.content.Intent
-import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
+import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
-import android.widget.TextView
 import java.io.*
-import org.json.*;
+import org.json.*
 
 
 private const val TEXT_IMPORT_CODE: Int = 0
@@ -26,8 +23,17 @@ private const val VIDEO_IMPORT_CODE: Int = 3
 class UploadActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
+
+
+
+        val bar = window.requestFeature(Window.FEATURE_ACTION_BAR)
+
         setContentView(R.layout.activity_upload)
+        val actionBar = supportActionBar
+        Log.i("fds", "$actionBar")
+        actionBar!!.setDisplayHomeAsUpEnabled(true)
     }
 
     fun uploadText(v: View) {
@@ -207,7 +213,12 @@ class UploadActivity : AppCompatActivity() {
         if (requestCode == VIDEO_IMPORT_CODE && resultCode == RESULT_OK ) {
             handleFileImport(data, "video")
         }
+    }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean { // Back button
+        val myIntent = Intent(applicationContext, StartActivity::class.java)
+        startActivityForResult(myIntent, 0)
+        return true
     }
 
 }

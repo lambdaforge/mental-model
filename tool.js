@@ -1,7 +1,6 @@
 uistate = {
 
     mapping: "main", // "main" or "practice"
- //   current: "main", // introduction, practice, instructions, mapping, show-data, settings
     video: "", // "introduction", "instructions"
 
     session: {
@@ -14,7 +13,6 @@ uistate = {
     height: 800,
     width: 1280,
     availableHeight: 600, // (- 200)for arrow and factor selection
- //   availableWidth: 734, // on mapping area (-546)
     yCenter: 400,
     maxFactors: 15,
 
@@ -112,10 +110,12 @@ showScreen = function(screenName) {
                 $("#video")[0].src = "video/" + settings.instructionVideo;
             break;
         case "mapping-task":
-            setupMapping();
-            if (uistate.mapping === "practice")
+            if (uistate.mapping === "practice") {
+                setupMapping();
                 $("#audio")[0].src = "audio/" + settings.practiceMappingAudio;
-            else {
+            }
+            else if (uistate.mapping === "main") {
+                setupMapping();
                 uistate.session.start = new Date();
                 $("#audio")[0].src = "audio/" + settings.mainMappingAudio;
             }
@@ -201,17 +201,19 @@ drawMenuArrow = function(arrowInd, arrowWeight, arrowMenu) {
     var left = { x: arrowMenu.left, y: yCenter };
     var right = { x: arrowMenu.right, y: yCenter };
 
+    var arrowLength = getDist(left, right);
+    var buttonHeight = canvasStyle.arrowHead + 2*canvasStyle.arrowButtonMargin;
+    var buttonWidth = arrowLength + 2* canvasStyle.arrowButtonMargin;
+
     var arrowOutline = arrowPath(left, right, style.lineWidth);
-    var arrowAttributes =  { fill: style.color, originY: "center" };
+    var arrowAttributes =  { fill: style.color, originY: "middle" };
 
     var arrow = new fabric.Polygon(arrowOutline, arrowAttributes);
     var arrowButton = new fabric.Rect({
-       // top: arrowMenu.top + arrowInd * arrowMenu.spacing - 36,
-     //   top: yCenter -  canvasStyle.arrowButtonHeight / 2,
         top: yCenter ,
-        left: xCenter - canvasStyle.arrowButtonWidth / 2,
-        width: canvasStyle.arrowButtonWidth,
-        height: canvasStyle.arrowButtonHeight,
+        left: xCenter - buttonWidth / 2,
+        width: buttonWidth,
+        height: buttonHeight,
         stroke: "transparent",
         originY: "center",
         fill: "transparent"
@@ -247,7 +249,6 @@ drawMenuArrow = function(arrowInd, arrowWeight, arrowMenu) {
 setupArrows = function() {
 
     // Only use negative arrows if specified in settings
-
     var arrows = settings.arrowWeights;
     if (!settings.useNegativeArrows) {
         arrows = settings.arrowWeights.filter(function(value) {
@@ -256,7 +257,6 @@ setupArrows = function() {
     }
 
     // Draw arrow area
-
     var maxSpace = canvasStyle.arrowMaxVertSpacing;
     var arrowMenuBB = {
         right:  uistate.width - canvasStyle.arrowSideSpacing,
@@ -275,12 +275,9 @@ setupArrows = function() {
 
 // Draw icon on canvas
 drawFactorIcon = function(iconName, xLeft, yTop, fixed) {
-    console.log(xLeft, yTop, fixed, iconName);
-    console.log(uistate.width, uistate.height);
     var factorImage = "images/" + settings.factorMedia[iconName]["img"];
-    console.log(factorImage);
     fabric.Image.fromURL( factorImage, function(icon) {
-        icon.scale(canvasStyle.iconSize / (icon.height > icon.width ? icon.height : icon.width)); // scaling already working!! check if float division!
+        icon.scale(canvasStyle.iconSize / Math.max(icon.height, icon.width));
         icon.hasControls = false;
         icon.borderColor = "transparent";
         icon.top = yTop;
@@ -288,8 +285,6 @@ drawFactorIcon = function(iconName, xLeft, yTop, fixed) {
         icon.iconType = "factor";
         icon.originX = "center";
         icon.originY = "middle";
-        console.log("scale");
-        console.log(canvasStyle.iconSize / (icon.height > icon.width ? icon.height : icon.width));
         icon.on("mousedown", function() {
             factorIconClick(this);
         });
@@ -299,10 +294,10 @@ drawFactorIcon = function(iconName, xLeft, yTop, fixed) {
         }
         else {
             icon.iconName = iconName;
-            icon.on("mouseup", function(e) {
+            icon.on("mouseup", function() {
                 repositionFactorIcon(this);
             });
-            icon.on("moving", function(e) {
+            icon.on("moving", function() {
                 if (icon.iconName === uistate.newArrow.startIcon) {
                     undoArrowStartSelection();
                 }
@@ -311,19 +306,15 @@ drawFactorIcon = function(iconName, xLeft, yTop, fixed) {
                 }
             });
         }
-
         canvas.add(icon);
-
-     //   icon.bringToFront();
     });
-    console.log(canvas.getObjects());
 };
 
 // Check if factor icon are too close
 belowMinimumDistance = function(icon) {
     var factors = getIconsOfType("factor");
-
     var selectionBorder = canvasStyle.leftSideWidth;
+
     for (var factor of factors) {
 
         if ( icon.iconName !== factor.iconName ) {
@@ -331,7 +322,7 @@ belowMinimumDistance = function(icon) {
             if (icon.left > selectionBorder && factor.left > selectionBorder) { // both icons on canvas
                 if (distance < canvasStyle.minIconDistance) return true;
             } else {
-                if (icon.left <= selectionBorder && factor.left < selectionBorder) { // both in selection
+                if (icon.left <= selectionBorder && factor.left < selectionBorder) { // both in selection menu
                     if (distance < canvasStyle.iconSize) return true;
                 }
             }
@@ -343,13 +334,14 @@ belowMinimumDistance = function(icon) {
 
 // On mouse up: move icon to last valid position
 repositionFactorIcon = function(icon) {
-    while (belowMinimumDistance(icon) && uistate.iconPositions.length > 0) { // if intersection
+    while (belowMinimumDistance(icon) && uistate.iconPositions.length > 0) {
         var lastPosition = uistate.iconPositions.pop();
         icon.left = lastPosition[0];
         icon.top = lastPosition[1];
     }
-    canvas.remove(icon); // redraw icon
+    canvas.remove(icon);
     canvas.add(icon);
+    redrawConnections(icon);
     uistate.iconPositions = []
 };
 
@@ -379,7 +371,7 @@ getConnectionStrings = function() {
 };
 
 
-//  Get icons connected to given icon
+// Get icons connected to given icon
 getFactorConnectionIcons = function(icon) {
     var factors = getIconsOfType("connection");
 
@@ -393,6 +385,7 @@ getFactorConnectionIcons = function(icon) {
 };
 
 
+// Revert to of arrow start icon selection
 undoArrowStartSelection = function() {
     uistate.newArrow.state = "select-start";
     uistate.newArrow.startIcon = "";
@@ -459,7 +452,7 @@ factorIconClick = function(icon) {
 iconPassOverDistance = function(icon) {
     var passOver = { left: 0, top: 0 };
 
-    var offset = settings.iconSize / 2;
+    var offset = canvasStyle.iconSize / 2;
     var hasConnection = getFactorConnectionIcons(icon).length > 0;
 
     var bottomLimit = uistate.height - offset;
@@ -477,32 +470,31 @@ iconPassOverDistance = function(icon) {
 };
 
 
+// Redraw arrows connected to icon
+redrawConnections = function(icon) {
+    var connIcons = getFactorConnectionIcons(icon);
+    for (var connectedIcon of connIcons) {
+        var factors = connectedIcon.iconName.split("-");
+
+        canvas.remove(connectedIcon);
+        drawConnection(factors[0], factors[1], connectedIcon.connectionWeight);
+    }
+};
+
+
 // Behaviour when icon is moved
 factorIconMoving = function(icon) {
 
     uistate.moving = icon.iconName;
-    uistate.iconPositions.push([icon.left, icon.top]); // save position (of mouse? not after passOvercheck?) for repositioning later
+    uistate.iconPositions.push([icon.left, icon.top]);
 
     // Do not allow passing over mapping area
     var passOver = iconPassOverDistance(icon);
     if (passOver.top !== 0 || passOver.left !== 0) {
         icon.left -= passOver.left;
         icon.top -= passOver.top;
-        uistate.actualPosition = { // used?
-            x: icon.left,
-            y: icon.top
-        }
     }
-
-    // Redraw arrows on move
-    var connIcons = getFactorConnectionIcons(icon);
-    for (var icon of connIcons) {
-        canvas.remove(icon);
-        console.log("redraw");
-        var factors = icon.iconName.split("-");
-        drawConnection(factors[0], factors[1], icon.connectionWeight);
-    }
-    uistate.actualPosition = {};
+    redrawConnections(icon);
 };
 
 
@@ -513,7 +505,6 @@ getIconByName = function(iconName) {
             return obj;
         }
     }
-    return undefined;
 };
 
 
@@ -524,40 +515,35 @@ getIconAnchor = function(iconName) {
 };
 
 
-// Draw arrow between symbols
+// Draw arrow between symbols, only horizontal?
 drawConnection = function(startIconName, endIconName, weight) {
 
     if (startIconName !== endIconName) {
         var style = arrowStyle(weight);
-
         var startPos = getIconAnchor(startIconName);
-        var endPos = getIconAnchor(endIconName);
-
+        var endPos   = getIconAnchor(endIconName);
         var dirVec = getDirv(startPos, endPos);
-        var distance = getDist(startPos, endPos);
+        var factorDistance = getDist(startPos, endPos);
 
-        if (distance > settings.minIconDistance + canvasStyle.arrowMargin) {
-            var d = settings.iconSize / 2 + canvasStyle.arrowMargin;
-        } else {
-            var d = (distance / 2 - 10);
-        }
+        if ( factorDistance > canvasStyle.minIconDistance + canvasStyle.arrowMargin)
+            var dFromCenter = canvasStyle.iconSize / 2 + canvasStyle.arrowMargin;
+        else
+            var dFromCenter = factorDistance / 2;
+
+        var arrowLength = Math.max(canvasStyle.arrowMinLength, factorDistance - 2 * dFromCenter);
+
         var leftAnchor = {
-            x: startPos.x + d * dirVec.x,
-            y: startPos.y + d * dirVec.y + canvasStyle.arrowHead / 2
+            x: startPos.x + dFromCenter * dirVec.x,
+            y: startPos.y + dFromCenter * dirVec.y + canvasStyle.arrowHead / 2
         };
-        var e = {
-            x: endPos.x - d * dirVec.x,
-            y: endPos.y - d * dirVec.y + canvasStyle.arrowHead / 2
-        };
-        var c = getDist(leftAnchor, e);
-        c = c < 20 ? 20 : c;
+
         var rightAnchor = {
-            x: leftAnchor.x + c,
+            x: leftAnchor.x + arrowLength,
             y: leftAnchor.y
         };
 
         var arrowOutline = arrowPath(leftAnchor, rightAnchor, style.lineWidth);
-        var arrow = new fabric.Polygon(arrowOutline, { fill: style.color });
+        var arrow = new fabric.Polygon(arrowOutline, {fill: style.color});
         arrow.centeredRotation = false;
         arrow.rotate(180 * Math.atan2(dirVec.y, dirVec.x) / Math.PI);
         arrow.borderColor = "transparent";
@@ -566,7 +552,7 @@ drawConnection = function(startIconName, endIconName, weight) {
         arrow.iconType = "connection";
         arrow.iconName = startIconName + "-" + endIconName;
         arrow.connectionWeight = weight;
-        arrow.on("mouseup", function() {
+        arrow.on("mouseup", function () {
             // if right of mapping area remove arrow
             var rightLimit = uistate.width - canvasStyle.leftSideWidth + canvasStyle.arrowDeletionToleranceMargin;
             if (arrow.oCoords.mr.x > rightLimit || arrow.oCoords.ml.x > rightLimit) {
@@ -625,15 +611,13 @@ divideCanvas = function() {
 
 // Layout of factor menu on left side of screen
 setupFactorMenu = function(factors) {
-
     var nCols = canvasStyle.factorsPerRow;
     var nRows = Math.ceil(factors.length / nCols);
     var horIconSpace = nCols * canvasStyle.iconSize + canvasStyle.factorXPadding * (nCols - 1);
     var vertIconSpace = nRows * canvasStyle.iconSize + canvasStyle.factorYPadding * (nRows - 1);
     var xOffset = (canvasStyle.leftSideWidth - horIconSpace)/2;
     var yOffset = canvasStyle.buttonSize + (uistate.availableHeight - vertIconSpace)/2;
-    console.log( xOffset);
-    console.log(yOffset);
+
     for (var factorInd = 0; factorInd < factors.length; factorInd++) {
         var col = factorInd % nCols;
         var row = Math.floor(factorInd / nCols);
@@ -673,20 +657,20 @@ setupMapping = function() {
     drawButton("next", uistate.width - 110, uistate.height - canvasStyle.buttonSize, function() {
         if (uistate.mapping === "practice") {
             if (practiceSolutionCorrect()) {
+                uistate.mapping = "finished";
                 uistate.video = "instructions";
                 showScreen("display-video");
             }
         } else {
+            uistate.mapping = "finished";
             showScreen("thank-you");
             saveResult();
         }
     });
 
-
     if (uistate.mapping === "practice") {
         fabric.Image.fromURL("images/" + settings.solutionImage, function(image) {
             image.scale(0.2);
-         //   image.top = 10;
             image.top = uistate.height/4 - 170; // 170 is image height now
             image.originX = "right";
             image.left = uistate.width - canvasStyle.rightSideWidth;
@@ -697,45 +681,34 @@ setupMapping = function() {
     }
 };
 
+
 // Get Euclidean distance of two vectors
-getDist = function(d, c) {
-    if (d.hasOwnProperty("x")) {
-        return Math.sqrt(Math.pow(c.x - d.x, 2) + Math.pow(c.y - d.y, 2));
+getDist = function(v, w) {
+    if (v.hasOwnProperty("x")) {
+        return Math.sqrt(Math.pow(w.x - v.x, 2) + Math.pow(w.y - v.y, 2));
     } else {
-        return Math.sqrt(Math.pow(c.left - d.left, 2) + Math.pow(c.top - d.top, 2));
+        return Math.sqrt(Math.pow(w.left - v.left, 2) + Math.pow(w.top - v.top, 2));
     }
 };
 
 
 // Get normalized direction vector between positions
-getDirv = function(d, c) {
-    if (d.hasOwnProperty("x")) {
-        return {
-            x: (c.x - d.x) / getDist(d, c),
-            y: (c.y - d.y) / getDist(d, c)
-        };
-    } else {
-        return {
-            x: (c.left - d.left) / getDist(d, c),
-            y: (c.top - d.top) / getDist(d, c)
-        };
-    }
+getDirv = function(v, w) {
+    var d = getDist(v, w);
+    if (v.hasOwnProperty("x"))  return { x: (w.x    - v.x)    / d, y: (w.y   - v.y)   / d };
+    else                           return { x: (w.left - v.left) / d, y: (w.top - v.top) / d };
 };
 
 
 // Get orthogonal vector
-getOrtho = function(d, c) {
-    var dVec =  getDirv(d, c);
-    return {
-        x: dVec.y,
-        y: -dVec.x
-    }
+getOrtho = function(v, w) {
+    var dVec =  getDirv(v, w);
+    return { x: dVec.y, y: -dVec.x };
 };
 
 
-// Calculate vertices for arrow path
+// Calculate vertices for arrow path, right anchor is at arrow tip
 arrowPath = function(leftAnchor, rightAnchor, lineWidth) {
-
     var headSize = canvasStyle.arrowHead;
     var dLR = getDirv(leftAnchor, rightAnchor);
     var dTB = getOrtho(leftAnchor, rightAnchor);
@@ -777,7 +750,6 @@ downloadData = function() {
     data = data? data : "No data";
     csvContent += data;
 
-    console.log("download clicked");
     var encodedUri = encodeURI(csvContent);
     var link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -790,18 +762,20 @@ downloadData = function() {
 
 // Use current window size to determine positions on canvas
 adjustCanvasSizesToScreen = function() {
+
     uistate.height = $(window).height();
     uistate.width = $(window).width();
     uistate.availableHeight = uistate.height - 2*canvasStyle.buttonSize;
     uistate.yCenter = uistate.height/2;
     uistate.maxFactors = Math.floor(uistate.availableHeight/canvasStyle.minIconDistance) * canvasStyle.factorsPerRow;
-
     uistate.xFixedFactor = uistate.width - canvasStyle.rightSideWidth - canvasStyle.iconSize - canvasStyle.fixedFactorDist;
     uistate.yFixedFactor.main = uistate.height/2 - canvasStyle.iconSize/2 ;
     uistate.yFixedFactor.practice = uistate.height * 3.0/4 - canvasStyle.iconSize/2;
 
 };
 
+
+// Set up canvas according to current window size
 setupCanvas = function() {
 
     adjustCanvasSizesToScreen();
@@ -813,32 +787,29 @@ setupCanvas = function() {
     canvas.selection = false;
     canvas.hoverCursor = "default";
 };
-/*
-resizeCanvas = function() { // test!!!
-    canvas.setWidth( $(window).width());
-    canvas.setHeight($(window).height());
-    canvas.renderAll();
-};
-*/
 
-//window.addEventListener("resize", resizeCanvas);
 
 // Add elements to media selection
-populateSelection = function(element, mediaType, defaultValue, optional=false) {
+populateSelection = function(element, mediaType, defaultValue, optional) {
 
     if (optional) {
         var option = document.createElement("option");
+
         option.value = "";
         option.textContent = "None";
         option.selected = true;
+
         element.appendChild(option);
     }
 
     for (var filename of mediaSources[mediaType]) {
         var option = document.createElement("option");
+
         option.value = filename;
         option.textContent = filename;
+
         element.appendChild(option);
+
         if (filename === defaultValue) option.selected = true;
     }
 };
@@ -851,12 +822,12 @@ populateSelectionForClass = function(className, mediaType) {
 
     for (var i = 0; i< element.length; i++) {
         var defaultValue = settings[element[i].id];
-        populateSelection(element[i], mediaType, defaultValue);
+        populateSelection(element[i], mediaType, defaultValue, false);
     }
 };
 
 
-// Draw
+// Draw row for factor in table
 factorRow = function(factorKey, used, fixed, defaultName, defaultImg, defaultAudio) {
     var tr = document.createElement("tr");
     tr.className = "factorRow";
@@ -869,8 +840,9 @@ factorRow = function(factorKey, used, fixed, defaultName, defaultImg, defaultAud
     input.className = "useFactor";
     input.name = factorKey;
     input.checked = used;
-    td.append(input);
+    td.appendChild(input);
     tr.appendChild(td);
+
 
     // fixed?
     var td1 = document.createElement("td");
@@ -887,11 +859,10 @@ factorRow = function(factorKey, used, fixed, defaultName, defaultImg, defaultAud
             var f = $(".useFactor[name="+ box.name +"]")[0];
             f.checked = true;
         } else {
-            console.log("false");
             box.checked = false;
         }
     };
-    td1.append(input1);
+    td1.appendChild(input1);
     tr.appendChild(td1);
 
     // name
@@ -901,7 +872,7 @@ factorRow = function(factorKey, used, fixed, defaultName, defaultImg, defaultAud
     input5.className = "factorName";
     input5.name = factorKey;
     input5.defaultValue = defaultName;
-    td5.append(input5);
+    td5.appendChild(input5);
     tr.appendChild(td5);
 
     // Image
@@ -909,8 +880,8 @@ factorRow = function(factorKey, used, fixed, defaultName, defaultImg, defaultAud
     var input2 = document.createElement("select");
     input2.name = factorKey;
     input2.className = "factorImg";
-    populateSelection(input2, "images", defaultImg);
-    td2.append(input2);
+    populateSelection(input2, "images", defaultImg, false);
+    td2.appendChild(input2);
     tr.appendChild(td2);
 
     // Sound
@@ -919,7 +890,7 @@ factorRow = function(factorKey, used, fixed, defaultName, defaultImg, defaultAud
     input3.name = factorKey;
     input3.className = "factorAudio";
     populateSelection(input3, "audio", defaultAudio, true);
-    td3.append(input3);
+    td3.appendChild(input3);
     tr.appendChild(td3);
 
     // Delete
@@ -930,8 +901,8 @@ factorRow = function(factorKey, used, fixed, defaultName, defaultImg, defaultAud
         var row = v.target.parentElement.parentElement;
         row.hidden = true;
     };
-    input4.append("Delete");
-    td4.append(input4);
+    input4.innerHTML = "Delete";
+    td4.appendChild(input4);
     tr.appendChild(td4);
 
     return tr;
@@ -946,7 +917,8 @@ listFactors = function() {
 
         if (!factor.practice) {
             var fixed = settings.factors.main.fixed === factorKey;
-            var used = settings.factors.main.dynamic.includes(factorKey) || fixed;
+          //  var used = settings.factors.main.dynamic.includes(factorKey) || fixed; // include not working on android
+            var used = (settings.factors.main.dynamic.indexOf(factorKey) !== -1) || fixed;
             var tr = factorRow(factorKey, used, fixed, factor["name"], factor["img"], factor["audio"]);
 
             factorTable.appendChild(tr);
@@ -957,10 +929,10 @@ listFactors = function() {
 
 // New factor row
 addFactorRow = function () {
-
     var factorTable = document.getElementById("factorMedia");
     var key = "custom_key_" + settings.customFactorNumber;
-    var tr = factorRow(key, false,false, key,"", "");
+    var tr = factorRow(key, false, false, key, "", "");
+
     factorTable.appendChild(tr);
     settings.customFactorNumber += 1;
 };
@@ -1036,6 +1008,8 @@ window.onload = function() {
         uistate.mapping = (uistate.video === "introduction")? "practice" : "main";
         showScreen("mapping-task");
     });
+
+    // On menu screen
     $("#btn-introduction").on("click", function() {
         uistate.video = "introduction";
         showScreen("display-video", settings.introductionVideo);
@@ -1054,9 +1028,6 @@ window.onload = function() {
         uistate.mapping = "main";
         showScreen("mapping-task");
     });
-    $("#btn-ty-back").on("click", function() { // on thank you screen
-        showScreen("mapping-task"); // check if data still drawn, otherwise skip setup
-    });
     $("#btn-data").on("click", function() {
         showScreen("show-data");
     });
@@ -1066,16 +1037,25 @@ window.onload = function() {
     $("#btn-settings").on("click", function() {
         showScreen("settings");
     });
-    $("#btn-save-settings").on("click", function() { // on settings screen
+
+    // On thank you screen
+    $("#btn-ty-back").on("click", function() {
+        showScreen("mapping-task");
+        uistate.mapping = "main";
+    });
+
+    // On settings screen
+    $("#btn-save-settings").on("click", function() {
         saveSettings();
         showScreen("menu");
     });
-    $("#btn-cancel-settings").on("click", function() { // on settings screen
+    $("#btn-cancel-settings").on("click", function() {
         showScreen("menu");
     });
-    $("#btn-add-factor").on("click", function() { // on settings screen
+    $("#btn-add-factor").on("click", function() {
         addFactorRow();
     });
+
     showScreen("menu");
 };
 
