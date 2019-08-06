@@ -976,7 +976,7 @@ saveSettings = function () {
         if (!row.hidden) {
             var use = $("input.useFactor[name=" + factorKey + "]")[0].checked;
             var fixed = $("input.fixedFactor[name=" + factorKey + "]")[0].checked;
-            var name = $("select.factorName[name=" + factorKey + "]")[0].value;
+            var name = $("input.factorName[name=" + factorKey + "]")[0].value;
             var img = $("select.factorImg[name=" + factorKey + "]")[0].value;
             var audio = $("select.factorAudio[name=" + factorKey + "]")[0].value;
 
