@@ -2,18 +2,18 @@ package com.example.mmeandroid
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import androidx.core.content.ContextCompat.startActivity
 import android.content.Intent
 import android.util.Log
 import android.view.View
 import java.io.*
+import android.content.SharedPreferences
 
 
 class StartActivity : AppCompatActivity() {
 
+    private var prefs: SharedPreferences? = null
+
     private fun copyAssetsTo(assetPath: String, targetDir: String) {
-     //   Log.i("assets", targetDir)
         val assetManager = this.assets
         var assets: Array<String>? = null
         try {
@@ -32,7 +32,7 @@ class StartActivity : AppCompatActivity() {
                 }
             }
         } catch (ex: IOException) {
-            Log.e("tag", "I/O Exception", ex)
+            Log.e("assets", "I/O Exception", ex)
         }
 
     }
@@ -58,27 +58,33 @@ class StartActivity : AppCompatActivity() {
             outStream.flush()
             outStream.close()
         } catch (e: Exception) {
-            Log.e("tag", e.message)
+            Log.e("assets", e.message)
         }
 
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_start)
+        prefs = getSharedPreferences("com.example.mmeandroid", MODE_PRIVATE)
+    }
 
-        val dir = this.filesDir.absolutePath
-        copyAssetsTo("www", dir)
+    override fun onResume() {
+        super.onResume()
+
+        if (prefs!!.getBoolean("firstrun", true)) {
+            copyAssetsTo("www", this.filesDir.absolutePath)
+            prefs!!.edit().putBoolean("firstrun", false).apply()
+        }
     }
 
     fun changeToUpload(v: View) {
         startActivity(Intent(this@StartActivity, UploadActivity::class.java))
-        Log.i("Content ", "Load upload layout")
+        Log.i("Content", "Load upload layout")
     }
 
     fun changeToMain(v: View) {
         startActivity(Intent(this@StartActivity, MainActivity::class.java))
-        Log.i("Content ", "Load main layout")
+        Log.i("Content", "Load main layout")
     }
 }

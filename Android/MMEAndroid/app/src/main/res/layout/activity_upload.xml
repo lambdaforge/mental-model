@@ -8,37 +8,6 @@
             android:layout_height="fill_parent">
 
         <TextView
-                android:text="Text Document"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingRight="20dp"
-                android:layout_column="1" />
-
-        <TextView
-                android:id="@+id/textFilename"
-                android:text=""
-                android:layout_width="200dip"
-                android:layout_height="wrap_content"
-                android:paddingRight="20dp"
-                android:gravity="center"
-                android:layout_column="1" />
-
-        <Button
-                android:id="@+id/uploadText"
-                android:text="Choose File"
-                android:onClick="uploadText"
-
-                android:layout_centerVertical="true"
-                android:layout_width="200dip"
-                android:layout_height="wrap_content" />
-
-    </TableRow>
-
-    <TableRow
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
-
-        <TextView
                 android:text="Video File"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

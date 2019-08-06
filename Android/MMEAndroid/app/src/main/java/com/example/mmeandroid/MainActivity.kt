@@ -5,28 +5,19 @@ import android.os.Bundle
 import android.os.Environment
 import android.webkit.*
 import androidx.appcompat.app.AlertDialog
-import android.media.MediaScannerConnection
 import android.util.Log
 import java.io.*
-import android.R.attr.path
-import android.R.attr.mimeType
-import android.R.attr.description
-import androidx.core.content.ContextCompat.getSystemService
 import android.app.DownloadManager
-import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Context
 import android.provider.MediaStore
-import androidx.core.content.ContextCompat.getSystemService
-
-
 
 
 class MainActivity : AppCompatActivity() {
+
     private fun isExternalStorageWritable(): Boolean {
         return Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
 

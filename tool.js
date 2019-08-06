@@ -803,6 +803,7 @@ populateSelection = function(element, mediaType, defaultValue, optional) {
     }
 
     for (var filename of mediaSources[mediaType]) {
+        console.log(filename)
         var option = document.createElement("option");
 
         option.value = filename;

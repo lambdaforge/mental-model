@@ -7,17 +7,14 @@ import android.provider.OpenableColumns
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
 import java.io.*
 import org.json.*
 
 
-private const val TEXT_IMPORT_CODE: Int = 0
 private const val IMAGE_IMPORT_CODE: Int = 1
 private const val AUDIO_IMPORT_CODE: Int = 2
 private const val VIDEO_IMPORT_CODE: Int = 3
-
 
 
 class UploadActivity : AppCompatActivity() {
@@ -26,26 +23,9 @@ class UploadActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
 
-
-
-        val bar = window.requestFeature(Window.FEATURE_ACTION_BAR)
-
         setContentView(R.layout.activity_upload)
         val actionBar = supportActionBar
-        Log.i("fds", "$actionBar")
         actionBar!!.setDisplayHomeAsUpEnabled(true)
-    }
-
-    fun uploadText(v: View) {
-
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "text/*"
-            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            action = Intent.ACTION_GET_CONTENT
-        }
-
-        startActivityForResult(intent, TEXT_IMPORT_CODE)
     }
 
     fun uploadVideo(v: View) {
@@ -85,34 +65,39 @@ class UploadActivity : AppCompatActivity() {
     }
 
     private fun getFileName(uri: Uri): String {
-        var result: String? = null
+        var fileName: String? = null
+
+        val mimeType = contentResolver.getType(uri)
+        val extension = mimeType!!.substringAfter('/')
 
         if (uri.scheme == "content") {
             val cursor = contentResolver.query(uri, null, null, null, null)
             try {
                 if (cursor != null && cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                    fileName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
                 }
             } finally {
                 cursor!!.close()
             }
         }
-        if (result == null) {
-            result = uri.path
-            val cut = result!!.lastIndexOf('/')
+        if (fileName == null) {
+            fileName = uri.path
+            val cut = fileName!!.lastIndexOf('/')
             if (cut != -1) {
-                result = result.substring(cut + 1)
+                fileName = fileName.substring(cut + 1)
             }
         }
-        return result
-    }
 
+        if (!fileName.toLowerCase().endsWith(extension)) {
+            fileName = "$fileName.$extension"
+        }
+        return fileName
+    }
 
     private fun readFile(fileName: String): String {
         val fileContent = StringBuffer("")
         val fis: FileInputStream
         try {
-            Log.i("rf", fileName)
             fis = FileInputStream(fileName)
             try {
                 while (true) {
@@ -144,21 +129,16 @@ class UploadActivity : AppCompatActivity() {
         outStream.close()
     }
 
-
     private fun saveToMediaList(fileName: String, mediaType: String) {
         val path = this.filesDir.absolutePath + "/www/mediaSources.js"
         val content = readFile(path)
         val json = content.substringAfter('=')
         val prefix = content.substringBefore("{")
 
-        Log.i("mlist", json)
-
-        var jsonObj = JSONObject(json)
-        var jsonList = jsonObj.getJSONArray(mediaType)
+        val jsonObj = JSONObject(json)
+        val jsonList = jsonObj.getJSONArray(mediaType)
         jsonList.put(fileName)
         val newContent = prefix + jsonObj.toString(2)
-
-        Log.i("mlist", newContent)
 
         val file = FileWriter(path)
         file.write(newContent)
@@ -166,7 +146,6 @@ class UploadActivity : AppCompatActivity() {
         file.close()
 
     }
-
 
     private fun handleSingleFile(uri: Uri, fileType: String) {
         val webDir = this.filesDir.absolutePath + "/www/"
@@ -186,7 +165,6 @@ class UploadActivity : AppCompatActivity() {
 
         saveToMediaList(fileName, fileType)
     }
-
 
     private fun handleFileImport(data: Intent?, fileType: String) {
         if (data != null) {
