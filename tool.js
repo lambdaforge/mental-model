@@ -224,14 +224,20 @@ drawMenuArrow = function(arrowInd, arrowWeight, arrowMenu) {
     icon.iconName = "addConnection" + arrowWeight;
     icon.connectionWeight = arrowWeight;
     icon.selectable = false;
-    icon.on("mousedown", function() {
-        if (uistate.blockUI) {
-            return
-        }
+    icon.on("mousedown", onArrowButtonClicked);
+    canvas.add(icon);
+};
+
+
+// Behaviour when arrow button is clicked
+onArrowButtonClicked = function(options) {
+    console.log("arrow clicked");
+    var icon = options.target;
+    if (!uistate.blockUI) {
         if (uistate.newArrow.weight !== icon.connectionWeight) {
             resetUIstate();
             uistate.newArrow.state = "select-start";
-            uistate.newArrow.weight = arrowWeight;
+            uistate.newArrow.weight = icon.connectionWeight;
             drawHighlight(icon);
         } else {
             resetUIstate()
@@ -240,10 +246,8 @@ drawMenuArrow = function(arrowInd, arrowWeight, arrowMenu) {
         setTimeout(function() {
             uistate.blockUI = false
         }, 500)
-    });
-    canvas.add(icon);
+    }
 };
-
 
 // Draw Arrow selection on right side of canvas
 setupArrows = function() {
@@ -273,8 +277,29 @@ setupArrows = function() {
     }
 };
 
+// Behaviour when icon is moved
+onFactorIconMoving = function(options) {
+    var icon = options.target;
+    removeHighlight();
+    if (icon.iconName === uistate.newArrow.startIcon) {
+        undoArrowStartSelection();
+    }
+    else {
+        uistate.moving = icon.iconName;
+        uistate.iconPositions.push([icon.left, icon.top]);
+
+        // Do not allow passing over mapping area
+        var passOver = iconPassOverDistance(icon);
+        if (passOver.top !== 0 || passOver.left !== 0) {
+            icon.left -= passOver.left;
+            icon.top -= passOver.top;
+        }
+        redrawConnections(icon);
+    }
+};
+
 // Draw icon on canvas
-drawFactorIcon = function(iconName, xLeft, yTop, fixed) {
+drawFactorIcon = function(iconName, xLeft, yTop, homeX, homeY, fixed) {
     var factorImage = "images/" + settings.factorMedia[iconName]["img"];
     fabric.Image.fromURL( factorImage, function(icon) {
         icon.scale(canvasStyle.iconSize / Math.max(icon.height, icon.width));
@@ -285,32 +310,27 @@ drawFactorIcon = function(iconName, xLeft, yTop, fixed) {
         icon.iconType = "factor";
         icon.originX = "center";
         icon.originY = "middle";
-        icon.on("mousedown", function() {
-            factorIconClick(this);
-        });
+        icon.on("mousedown", onFactorIconClicked);
+
         if (fixed) {
+            icon.iconFixed = true;
             icon.iconName = "fg:" + iconName;
             icon.selectable = false;
         }
         else {
+            icon.iconFixed = false;
+            icon.selectable = false; // causes immobility
             icon.iconName = iconName;
-            icon.on("mouseup", function() {
-                repositionFactorIcon(this);
-            });
-            icon.on("moving", function() {
-                if (icon.iconName === uistate.newArrow.startIcon) {
-                    undoArrowStartSelection();
-                }
-                else {
-                    factorIconMoving(this);
-                }
-            });
+            icon.iconHomeX = homeX;
+            icon.iconHomeY = homeY;
+        //    icon.on("mouseup", onFactorIconMouseUp);
+          //  icon.on("moving", onFactorIconMoving);
         }
         canvas.add(icon);
     });
 };
 
-// Check if factor icon are too close
+// Check if a factor icon is too close to the others
 belowMinimumDistance = function(icon) {
     var factors = getIconsOfType("factor");
     var selectionBorder = canvasStyle.leftSideWidth;
@@ -333,14 +353,15 @@ belowMinimumDistance = function(icon) {
 
 
 // On mouse up: move icon to last valid position
-repositionFactorIcon = function(icon) {
+onFactorIconMouseUp = function(options) {
+    var icon = options.target;
     while (belowMinimumDistance(icon) && uistate.iconPositions.length > 0) {
         var lastPosition = uistate.iconPositions.pop();
         icon.left = lastPosition[0];
         icon.top = lastPosition[1];
     }
-    canvas.remove(icon);
-    canvas.add(icon);
+    //canvas.remove(icon);
+    //canvas.add(icon);
     redrawConnections(icon);
     uistate.iconPositions = []
 };
@@ -396,21 +417,22 @@ undoArrowStartSelection = function() {
 
 
 // Behaviour on icon click
-factorIconClick = function(icon) {
+onFactorIconClicked = function(options) {
+    var icon = options.target;
     console.log("Clicked factor: " + icon.iconName);
     uistate.iconPositions = [
         [icon.left, icon.top]
     ];
+
+    if (uistate.highlight === icon.iconName)    removeHighlight();
+    else                                        drawHighlight(icon);
 
     var factorMedia = settings.factorMedia[icon.iconName];
     if (uistate.audioCue && factorMedia.audio) { // when question mark clicked
 
         console.log("Playing factor audio for: " + icon.iconName);
         $("audio")[0].src = "audio/" + factorMedia.audio;
-        drawHighlight(icon);
-        setTimeout(function() {
-            removeHighlight();
-        }, 1000);
+        setTimeout(removeHighlight, 1000);
         uistate.audioCue = false;
         return;
     }
@@ -424,7 +446,6 @@ factorIconClick = function(icon) {
                 console.log("select start: " + icon.iconName);
                 uistate.newArrow.state = "select-end";
                 uistate.newArrow.startIcon = icon.iconName;
-                drawHighlight(icon);
                 break;
             case "select-end":
                 if (uistate.newArrow.startIcon === icon.iconName) {
@@ -450,21 +471,28 @@ factorIconClick = function(icon) {
 
 // Calculate signed x and y distance from allowable area
 iconPassOverDistance = function(icon) {
-    var passOver = { left: 0, top: 0 };
+    var hasConnection = getFactorConnectionIcons(icon).length > 0;
+
+    return passOverDistance(icon.left, icon.top, hasConnection);
+};
+
+passOverDistance = function(x, y, withLeftSide=false) {
+    var passOver = { x: 0, y: 0, occurs: false };
 
     var offset = canvasStyle.iconSize / 2;
-    var hasConnection = getFactorConnectionIcons(icon).length > 0;
 
     var bottomLimit = uistate.height - offset;
     var topLimit    = offset;
     var rightLimit  = uistate.width - canvasStyle.rightSideWidth - offset;
     var leftLimit   = offset;
-    if (hasConnection) leftLimit +=  canvasStyle.leftSideWidth;
+    if (!withLeftSide) leftLimit +=  canvasStyle.leftSideWidth;
 
-    if      (icon.left < leftLimit)   passOver.left = icon.left - leftLimit;
-    else if (icon.left > rightLimit)  passOver.left = icon.left - rightLimit;
-    if      (icon.top  < topLimit)    passOver.top  = icon.top  - topLimit;
-    else if (icon.top  > bottomLimit) passOver.top  = icon.top  - bottomLimit;
+    if      (x < leftLimit)   passOver.x = x - leftLimit;
+    else if (x > rightLimit)  passOver.x = x - rightLimit;
+    if      (y < topLimit)    passOver.y = y - topLimit;
+    else if (y > bottomLimit) passOver.y = y - bottomLimit;
+
+    passOver.occurs = (passOver.x !== 0 || passOver.y !== 0);
 
     return passOver;
 };
@@ -482,19 +510,12 @@ redrawConnections = function(icon) {
 };
 
 
-// Behaviour when icon is moved
-factorIconMoving = function(icon) {
-
-    uistate.moving = icon.iconName;
-    uistate.iconPositions.push([icon.left, icon.top]);
-
-    // Do not allow passing over mapping area
-    var passOver = iconPassOverDistance(icon);
-    if (passOver.top !== 0 || passOver.left !== 0) {
-        icon.left -= passOver.left;
-        icon.top -= passOver.top;
+// Remove arrows connected to icon
+removeConnections = function(icon) {
+    var connIcons = getFactorConnectionIcons(icon);
+    for (var connectedIcon of connIcons) {
+        canvas.remove(connectedIcon);
     }
-    redrawConnections(icon);
 };
 
 
@@ -515,6 +536,14 @@ getIconAnchor = function(iconName) {
 };
 
 
+// Behaviour on arrow click
+onArrowClicked = function(options) {
+    var icon = options.target;
+    if (uistate.highlight === icon.iconName)    removeHighlight();
+    else                                        drawHighlight(icon);
+};
+
+
 // Draw arrow between symbols, only horizontal?
 drawConnection = function(startIconName, endIconName, weight) {
 
@@ -525,10 +554,11 @@ drawConnection = function(startIconName, endIconName, weight) {
         var dirVec = getDirv(startPos, endPos);
         var factorDistance = getDist(startPos, endPos);
 
+        var dFromCenter = 0;
         if ( factorDistance > canvasStyle.minIconDistance + canvasStyle.arrowMargin)
-            var dFromCenter = canvasStyle.iconSize / 2 + canvasStyle.arrowMargin;
+            dFromCenter = canvasStyle.iconSize / 2 + canvasStyle.arrowMargin;
         else
-            var dFromCenter = factorDistance / 2;
+            dFromCenter = factorDistance / 2;
 
         var arrowLength = Math.max(canvasStyle.arrowMinLength, factorDistance - 2 * dFromCenter);
 
@@ -548,10 +578,14 @@ drawConnection = function(startIconName, endIconName, weight) {
         arrow.rotate(180 * Math.atan2(dirVec.y, dirVec.x) / Math.PI);
         arrow.borderColor = "transparent";
         arrow.hasControls = false;
-        arrow.movable = true;
+      //  arrow.movable = false;
+
+        arrow.selectable = false;
         arrow.iconType = "connection";
         arrow.iconName = startIconName + "-" + endIconName;
         arrow.connectionWeight = weight;
+        arrow.on("mousedown", onArrowClicked);
+        /*
         arrow.on("mouseup", function () {
             // if right of mapping area remove arrow
             var rightLimit = uistate.width - canvasStyle.leftSideWidth + canvasStyle.arrowDeletionToleranceMargin;
@@ -561,11 +595,10 @@ drawConnection = function(startIconName, endIconName, weight) {
                 canvas.remove(arrow);
                 drawConnection(startIconName, endIconName, weight);
             }
-        });
+        });*/
         canvas.add(arrow);
     }
 };
-
 
 // Divide canvas into 3 areas
 divideCanvas = function() {
@@ -623,10 +656,56 @@ setupFactorMenu = function(factors) {
         var row = Math.floor(factorInd / nCols);
         var xLeft = xOffset + ((canvasStyle.factorXPadding + canvasStyle.iconSize) * col) + canvasStyle.iconSize/2;
         var yTop = yOffset + (canvasStyle.factorYPadding + canvasStyle.iconSize) * row + canvasStyle.iconSize/2;
-        drawFactorIcon(factors[factorInd], xLeft, yTop, false);
+        drawFactorIcon(factors[factorInd], xLeft, yTop, xLeft, yTop, false);
     }
 };
 
+onNextButtonClicked = function() {
+    console.log("Next clicked");
+    if (uistate.mapping === "practice") {
+        if (practiceSolutionCorrect()) {
+            uistate.mapping = "finished";
+            uistate.video = "instructions";
+            showScreen("display-video");
+        }
+    } else {
+        uistate.mapping = "finished";
+        showScreen("thank-you");
+        saveResult();
+    }
+};
+
+onQuestionButtonClicked = function() {
+    console.log("Question clicked");
+    resetUIstate();
+    uistate.audioCue = true;
+    var questionIcon = getIconByName("question");
+    drawHighlight(questionIcon);
+};
+
+onBinButtonClicked = function() {
+    console.log("Bin clicked");
+    if (uistate.newArrow.state === "select-arrow") {
+        console.log(uistate.highlight);
+        var icon = getIconByName(uistate.highlight);
+        if (icon && !icon.iconFixed) {
+            if (icon.iconType === "factor") {
+                console.log("Removing factor:", icon.iconName);
+
+                removeConnections(icon);
+
+                canvas.remove(icon);
+                icon.left = icon.iconHomeX;
+                icon.top  = icon.iconHomeY;
+                canvas.add(icon);
+
+            } else if (icon.iconType === "connection") {
+                canvas.remove(icon);
+            }
+        }
+    }
+    resetUIstate();
+};
 
 // Layout and behaviour of drawing screen
 setupMapping = function() {
@@ -643,30 +722,12 @@ setupMapping = function() {
     setupArrows();
     setupFactorMenu(dynamicFactors);
     console.log("Draw factors", dynamicFactors);
-    drawFactorIcon(fixedFactor, uistate.xFixedFactor,  uistate.yFixedFactor[uistate.mapping], true);
+    drawFactorIcon(fixedFactor, uistate.xFixedFactor,  uistate.yFixedFactor[uistate.mapping], uistate.xFixedFactor,  uistate.yFixedFactor[uistate.mapping], true);
 
-    // Setup "question" button
-    drawButton("question", 100, uistate.height - canvasStyle.buttonSize , function() {
-        resetUIstate();
-        uistate.audioCue = true;
-        var questionIcon = getIconByName("question");
-        drawHighlight(questionIcon);
-    });
-
-    // Setup "next" button
-    drawButton("next", uistate.width - 110, uistate.height - canvasStyle.buttonSize, function() {
-        if (uistate.mapping === "practice") {
-            if (practiceSolutionCorrect()) {
-                uistate.mapping = "finished";
-                uistate.video = "instructions";
-                showScreen("display-video");
-            }
-        } else {
-            uistate.mapping = "finished";
-            showScreen("thank-you");
-            saveResult();
-        }
-    });
+    // Setup buttons
+    drawButton("question", 100, uistate.height - canvasStyle.buttonSize, onQuestionButtonClicked);
+    drawButton("next", uistate.width - 110, uistate.height - canvasStyle.buttonSize, onNextButtonClicked);
+    drawButton("bin", uistate.width - 130, 0 , onBinButtonClicked);
 
     if (uistate.mapping === "practice") {
         fabric.Image.fromURL("images/" + settings.solutionImage, function(image) {
@@ -775,6 +836,35 @@ adjustCanvasSizesToScreen = function() {
 };
 
 
+// Behaviour when canvas is clicked
+onCanvasClicked = function(options) {
+    console.log("canvas clicked");
+    console.log("target");
+    console.log(options.target);
+    if (!options.target && uistate.newArrow.state === "select-arrow") {
+        console.log("empty canvas clicked");
+        console.log(uistate.highlight);
+        var icon = getIconByName(uistate.highlight);
+        console.log(icon);
+
+
+        if (icon && (icon.iconType === "factor")) {
+            var passOver = passOverDistance(options.e.clientX, options.e.clientY);
+            if (!passOver.occurs) {
+                removeHighlight();
+
+                canvas.remove(icon);
+                icon.left = options.e.clientX;
+                icon.top = options.e.clientY;
+                canvas.add(icon);
+
+                redrawConnections(icon);
+            }
+        }
+    }
+};
+
+
 // Set up canvas according to current window size
 setupCanvas = function() {
 
@@ -783,7 +873,10 @@ setupCanvas = function() {
     canvas = new fabric.Canvas("mapping-canvas", {
         width: uistate.width,
         height: uistate.height
-        });
+    });
+
+    canvas.on("mouse:down", onCanvasClicked);
+
     canvas.selection = false;
     canvas.hoverCursor = "default";
 };
@@ -1043,6 +1136,9 @@ window.onload = function() {
     $("#btn-ty-back").on("click", function() {
         showScreen("mapping-task");
         uistate.mapping = "main";
+    });
+    $("#btn-ty-tomain").on("click", function() {
+        showScreen("menu");
     });
 
     // On settings screen
