@@ -335,8 +335,8 @@ belowMinimumDistance = function(icon) {
     var factors = getIconsOfType("factor");
     var selectionBorder = canvasStyle.leftSideWidth;
 
-    for (var factor of factors) {
-
+    for (var factorInd = 0; factorInd < factors.length; factorInd++) {
+        var factor = factors[i]
         if ( icon.iconName !== factor.iconName ) {
             var distance = getDist(icon, factor);
             if (icon.left > selectionBorder && factor.left > selectionBorder) { // both icons on canvas
@@ -381,10 +381,11 @@ getIconsOfType = function(type) {
 
 // Get arrow objects from canvas
 getConnectionStrings = function() {
-    var factors = getIconsOfType("connection");
+    var icons = getIconsOfType("connection");
 
     var arrows = [];
-    for (var icon of factors) {
+    for (arrowInd = 0; arrowInd < icons.length; arrowInd++) {
+        var icon = icons[arrowInd]
         var infoArray = icon.iconName.split("-").concat(icon.connectionWeight);
         arrows.push(infoArray.join("\t"));
     }
@@ -394,12 +395,13 @@ getConnectionStrings = function() {
 
 // Get icons connected to given icon
 getFactorConnectionIcons = function(icon) {
-    var factors = getIconsOfType("connection");
+    var icons = getIconsOfType("connection");
 
     var connectedIcons = [];
-    for (var factor of factors) {
-        if (factor.iconName.indexOf(icon.iconName) !== -1) {
-            connectedIcons.push(factor);
+    for (arrowInd = 0; arrowInd < icons.length; arrowInd++) {
+        var icon = icons[arrowInd]
+        if (icon.iconName.indexOf(icon.iconName) !== -1) {
+            connectedIcons.push(icon);
         }
     }
     return connectedIcons;
@@ -476,7 +478,9 @@ iconPassOverDistance = function(icon) {
     return passOverDistance(icon.left, icon.top, hasConnection);
 };
 
-passOverDistance = function(x, y, withLeftSide=false) {
+passOverDistance = function(x, y, withLeftSide) {
+    if (withLeftSide == undefined) withLeftSide = false
+
     var passOver = { x: 0, y: 0, occurs: false };
 
     var offset = canvasStyle.iconSize / 2;
@@ -500,28 +504,31 @@ passOverDistance = function(x, y, withLeftSide=false) {
 
 // Redraw arrows connected to icon
 redrawConnections = function(icon) {
-    var connIcons = getFactorConnectionIcons(icon);
-    for (var connectedIcon of connIcons) {
-        var factors = connectedIcon.iconName.split("-");
+    var connectedIcons = getFactorConnectionIcons(icon);
+    for (var arrowInd = 0; arrowInd < connectedIcons.length; arrowInd++) {
+        var icon = connectedIcons[arrowInd]
+        var factors = icon.iconName.split("-");
 
         canvas.remove(connectedIcon);
-        drawConnection(factors[0], factors[1], connectedIcon.connectionWeight);
+        drawConnection(factors[0], factors[1], icon.connectionWeight);
     }
 };
 
 
 // Remove arrows connected to icon
 removeConnections = function(icon) {
-    var connIcons = getFactorConnectionIcons(icon);
-    for (var connectedIcon of connIcons) {
-        canvas.remove(connectedIcon);
+    var connectedIcons = getFactorConnectionIcons(icon);
+    for (var arrowInd = 0; arrowInd < connectedIcons.length; arrowInd++) {
+        canvas.remove(connectedIcons[arrowInd]);
     }
 };
 
 
 // Get object from canvas
 getIconByName = function(iconName) {
-    for (var obj of canvas.getObjects()) {
+    var objects = canvas.getObjects()
+    for (var objInd = 0; objInd < objects.length; objInd++) {
+        var obj = objects[objInd]
         if (obj.hasOwnProperty("iconName") && obj.iconName === iconName) {
             return obj;
         }
@@ -895,8 +902,9 @@ populateSelection = function(element, mediaType, defaultValue, optional) {
         element.appendChild(option);
     }
 
-    for (var filename of mediaSources[mediaType]) {
-        console.log(filename)
+    var files = mediaSources[mediaType]
+    for (var fileInd = 0; fileInd < files.length; fileInd++) {
+        var filename = files[fileInd]
         var option = document.createElement("option");
 
         option.value = filename;
@@ -914,7 +922,7 @@ populateSelectionForClass = function(className, mediaType) {
 
     var element = document.getElementsByClassName(className);
 
-    for (var i = 0; i< element.length; i++) {
+    for (var i = 0; i < element.length; i++) {
         var defaultValue = settings[element[i].id];
         populateSelection(element[i], mediaType, defaultValue, false);
     }
@@ -1007,6 +1015,7 @@ factorRow = function(factorKey, used, fixed, defaultName, defaultImg, defaultAud
 listFactors = function() {
     var factorTable = document.getElementById("factorMedia");
     for (var factorKey in settings.factorMedia){
+        console.log(factorKey)
         var factor = settings.factorMedia[factorKey];
 
         if (!factor.practice) {
@@ -1055,7 +1064,9 @@ saveSettings = function () {
     // Set media
     var mediaList = [ "instructionVideo", "introductionVideo", "thankYouImage",
         "thankYouAudio", "mainMappingAudio", "practiceMappingAudio"];
-    for (var item of mediaList) {
+
+    for (var mediaInd = 0; mediaInd < medialist.length; mediaInd++) {
+        var item = medialist[mediaInd]
         var element = document.getElementById(item);
         var mediaFile = element.options[element.selectedIndex].value;
         if (mediaFile && mediaFile !== "") settings[item] = mediaFile;
@@ -1065,7 +1076,8 @@ saveSettings = function () {
     settings.factors.main.fixed = "";
     settings.factors.main.dynamic = [];
     var factorRows = document.getElementsByClassName("factorRow");
-    for (var row of factorRows) {
+    for (var rowInd = 0; rowInd < factorRows.length; rowInd++) {
+        var row = factorRows[rowInd]
         var factorKey = row.name;
         if (!row.hidden) {
             var use = $("input.useFactor[name=" + factorKey + "]")[0].checked;
