@@ -843,12 +843,14 @@ adjustCanvasSizesToScreen = function() {
 };
 
 
+
 // Behaviour when canvas is clicked
 onCanvasClicked = function(options) {
+
     console.log("canvas clicked");
-    console.log("target");
-    console.log(options.target);
+
     if (!options.target && uistate.newArrow.state === "select-arrow") {
+
         console.log("empty canvas clicked");
         console.log(uistate.highlight);
         var icon = getIconByName(uistate.highlight);
@@ -856,13 +858,18 @@ onCanvasClicked = function(options) {
 
 
         if (icon && (icon.iconType === "factor")) {
-            var passOver = passOverDistance(options.e.clientX, options.e.clientY);
+            var pointer = canvas.getPointer(options.e);
+            var x = pointer.x;
+            var y = pointer.y;
+            var passOver = passOverDistance(x, y);
             if (!passOver.occurs) {
+
                 removeHighlight();
 
+                icon.left = x;
+                icon.top = y;
+
                 canvas.remove(icon);
-                icon.left = options.e.clientX;
-                icon.top = options.e.clientY;
                 canvas.add(icon);
 
                 redrawConnections(icon);
