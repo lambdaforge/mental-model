@@ -41,7 +41,9 @@ console.log(settings);
 // Compares practice solution with drawn diagram
 practiceSolutionCorrect = function() {
     var diagramDrawn = getConnectionStrings().sort().join("");
-    var correctDiagram = settings.practiceSolution.sort().join("").replace(" ","\t");
+    console.log(diagramDrawn);
+    var correctDiagram = settings.practiceSolution.sort().join("");
+    console.log(correctDiagram);
 
     return diagramDrawn === correctDiagram;
 };
@@ -117,9 +119,6 @@ showScreen = function(screenName) {
             sel.css("height", canvasStyle.height);
             sel.css("background-position", "center");
             $("#audio")[0].src = "audio/" + settings.thankYouAudio;
-            break;
-        case "show-data":
-            $("#show-data pre").text(localStorage.getItem("mmetool"));
             break;
         case "settings":
             break;
@@ -267,7 +266,7 @@ drawFactorIcon = function(iconName, xLeft, yTop, fixed) {
         if (fixed) {
             icon.iconFixed = true;
             icon.selectable = false;
-            icon.iconName = "fg:" + iconName;
+            icon.iconName = iconName;
         }
         else {
             icon.iconFixed = false;
@@ -285,6 +284,7 @@ tooCloseToOtherFactors = function(pointer) {
     var factors = getIconsOfType("factor");
 
     for (var factorInd = 0; factorInd < factors.length; factorInd++) {
+
         var factor = factors[factorInd];
         var distance = getDist(pointer, {x: factor.left, y: factor.top});
         if (distance < canvasStyle.minIconDistance) return true;
@@ -420,14 +420,10 @@ withinMappingArea = function(x, y) {
 // Redraw arrows connected to icon
 redrawConnections = function(factor) {
     var connectedIcons = getFactorConnectionIcons(factor);
-    console.log("connectedIcons",connectedIcons);
-    console.log("factor", factor);
     for (var arrowInd = 0; arrowInd < connectedIcons.length; arrowInd++) {
         var connectedIcon = connectedIcons[arrowInd];
         var factors = connectedIcon.iconName.split("-");
 
-        console.log("name", connectedIcon.iconName);
-        console.log("factors", factors);
         canvas.remove(connectedIcon);
         drawConnection(factors[0], factors[1], connectedIcon.connectionWeight);
     }
@@ -562,12 +558,15 @@ setupFactorMenu = function(factors) {
 onNextButtonClicked = function() {
     console.log("Next clicked");
     if (uistate.mapping === "practice") {
+    console.log("prac");
         if (practiceSolutionCorrect()) {
+    console.log("corr");
             uistate.mapping = "finished";
             uistate.video = "instructions";
             showScreen("display-video");
         }
     } else {
+    console.log("fin");
         uistate.mapping = "finished";
         showScreen("thank-you");
         saveResult();
@@ -631,7 +630,8 @@ setupMapping = function() {
     setupFactorMenu(dynamicFactors);
     console.log("Draw factors", dynamicFactors);
     var xFixed = canvasStyle.xFixedFactor;
-    var yFixed = canvasStyle.yFixedFactor[uistate.mapping];
+    var yFixed = canvasStyle.yFixedFactor;
+
     drawFactorIcon(fixedFactor, xFixed,  yFixed, true);
 
     // Setup buttons
@@ -1008,9 +1008,6 @@ window.onload = function() {
         uistate.sessionComment = $("#comment")[0].value;
         uistate.mapping = "main";
         showScreen("mapping-task");
-    });
-    $("#btn-data").on("click", function() {
-        showScreen("show-data");
     });
     $("#btn-download").on("click", function() {
         downloadData();

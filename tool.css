@@ -40,4 +40,30 @@ video {
 button {
     font-size: 16px;
     height: 30px;
+    margin: 10px;
+}
+
+#steps {
+    width: 220px;
+    float: left;
+}
+
+.stepButtons {
+    width: 150px;
+}
+
+.boxed {
+    border: 1px solid gray;
+    width: 160px;
+    float: right;
+
+}
+
+.otherBtn {
+    width: 140px;
+}
+
+#options {
+    width: 100%;
+    display: inline;
 }

@@ -31,8 +31,8 @@ class StartActivity : AppCompatActivity() {
                     copyAssetsTo(assetPath + "/" + assets[i], targetDir)
                 }
             }
-        } catch (ex: IOException) {
-            Log.e("assets", "I/O Exception", ex)
+        } catch (e: IOException) {
+            Log.e("assets", "I/O Exception", e)
         }
 
     }
@@ -72,10 +72,10 @@ class StartActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        if (prefs!!.getBoolean("firstrun", true)) {
+      //  if (prefs!!.getBoolean("firstrun", true)) {
             copyAssetsTo("www", this.filesDir.absolutePath)
             prefs!!.edit().putBoolean("firstrun", false).apply()
-        }
+       // }
     }
 
     fun changeToUpload(v: View) {

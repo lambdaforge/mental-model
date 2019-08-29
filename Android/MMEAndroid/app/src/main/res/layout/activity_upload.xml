@@ -1,97 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="fill_parent"
-             android:layout_height="fill_parent">
+             android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:weightSum="3">
 
-    <TableRow
+    <RelativeLayout
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
-        <TextView
-                android:text="Video File"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingRight="20dp"
-                android:layout_column="1" />
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+            <TextView
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:text="Video Files"
+                    android:layout_width="150dip"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="20dp"
+                    android:paddingStart="20dp"/>
 
-        <TextView
-                android:id="@+id/videoFilename"
-                android:text=""
-                android:layout_width="200dip"
-                android:layout_height="wrap_content"
-                android:paddingRight="20dp"
-                android:gravity="center"
-                android:layout_column="1" />
+            <Button
+                    android:text="Choose File"
+                    android:onClick="uploadVideo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+        </LinearLayout>
 
-        <Button
-                android:id="@+id/uploadVideo"
-                android:text="Choose File"
-                android:onClick="uploadVideo"
+    </RelativeLayout>
 
-                android:layout_centerVertical="true"
-                android:layout_width="200dip"
-                android:layout_height="wrap_content" />
-
-    </TableRow>
-
-    <TableRow
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-    <TextView
-            android:text="Audio File"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingRight="20dp"
-            android:layout_column="1" />
-
-    <TextView
-            android:id="@+id/audioFilename"
-            android:text=""
-            android:layout_width="200dip"
-            android:layout_height="wrap_content"
-            android:paddingRight="20dp"
-            android:gravity="center"
-            android:layout_column="1" />
-
-    <Button
-            android:id="@+id/uploadAudio"
-            android:text="Choose File"
-            android:onClick="uploadAudio"
-
-            android:layout_centerVertical="true"
-            android:layout_width="200dip"
-            android:layout_height="wrap_content" />
-
-    </TableRow>
-
-    <TableRow
+    <RelativeLayout
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
-        <TextView
-                android:text="Image File"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingRight="20dp"
-                android:layout_column="1" />
+            android:layout_height="0dp"
+            android:layout_weight="1">
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+            <TextView
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:text="Audio Files"
+                    android:layout_width="150dip"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="20dp"
+                    android:paddingStart="20dp"/>
 
-        <TextView
-                android:id="@+id/imageFilename"
-                android:text=""
-                android:layout_width="200dip"
-                android:layout_height="wrap_content"
-                android:paddingRight="20dp"
-                android:gravity="center"
-                android:layout_column="1" />
+            <Button
+                    android:text="Choose File"
+                    android:onClick="uploadAudio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+        </LinearLayout>
 
-        <Button
-                android:id="@+id/uploadImage"
-                android:text="Choose File"
-                android:onClick="uploadImage"
+    </RelativeLayout>
 
-                android:layout_centerVertical="true"
-                android:layout_width="200dip"
-                android:layout_height="wrap_content" />
+    <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+            <TextView
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:text="Image Files"
+                    android:layout_width="150dip"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="20dp"
+                    android:paddingStart="20dp"/>
 
-    </TableRow>
+            <Button
+                    android:text="Choose File"
+                    android:onClick="uploadImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+        </LinearLayout>
 
-</TableLayout>
+    </RelativeLayout>
+
+</LinearLayout>

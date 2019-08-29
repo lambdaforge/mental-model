@@ -28,10 +28,10 @@ arrowPositions = function(h, w, rightSideWidth, leftSideLineHeight, nArrows) {
 
 
 // Get weights of arrow actually used in this mapping
-getUsedArrows = function(weights, negativeUsed) {
+getUsedArrows = function(weights, negativeUsed, mappingType) {
     var arrows = [];
     for (var i = 0; i < weights.length; i++) {
-        if (weights[i] > 0 || negativeUsed) {
+        if (weights[i] > 0 || (negativeUsed && !(mappingType== "practice")) ) {
             arrows.push(weights[i]);
         }
     }
@@ -65,16 +65,13 @@ getPixelSizes = function(w, h, mappingType, settings) { // "main" or "practice"
     var mappingScreenWidth = w - leftSideLineHeight - leftSideWidth;
     var mappingCenterX = leftSideWidth + mappingScreenWidth/2;
 
-    var arrowsUsed = getUsedArrows(settings.arrowWeights, settings.useNegativeArrows);
+    var arrowsUsed = getUsedArrows(settings.arrowWeights, settings.useNegativeArrows, mappingType);
     var maxArrowWidth = h/80;
-    console.log("h", h); // 800
-    console.log("maxArrowWidth", maxArrowWidth);//10
     var minArrowWidth = 2;
     var maxAbsWeight = getAbsoluteMax(arrowsUsed);
     var arrowWidthSteps = (maxArrowWidth - minArrowWidth ) / (maxAbsWeight-1);
     var arrowHeadSize = h / 40;
-    console.log("arrowHeadSize", arrowHeadSize); // 20
-
+    var iconSize = Math.min(0.9 * leftSideLineHeight, leftSideWidth/3)
 
     return {
         height: h,
@@ -86,16 +83,16 @@ getPixelSizes = function(w, h, mappingType, settings) { // "main" or "practice"
         availableHeight: availableHeight,
         leftSideLineHeight: leftSideLineHeight,
 
-        xFixedFactor: w - w / 8,
+        xFixedFactor: w - rightSideWidth - 1.5*iconSize,
         yFixedFactor: (mappingType === "practice") ? h * 3 / 4 : h / 2,
 
         practiceImageY: h * 1 / 4,
         practiceImageX: mappingCenterX,
-        practiceImageHeight: h*1/4,
+        practiceImageHeight: h * 0.5,
 
-        buttonSize: leftSideLineHeight,
-        iconSize: Math.min(0.9 * leftSideLineHeight, leftSideWidth/3),
-        minIconDistance: leftSideLineHeight,
+        buttonSize: iconSize,
+        iconSize: iconSize,
+        minIconDistance: iconSize,
 
         factorsPerRow: factorsPerRow,
         initialFactorPositions: factorPositions(leftSideLineHeight, leftSideWidth, nFactors, factorsPerRow),
@@ -117,9 +114,6 @@ getPixelSizes = function(w, h, mappingType, settings) { // "main" or "practice"
 
         centerRightSide: w - rightSideWidth/2,
         centerLeftSide: leftSideWidth/2,
-
-      //  arrowMaxVertSpacing: 100,
-
 
     };
 

@@ -28,40 +28,49 @@ class UploadActivity : AppCompatActivity() {
         actionBar!!.setDisplayHomeAsUpEnabled(true)
     }
 
-    fun uploadVideo(v: View) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "video/*"
-            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            action = Intent.ACTION_GET_CONTENT
+        if (requestCode == IMAGE_IMPORT_CODE && resultCode == RESULT_OK ) {
+            handleFileImport(data, "images")
         }
+        if (requestCode == AUDIO_IMPORT_CODE && resultCode == RESULT_OK ) {
+            handleFileImport(data, "audio")
+        }
+        if (requestCode == VIDEO_IMPORT_CODE && resultCode == RESULT_OK ) {
+            handleFileImport(data, "video")
+        }
+    }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean { // Back button
+        val intent = Intent(applicationContext, StartActivity::class.java)
+        startActivityForResult(intent, 0)
+        return true
+    }
+
+    fun uploadVideo(v: View) {
+        val intent = openPicker("video/*")
         startActivityForResult(intent, VIDEO_IMPORT_CODE)
     }
 
     fun uploadAudio(v: View) {
-
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "audio/*"
-            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            action = Intent.ACTION_GET_CONTENT
-        }
-
+        val intent = openPicker("audio/*")
         startActivityForResult(intent, AUDIO_IMPORT_CODE)
     }
 
     fun uploadImage(v: View) {
+        val intent = openPicker("image/*")
+        startActivityForResult(intent, IMAGE_IMPORT_CODE)
+    }
 
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+    private fun openPicker(fileType: String): Intent {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+        intent.apply {
             addCategory(Intent.CATEGORY_OPENABLE)
-            type = "image/*"
+            type = fileType
             putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
             action = Intent.ACTION_GET_CONTENT
         }
-
-        startActivityForResult(intent, IMAGE_IMPORT_CODE)
+        return intent
     }
 
     private fun getFileName(uri: Uri): String {
@@ -122,7 +131,11 @@ class UploadActivity : AppCompatActivity() {
         while (true) {
             val bf = inStream.read(buffer)
             if (bf == -1) break
-            outStream.write(buffer, 0, bf)
+            try {
+                outStream.write(buffer, 0, bf)
+            } catch (e: IOException) {
+
+            }
         }
         inStream.close()
         outStream.flush()
@@ -177,26 +190,6 @@ class UploadActivity : AppCompatActivity() {
                 else Log.i("File Chooser", "No File selected")
             }
         }
-    }
-
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-
-        if (requestCode == IMAGE_IMPORT_CODE && resultCode == RESULT_OK ) {
-            handleFileImport(data, "images")
-        }
-        if (requestCode == AUDIO_IMPORT_CODE && resultCode == RESULT_OK ) {
-            handleFileImport(data, "audio")
-        }
-        if (requestCode == VIDEO_IMPORT_CODE && resultCode == RESULT_OK ) {
-            handleFileImport(data, "video")
-        }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean { // Back button
-        val myIntent = Intent(applicationContext, StartActivity::class.java)
-        startActivityForResult(myIntent, 0)
-        return true
     }
 
 }

@@ -20,14 +20,23 @@
                             <td><input id="comment" type="text" length="20"/></td>
                         </tr>
                     </table>
-                    <br><br>
-                    <button id="btn-introduction" type="button">Introduction</button>
-                    <button id="btn-practice" type="button">Practice</button>
-                    <button id="btn-instructions" type="button">Instructions</button>
-                    <button id="btn-mapping" type="button">Mapping</button>
-                    <button id="btn-data" type="button">Show Data</button>
-                    <button id="btn-settings" type="button">Settings</button>
-                    <button id="btn-download" type="button">Download</button>
+                    <button id="btn-introduction" type="button">Start</button>
+                    <br>
+                    <div id="options">
+                        <div id="steps">
+                            <br><br>
+                            <i>or Jump to</i> <br><br>
+                            <button class="stepButtons" id="btn-practice" type="button">Practice</button><br>
+                            <button class="stepButtons" id="btn-instructions" type="button">Instructions</button><br>
+                            <button class="stepButtons" id="btn-mapping" type="button">Mapping</button><br>
+                            <br>
+                        </div>
+
+                        <div class="boxed">
+                            <button class="otherBtn" id="btn-settings" type="button">Settings</button><br>
+                            <button class="otherBtn" id="btn-download" type="button">Download Data</button>
+                        </div>
+                    </div>
             </div>
             <div id="display-video" class="screen">
                 <video id="video" controls></video>

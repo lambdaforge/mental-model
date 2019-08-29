@@ -28,7 +28,7 @@ defaultSettings = {
 
 
     solutionImage: "solution.png",
-    practiceSolution:  ["food smile 3", "work money 2", "money smile 2",  "sleep smile 1"],
+    practiceSolution:  ["food\tsmile\t3", "work\tmoney\t2", "money\tsmile\t2",  "sleep\tsmile\t1"],
 
 
     //
