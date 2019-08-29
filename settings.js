@@ -4,7 +4,8 @@ defaultSettings = {
     audioBlock: true,
     useNegativeArrows: true,
     arrowWeights: [3, 2, 1, -1, -2, -3], // choose (limited) amount?
-    arrowColor: {positive: "blue", negative: "red"},
+    arrowColor: { positive: "blue", negative: "red" },
+    highlightColor: "lightskyblue",
     customFactorNumber: 0,
 
     factors: {

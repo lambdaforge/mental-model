@@ -9,17 +9,6 @@ uistate = {
         comment: ""
     },
 
-    // Canvas state, adjust on startup
-    height: 800,
-    width: 1280,
-    availableHeight: 600, // (- 200)for arrow and factor selection
-    yCenter: 400,
-    maxFactors: 15,
-
-    xFixedFactor: 1000,
-    yFixedFactor: { main: 400, practice: 600 },
-
-
     newArrow: {
         state: "select-arrow", // select-start, select-end
         startIcon: "",
@@ -34,17 +23,18 @@ uistate = {
 };
 
 var canvas = null;
+var canvasStyle = null;
 
 // Load saved settings or use defaults
 settings = defaultSettings; // settings needs to be global
+/*
 var data = localStorage.getItem("mmetool_settings");
-
 
 if( data ) {
     settings = JSON.parse(data);
     console.log("Use stored settings");
 }
-else       console.log("Default settings used");
+else       console.log("Default settings used");*/
 
 console.log(settings);
 
@@ -69,7 +59,7 @@ drawHighlight = function(icon) {
         width: bbox.width + margin,
         height: bbox.height + margin,
         selectable: false,
-        fill: canvasStyle.highlightColor
+        fill: settings.highlightColor
     });
     highlight.iconName = "highlight";
     canvas.add(highlight);
@@ -124,7 +114,7 @@ showScreen = function(screenName) {
             var url = "images/" + settings.thankYouImage;
             var sel = $("#thank-you");
             sel.css("background-image", "url(" + url + ")");
-            sel.css("height", uistate.height);
+            sel.css("height", canvasStyle.height);
             sel.css("background-position", "center");
             $("#audio")[0].src = "audio/" + settings.thankYouAudio;
             break;
@@ -171,6 +161,8 @@ drawButton = function(name, xLeft, yTop, onmousedown) {
         icon.scaleToWidth(canvasStyle.buttonSize);
         icon.top = yTop;
         icon.left = xLeft;
+        icon.originX = "center";
+        icon.originY = "middle";
         icon.selectable = false;
         icon.iconType = "button";
         icon.iconName = name;
@@ -182,8 +174,7 @@ drawButton = function(name, xLeft, yTop, onmousedown) {
 
 // Get color and line width from arrow weight
 arrowStyle = function(arrowWeight) {
-    var factor = canvasStyle.arrowWeightLineWidthFactor;
-    var width = Math.floor(Math.abs(arrowWeight)*factor);
+    var width = canvasStyle.arrowLineWidth(Math.abs(arrowWeight));
     var cChoice = settings.arrowColor;
     var color =  arrowWeight < 0 ? cChoice.negative : cChoice.positive;
     return {"color": color, "lineWidth": width}
@@ -191,31 +182,29 @@ arrowStyle = function(arrowWeight) {
 
 
 // Draw arrow in arrow menu
-drawMenuArrow = function(arrowInd, arrowWeight, arrowMenu) {
+drawMenuArrow = function(arrowInd, arrowWeight) {
 
+    var pos = canvasStyle.arrowPositions[arrowInd];
     var style = arrowStyle(arrowWeight);
 
-    var xCenter = arrowMenu.left + (arrowMenu.right - arrowMenu.left) / 2 ;
-    var yCenter = arrowMenu.top + (arrowInd + 0.5) * arrowMenu.spacing;
+    var halfLength =  canvasStyle.arrowLength / 2;
+    var arrowStart = { x: pos.x - halfLength, y: pos.y };
 
-    var left = { x: arrowMenu.left, y: yCenter };
-    var right = { x: arrowMenu.right, y: yCenter };
+    var buttonHeight = canvasStyle.arrowHead + 2 * canvasStyle.arrowButtonMargin;
+    var buttonWidth = canvasStyle.arrowLength + 2 * canvasStyle.arrowButtonMargin;
 
-    var arrowLength = getDist(left, right);
-    var buttonHeight = canvasStyle.arrowHead + 2*canvasStyle.arrowButtonMargin;
-    var buttonWidth = arrowLength + 2* canvasStyle.arrowButtonMargin;
-
-    var arrowOutline = arrowPath(left, right, style.lineWidth);
-    var arrowAttributes =  { fill: style.color, originY: "middle" };
+    var arrowOutline = leftRightArrow(arrowStart, canvasStyle.arrowLength, style.lineWidth);
+    var arrowAttributes =  { fill: style.color, originY: "center", originX: "middle"};
 
     var arrow = new fabric.Polygon(arrowOutline, arrowAttributes);
     var arrowButton = new fabric.Rect({
-        top: yCenter ,
-        left: xCenter - buttonWidth / 2,
+        top: pos.y ,
+        left: pos.x,
         width: buttonWidth,
         height: buttonHeight,
         stroke: "transparent",
         originY: "center",
+        originX: "middle",
         fill: "transparent"
     });
 
@@ -253,53 +242,16 @@ onArrowButtonClicked = function(options) {
 setupArrows = function() {
 
     // Only use negative arrows if specified in settings
-    var arrows = settings.arrowWeights;
-    if (!settings.useNegativeArrows) {
-        arrows = settings.arrowWeights.filter(function(value) {
-            return value >= 0;
-        });
-    }
-
-    // Draw arrow area
-    var maxSpace = canvasStyle.arrowMaxVertSpacing;
-    var arrowMenuBB = {
-        right:  uistate.width - canvasStyle.arrowSideSpacing,
-        width: canvasStyle.rightSideWidth - 2*canvasStyle.arrowSideSpacing,
-        spacing: Math.min(maxSpace, uistate.availableHeight / arrows.length)
-    };
-
-    arrowMenuBB.height = arrowMenuBB.spacing * arrows.length;
-    arrowMenuBB.left = arrowMenuBB.right - arrowMenuBB.width;
-    arrowMenuBB.top = uistate.yCenter - arrowMenuBB.height / 2;
+    var arrows = canvasStyle.arrowsUsed;
 
     for (var arrowInd = 0; arrowInd < arrows.length; arrowInd++) {
-        drawMenuArrow(arrowInd, arrows[arrowInd], arrowMenuBB);
+        drawMenuArrow(arrowInd, arrows[arrowInd]);
     }
 };
 
-// Behaviour when icon is moved
-onFactorIconMoving = function(options) {
-    var icon = options.target;
-    removeHighlight();
-    if (icon.iconName === uistate.newArrow.startIcon) {
-        undoArrowStartSelection();
-    }
-    else {
-        uistate.moving = icon.iconName;
-        uistate.iconPositions.push([icon.left, icon.top]);
-
-        // Do not allow passing over mapping area
-        var passOver = iconPassOverDistance(icon);
-        if (passOver.top !== 0 || passOver.left !== 0) {
-            icon.left -= passOver.left;
-            icon.top -= passOver.top;
-        }
-        redrawConnections(icon);
-    }
-};
 
 // Draw icon on canvas
-drawFactorIcon = function(iconName, xLeft, yTop, homeX, homeY, fixed) {
+drawFactorIcon = function(iconName, xLeft, yTop, fixed) {
     var factorImage = "images/" + settings.factorMedia[iconName]["img"];
     fabric.Image.fromURL( factorImage, function(icon) {
         icon.scale(canvasStyle.iconSize / Math.max(icon.height, icon.width));
@@ -314,56 +266,30 @@ drawFactorIcon = function(iconName, xLeft, yTop, homeX, homeY, fixed) {
 
         if (fixed) {
             icon.iconFixed = true;
-            icon.iconName = "fg:" + iconName;
             icon.selectable = false;
+            icon.iconName = "fg:" + iconName;
         }
         else {
             icon.iconFixed = false;
             icon.selectable = false; // causes immobility
             icon.iconName = iconName;
-            icon.iconHomeX = homeX;
-            icon.iconHomeY = homeY;
-        //    icon.on("mouseup", onFactorIconMouseUp);
-          //  icon.on("moving", onFactorIconMoving);
+            icon.iconHomeX = xLeft;
+            icon.iconHomeY = yTop;
         }
         canvas.add(icon);
     });
 };
 
 // Check if a factor icon is too close to the others
-belowMinimumDistance = function(icon) {
+tooCloseToOtherFactors = function(pointer) {
     var factors = getIconsOfType("factor");
-    var selectionBorder = canvasStyle.leftSideWidth;
 
     for (var factorInd = 0; factorInd < factors.length; factorInd++) {
-        var factor = factors[i]
-        if ( icon.iconName !== factor.iconName ) {
-            var distance = getDist(icon, factor);
-            if (icon.left > selectionBorder && factor.left > selectionBorder) { // both icons on canvas
-                if (distance < canvasStyle.minIconDistance) return true;
-            } else {
-                if (icon.left <= selectionBorder && factor.left < selectionBorder) { // both in selection menu
-                    if (distance < canvasStyle.iconSize) return true;
-                }
-            }
-        }
+        var factor = factors[factorInd];
+        var distance = getDist(pointer, {x: factor.left, y: factor.top});
+        if (distance < canvasStyle.minIconDistance) return true;
     }
     return false;
-};
-
-
-// On mouse up: move icon to last valid position
-onFactorIconMouseUp = function(options) {
-    var icon = options.target;
-    while (belowMinimumDistance(icon) && uistate.iconPositions.length > 0) {
-        var lastPosition = uistate.iconPositions.pop();
-        icon.left = lastPosition[0];
-        icon.top = lastPosition[1];
-    }
-    //canvas.remove(icon);
-    //canvas.add(icon);
-    redrawConnections(icon);
-    uistate.iconPositions = []
 };
 
 
@@ -384,8 +310,8 @@ getConnectionStrings = function() {
     var icons = getIconsOfType("connection");
 
     var arrows = [];
-    for (arrowInd = 0; arrowInd < icons.length; arrowInd++) {
-        var icon = icons[arrowInd]
+    for (var arrowInd = 0; arrowInd < icons.length; arrowInd++) {
+        var icon = icons[arrowInd];
         var infoArray = icon.iconName.split("-").concat(icon.connectionWeight);
         arrows.push(infoArray.join("\t"));
     }
@@ -394,14 +320,14 @@ getConnectionStrings = function() {
 
 
 // Get icons connected to given icon
-getFactorConnectionIcons = function(icon) {
-    var icons = getIconsOfType("connection");
+getFactorConnectionIcons = function(factor) {
+    var connections = getIconsOfType("connection");
 
     var connectedIcons = [];
-    for (arrowInd = 0; arrowInd < icons.length; arrowInd++) {
-        var icon = icons[arrowInd]
-        if (icon.iconName.indexOf(icon.iconName) !== -1) {
-            connectedIcons.push(icon);
+    for (var arrowInd = 0; arrowInd < connections.length; arrowInd++) {
+        var arrow = connections[arrowInd];
+        if (arrow.iconName.indexOf(factor.iconName) !== -1) {
+            connectedIcons.push(arrow);
         }
     }
     return connectedIcons;
@@ -470,47 +396,40 @@ onFactorIconClicked = function(options) {
     }
 };
 
+// Distance to edge of mapping area
+withinMappingArea = function(x, y) {
 
-// Calculate signed x and y distance from allowable area
-iconPassOverDistance = function(icon) {
-    var hasConnection = getFactorConnectionIcons(icon).length > 0;
-
-    return passOverDistance(icon.left, icon.top, hasConnection);
-};
-
-passOverDistance = function(x, y, withLeftSide) {
-    if (withLeftSide == undefined) withLeftSide = false
-
-    var passOver = { x: 0, y: 0, occurs: false };
+    var passOver = { x: 0, y: 0 };
 
     var offset = canvasStyle.iconSize / 2;
 
-    var bottomLimit = uistate.height - offset;
+    var bottomLimit = canvasStyle.height - offset;
     var topLimit    = offset;
-    var rightLimit  = uistate.width - canvasStyle.rightSideWidth - offset;
-    var leftLimit   = offset;
-    if (!withLeftSide) leftLimit +=  canvasStyle.leftSideWidth;
+    var rightLimit  = canvasStyle.width - canvasStyle.rightSideWidth - offset;
+    var leftLimit   = canvasStyle.leftSideWidth;
 
     if      (x < leftLimit)   passOver.x = x - leftLimit;
     else if (x > rightLimit)  passOver.x = x - rightLimit;
     if      (y < topLimit)    passOver.y = y - topLimit;
     else if (y > bottomLimit) passOver.y = y - bottomLimit;
 
-    passOver.occurs = (passOver.x !== 0 || passOver.y !== 0);
-
-    return passOver;
+    return (passOver.x !== 0 || passOver.y !== 0);
 };
 
 
 // Redraw arrows connected to icon
-redrawConnections = function(icon) {
-    var connectedIcons = getFactorConnectionIcons(icon);
+redrawConnections = function(factor) {
+    var connectedIcons = getFactorConnectionIcons(factor);
+    console.log("connectedIcons",connectedIcons);
+    console.log("factor", factor);
     for (var arrowInd = 0; arrowInd < connectedIcons.length; arrowInd++) {
-        var icon = connectedIcons[arrowInd]
-        var factors = icon.iconName.split("-");
+        var connectedIcon = connectedIcons[arrowInd];
+        var factors = connectedIcon.iconName.split("-");
 
+        console.log("name", connectedIcon.iconName);
+        console.log("factors", factors);
         canvas.remove(connectedIcon);
-        drawConnection(factors[0], factors[1], icon.connectionWeight);
+        drawConnection(factors[0], factors[1], connectedIcon.connectionWeight);
     }
 };
 
@@ -526,9 +445,9 @@ removeConnections = function(icon) {
 
 // Get object from canvas
 getIconByName = function(iconName) {
-    var objects = canvas.getObjects()
+    var objects = canvas.getObjects();
     for (var objInd = 0; objInd < objects.length; objInd++) {
-        var obj = objects[objInd]
+        var obj = objects[objInd];
         if (obj.hasOwnProperty("iconName") && obj.iconName === iconName) {
             return obj;
         }
@@ -569,40 +488,22 @@ drawConnection = function(startIconName, endIconName, weight) {
 
         var arrowLength = Math.max(canvasStyle.arrowMinLength, factorDistance - 2 * dFromCenter);
 
-        var leftAnchor = {
-            x: startPos.x + dFromCenter * dirVec.x,
-            y: startPos.y + dFromCenter * dirVec.y + canvasStyle.arrowHead / 2
-        };
+        var arrowStartX = startPos.x + dFromCenter * dirVec.x;
+        var arrowStartY = startPos.y + dFromCenter * dirVec.y;
+        var arrowStart = {x: arrowStartX, y: arrowStartY};
 
-        var rightAnchor = {
-            x: leftAnchor.x + arrowLength,
-            y: leftAnchor.y
-        };
+        var arrowOutline = leftRightArrow(arrowStart, arrowLength, style.lineWidth);
 
-        var arrowOutline = arrowPath(leftAnchor, rightAnchor, style.lineWidth);
         var arrow = new fabric.Polygon(arrowOutline, {fill: style.color});
         arrow.centeredRotation = false;
         arrow.rotate(180 * Math.atan2(dirVec.y, dirVec.x) / Math.PI);
         arrow.borderColor = "transparent";
         arrow.hasControls = false;
-      //  arrow.movable = false;
-
         arrow.selectable = false;
         arrow.iconType = "connection";
         arrow.iconName = startIconName + "-" + endIconName;
         arrow.connectionWeight = weight;
         arrow.on("mousedown", onArrowClicked);
-        /*
-        arrow.on("mouseup", function () {
-            // if right of mapping area remove arrow
-            var rightLimit = uistate.width - canvasStyle.leftSideWidth + canvasStyle.arrowDeletionToleranceMargin;
-            if (arrow.oCoords.mr.x > rightLimit || arrow.oCoords.ml.x > rightLimit) {
-                canvas.remove(arrow);
-            } else {
-                canvas.remove(arrow);
-                drawConnection(startIconName, endIconName, weight);
-            }
-        });*/
         canvas.add(arrow);
     }
 };
@@ -613,7 +514,7 @@ divideCanvas = function() {
         top: 0,
         left: 0,
         width: canvasStyle.leftSideWidth,
-        height: uistate.height,
+        height: canvasStyle.height,
         fill: "#EAEAEA",
         selectable: false
     });
@@ -621,23 +522,23 @@ divideCanvas = function() {
         top: 0,
         left: canvasStyle.leftSideWidth,
         width: canvasStyle.borderWidth,
-        height: uistate.height,
+        height: canvasStyle.height,
         fill: "#BBBBBB",
         selectable: false
     });
     var rightSide = new fabric.Rect({
         top: 0,
-        left: uistate.width - canvasStyle.rightSideWidth,
+        left: canvasStyle.width - canvasStyle.rightSideWidth,
         width: canvasStyle.rightSideWidth,
-        height: uistate.height,
+        height: canvasStyle.height,
         fill: "#EAEAEA",
         selectable: false
     });
     var rightBorder = new fabric.Rect({
         top: 0,
-        left: uistate.width - canvasStyle.rightSideWidth - canvasStyle.borderWidth,
+        left: canvasStyle.width - canvasStyle.rightSideWidth - canvasStyle.borderWidth,
         width: canvasStyle.borderWidth,
-        height: uistate.height,
+        height: canvasStyle.height,
         fill: "#AAAAAA",
         selectable: false
     });
@@ -651,19 +552,10 @@ divideCanvas = function() {
 
 // Layout of factor menu on left side of screen
 setupFactorMenu = function(factors) {
-    var nCols = canvasStyle.factorsPerRow;
-    var nRows = Math.ceil(factors.length / nCols);
-    var horIconSpace = nCols * canvasStyle.iconSize + canvasStyle.factorXPadding * (nCols - 1);
-    var vertIconSpace = nRows * canvasStyle.iconSize + canvasStyle.factorYPadding * (nRows - 1);
-    var xOffset = (canvasStyle.leftSideWidth - horIconSpace)/2;
-    var yOffset = canvasStyle.buttonSize + (uistate.availableHeight - vertIconSpace)/2;
+    var positions = canvasStyle.initialFactorPositions;
 
     for (var factorInd = 0; factorInd < factors.length; factorInd++) {
-        var col = factorInd % nCols;
-        var row = Math.floor(factorInd / nCols);
-        var xLeft = xOffset + ((canvasStyle.factorXPadding + canvasStyle.iconSize) * col) + canvasStyle.iconSize/2;
-        var yTop = yOffset + (canvasStyle.factorYPadding + canvasStyle.iconSize) * row + canvasStyle.iconSize/2;
-        drawFactorIcon(factors[factorInd], xLeft, yTop, xLeft, yTop, false);
+        drawFactorIcon(factors[factorInd], positions[factorInd].x, positions[factorInd].y, false);
     }
 };
 
@@ -682,6 +574,8 @@ onNextButtonClicked = function() {
     }
 };
 
+
+// Behaviour when questionmark is clicked
 onQuestionButtonClicked = function() {
     console.log("Question clicked");
     resetUIstate();
@@ -690,6 +584,8 @@ onQuestionButtonClicked = function() {
     drawHighlight(questionIcon);
 };
 
+
+// Behaviour when bin is clicked
 onBinButtonClicked = function() {
     console.log("Bin clicked");
     if (uistate.newArrow.state === "select-arrow") {
@@ -722,6 +618,11 @@ setupMapping = function() {
     var dynamicFactors = factors["dynamic"];
     var fixedFactor = factors["fixed"];
 
+    // adjust Sizes
+    var h = $(window).height();
+    var w = $(window).width();
+    canvasStyle = getPixelSizes(w, h, uistate.mapping, settings);
+
     canvas.clear();
 
     // Set up arrows and factors
@@ -729,19 +630,24 @@ setupMapping = function() {
     setupArrows();
     setupFactorMenu(dynamicFactors);
     console.log("Draw factors", dynamicFactors);
-    drawFactorIcon(fixedFactor, uistate.xFixedFactor,  uistate.yFixedFactor[uistate.mapping], uistate.xFixedFactor,  uistate.yFixedFactor[uistate.mapping], true);
+    var xFixed = canvasStyle.xFixedFactor;
+    var yFixed = canvasStyle.yFixedFactor[uistate.mapping];
+    drawFactorIcon(fixedFactor, xFixed,  yFixed, true);
 
     // Setup buttons
-    drawButton("question", 100, uistate.height - canvasStyle.buttonSize, onQuestionButtonClicked);
-    drawButton("next", uistate.width - 110, uistate.height - canvasStyle.buttonSize, onNextButtonClicked);
-    drawButton("bin", uistate.width - 130, 0 , onBinButtonClicked);
+    var halfButton = canvasStyle.buttonSize / 2;
+    drawButton("question", canvasStyle.centerLeftSide, h - halfButton, onQuestionButtonClicked);
+    drawButton("next", canvasStyle.centerRightSide, h - halfButton, onNextButtonClicked);
+    drawButton("bin", canvasStyle.centerRightSide, halfButton , onBinButtonClicked);
 
     if (uistate.mapping === "practice") {
         fabric.Image.fromURL("images/" + settings.solutionImage, function(image) {
-            image.scale(0.2);
-            image.top = uistate.height/4 - 170; // 170 is image height now
-            image.originX = "right";
-            image.left = uistate.width - canvasStyle.rightSideWidth;
+
+            image.scale(canvasStyle.practiceImageHeight / image.height);
+            image.top = canvasStyle.practiceImageY;
+            image.originX = "center";
+            image.originY = "middle";
+            image.left = canvasStyle.practiceImageX;
             image.selectable = false;
             image.opacity = 0.5;
             canvas.add(image)
@@ -776,36 +682,20 @@ getOrtho = function(v, w) {
 
 
 // Calculate vertices for arrow path, right anchor is at arrow tip
-arrowPath = function(leftAnchor, rightAnchor, lineWidth) {
-    var headSize = canvasStyle.arrowHead;
-    var dLR = getDirv(leftAnchor, rightAnchor);
-    var dTB = getOrtho(leftAnchor, rightAnchor);
+leftRightArrow = function(arrowStart, arrowLength, lineWidth) {
 
-    var arrowTip = rightAnchor;
-    var headB = {
-        x: rightAnchor.x + dTB.x * headSize / 2  - dLR.x * headSize / 2,
-        y: rightAnchor.y + dTB.y * headSize / 2  - dLR.y * headSize / 2
-    };
-    var headT = {
-        x: rightAnchor.x - dTB.x * headSize / 2  - dLR.x * headSize / 2,
-        y: rightAnchor.y - dTB.y * headSize / 2  - dLR.y * headSize / 2
-    };
-    var br = {
-        x: rightAnchor.x + dTB.x * lineWidth / 2 - dLR.x * headSize / 2,
-        y: rightAnchor.y + dTB.y * lineWidth / 2 - dLR.y * headSize / 2
-    };
-    var tr = {
-        x: rightAnchor.x - dTB.x * lineWidth / 2 - dLR.x * headSize / 2,
-        y: rightAnchor.y - dTB.y * lineWidth / 2 - dLR.y * headSize / 2
-    };
-    var bl = {
-        x: leftAnchor.x  + dTB.x * lineWidth / 2,
-        y: leftAnchor.y  + dTB.y * lineWidth / 2
-    };
-    var tl = {
-        x: leftAnchor.x  - dTB.x * lineWidth / 2,
-        y: leftAnchor.y  - dTB.y * lineWidth / 2
-    };
+    var halfHead = canvasStyle.arrowHead / 2;
+    var halfLine = lineWidth / 2;
+    var rightX = arrowStart.x + arrowLength;
+
+    var arrowTip = { x: rightX,              y: arrowStart.y            };
+    var headB    = { x: rightX - halfHead,   y: arrowStart.y + halfHead };
+    var headT    = { x: rightX - halfHead,   y: arrowStart.y - halfHead };
+    var br       = { x: rightX - halfHead,   y: arrowStart.y + halfLine };
+    var tr       = { x: rightX - halfHead,   y: arrowStart.y - halfLine };
+    var bl       = { x: arrowStart.x,        y: arrowStart.y + halfLine };
+    var tl       = { x: arrowStart.x ,       y: arrowStart.y - halfLine };
+
     return [arrowTip, headB, br, bl, tl, tr, headT]
 };
 
@@ -828,22 +718,6 @@ downloadData = function() {
 };
 
 
-// Use current window size to determine positions on canvas
-adjustCanvasSizesToScreen = function() {
-
-    uistate.height = $(window).height();
-    uistate.width = $(window).width();
-    uistate.availableHeight = uistate.height - 2*canvasStyle.buttonSize;
-    uistate.yCenter = uistate.height/2;
-    uistate.maxFactors = Math.floor(uistate.availableHeight/canvasStyle.minIconDistance) * canvasStyle.factorsPerRow;
-    uistate.xFixedFactor = uistate.width - canvasStyle.rightSideWidth - canvasStyle.iconSize - canvasStyle.fixedFactorDist;
-    uistate.yFixedFactor.main = uistate.height/2 - canvasStyle.iconSize/2 ;
-    uistate.yFixedFactor.practice = uistate.height * 3.0/4 - canvasStyle.iconSize/2;
-
-};
-
-
-
 // Behaviour when canvas is clicked
 onCanvasClicked = function(options) {
 
@@ -856,19 +730,19 @@ onCanvasClicked = function(options) {
         var icon = getIconByName(uistate.highlight);
         console.log(icon);
 
-
         if (icon && (icon.iconType === "factor")) {
             var pointer = canvas.getPointer(options.e);
             var x = pointer.x;
             var y = pointer.y;
-            var passOver = passOverDistance(x, y);
-            if (!passOver.occurs) {
+
+            if (!tooCloseToOtherFactors(pointer) && !withinMappingArea(x, y)) {
 
                 removeHighlight();
 
                 icon.left = x;
                 icon.top = y;
 
+                // Necessary for fabric.js too detect new position:
                 canvas.remove(icon);
                 canvas.add(icon);
 
@@ -882,15 +756,11 @@ onCanvasClicked = function(options) {
 // Set up canvas according to current window size
 setupCanvas = function() {
 
-    adjustCanvasSizesToScreen();
-
     canvas = new fabric.Canvas("mapping-canvas", {
-        width: uistate.width,
-        height: uistate.height
+        width: $(window).width(),
+        height: $(window).height()
     });
-
     canvas.on("mouse:down", onCanvasClicked);
-
     canvas.selection = false;
     canvas.hoverCursor = "default";
 };
@@ -909,9 +779,9 @@ populateSelection = function(element, mediaType, defaultValue, optional) {
         element.appendChild(option);
     }
 
-    var files = mediaSources[mediaType]
+    var files = mediaSources[mediaType];
     for (var fileInd = 0; fileInd < files.length; fileInd++) {
-        var filename = files[fileInd]
+        var filename = files[fileInd];
         var option = document.createElement("option");
 
         option.value = filename;
@@ -1022,12 +892,10 @@ factorRow = function(factorKey, used, fixed, defaultName, defaultImg, defaultAud
 listFactors = function() {
     var factorTable = document.getElementById("factorMedia");
     for (var factorKey in settings.factorMedia){
-        console.log(factorKey)
         var factor = settings.factorMedia[factorKey];
 
         if (!factor.practice) {
             var fixed = settings.factors.main.fixed === factorKey;
-          //  var used = settings.factors.main.dynamic.includes(factorKey) || fixed; // include not working on android
             var used = (settings.factors.main.dynamic.indexOf(factorKey) !== -1) || fixed;
             var tr = factorRow(factorKey, used, fixed, factor["name"], factor["img"], factor["audio"]);
 
@@ -1072,8 +940,8 @@ saveSettings = function () {
     var mediaList = [ "instructionVideo", "introductionVideo", "thankYouImage",
         "thankYouAudio", "mainMappingAudio", "practiceMappingAudio"];
 
-    for (var mediaInd = 0; mediaInd < medialist.length; mediaInd++) {
-        var item = medialist[mediaInd]
+    for (var mediaInd = 0; mediaInd < mediaList.length; mediaInd++) {
+        var item = mediaList[mediaInd];
         var element = document.getElementById(item);
         var mediaFile = element.options[element.selectedIndex].value;
         if (mediaFile && mediaFile !== "") settings[item] = mediaFile;
@@ -1084,7 +952,7 @@ saveSettings = function () {
     settings.factors.main.dynamic = [];
     var factorRows = document.getElementsByClassName("factorRow");
     for (var rowInd = 0; rowInd < factorRows.length; rowInd++) {
-        var row = factorRows[rowInd]
+        var row = factorRows[rowInd];
         var factorKey = row.name;
         if (!row.hidden) {
             var use = $("input.useFactor[name=" + factorKey + "]")[0].checked;
