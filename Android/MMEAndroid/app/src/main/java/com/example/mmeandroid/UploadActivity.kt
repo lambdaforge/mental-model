@@ -10,6 +10,9 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import java.io.*
 import org.json.*
+import android.widget.ListView
+import android.widget.ArrayAdapter
+import androidx.appcompat.app.AlertDialog
 
 
 private const val IMAGE_IMPORT_CODE: Int = 1
@@ -19,13 +22,30 @@ private const val VIDEO_IMPORT_CODE: Int = 3
 
 class UploadActivity : AppCompatActivity() {
 
+    private var listView = HashMap<String, ArrayAdapter<String>>()
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_upload)
+
+        // top bar with back button
         val actionBar = supportActionBar
         actionBar!!.setDisplayHomeAsUpEnabled(true)
+
+
+        listView["images"] = ArrayAdapter(this, R.layout.list_row, ArrayList<String>())
+        val imageList = findViewById<ListView>(R.id.ImageList)
+        imageList.adapter =  listView["images"]
+
+        listView["video"] = ArrayAdapter(this, R.layout.list_row, ArrayList<String>())
+        val videoList = findViewById<ListView>(R.id.VideoList)
+        videoList.adapter =  listView["video"]
+
+        listView["audio"] = ArrayAdapter(this, R.layout.list_row, ArrayList<String>())
+        val audioList = findViewById<ListView>(R.id.AudioList)
+        audioList.adapter =  listView["audio"]
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -76,29 +96,25 @@ class UploadActivity : AppCompatActivity() {
     private fun getFileName(uri: Uri): String {
         var fileName: String? = null
 
-        val mimeType = contentResolver.getType(uri)
-        val extension = mimeType!!.substringAfter('/')
-
         if (uri.scheme == "content") {
             val cursor = contentResolver.query(uri, null, null, null, null)
             try {
                 if (cursor != null && cursor.moveToFirst()) {
                     fileName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                    Log.i("chooser", fileName)
+
                 }
             } finally {
                 cursor!!.close()
             }
         }
         if (fileName == null) {
+
             fileName = uri.path
             val cut = fileName!!.lastIndexOf('/')
             if (cut != -1) {
                 fileName = fileName.substring(cut + 1)
             }
-        }
-
-        if (!fileName.toLowerCase().endsWith(extension)) {
-            fileName = "$fileName.$extension"
         }
         return fileName
     }
@@ -126,6 +142,16 @@ class UploadActivity : AppCompatActivity() {
         return String(fileContent)
     }
 
+    private fun openInfoDialog(title: String, message: String) {
+        val builder = AlertDialog.Builder(this@UploadActivity)
+        builder.setTitle(title)
+        builder.setMessage(message)
+        builder.setPositiveButton("OK")    { dialog, _ -> dialog.cancel()          }
+
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
+    }
+
     private fun copyFile(inStream: InputStream, outStream: FileOutputStream) {
         val buffer = ByteArray(1024)
         while (true) {
@@ -134,7 +160,8 @@ class UploadActivity : AppCompatActivity() {
             try {
                 outStream.write(buffer, 0, bf)
             } catch (e: IOException) {
-
+                openInfoDialog("File Import", "Importing file failed!")
+                break
             }
         }
         inStream.close()
@@ -161,35 +188,49 @@ class UploadActivity : AppCompatActivity() {
     }
 
     private fun handleSingleFile(uri: Uri, fileType: String) {
-        val webDir = this.filesDir.absolutePath + "/www/"
-        val fileDir = "$webDir$fileType/"
-
-        Log.i("File Chooser", "Read $uri")
-        val inStream = contentResolver.openInputStream(uri)!!
-
+        val webDir = this.filesDir.absolutePath + "/www"
+        val fileDir = "$webDir/$fileType"
         val fileName = getFileName(uri)
-        val newFileName = "$fileDir$fileName"
+        val newFileName = "$fileDir/$fileName"
 
-        Log.i("File Chooser", "Write $newFileName")
-        val outStream = FileOutputStream(newFileName)
+        val pos = listView[fileType]?.getPosition(fileName)
 
-        copyFile(inStream, outStream)
-        Log.i("File Chooser", "Written $newFileName")
+        if( pos == -1 ) {
+            listView[fileType]?.add(fileName)
+            if (!File(newFileName).exists()) {
+                Log.i("File Chooser", "Read $uri")
+                val inStream = contentResolver.openInputStream(uri)!!
 
-        saveToMediaList(fileName, fileType)
+                Log.i("File Chooser", "Write $newFileName")
+                val outStream = FileOutputStream(newFileName)
+
+                copyFile(inStream, outStream)
+                Log.i("File Chooser", "Written $newFileName")
+
+                saveToMediaList(fileName, fileType)
+            }
+            else {
+                Log.i("File Chooser", "File $fileName already exists in $fileDir")
+            }
+
+        } else {
+            Log.i("File Chooser", "File $fileName already in list view")
+        }
     }
 
     private fun handleFileImport(data: Intent?, fileType: String) {
         if (data != null) {
-            if (data.clipData != null) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN && data.clipData != null) {
                 val uris = data.clipData!!
-                val count = uris.itemCount
+                val count = uris.itemCount - 1
                 for (i in 0..count) handleSingleFile(uris.getItemAt(i).uri, fileType)
+
             } else {
                 if (data.data != null)  handleSingleFile(data.data!!, fileType)
                 else Log.i("File Chooser", "No File selected")
             }
         }
+        else Log.i("File Chooser", "No data sent")
     }
 
 }

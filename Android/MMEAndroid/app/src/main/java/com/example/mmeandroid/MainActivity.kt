@@ -11,13 +11,23 @@ import android.app.DownloadManager
 import android.content.ContentValues
 import android.content.Context
 import android.provider.MediaStore
+import android.content.Intent
+import android.webkit.DownloadListener
+import android.net.Uri
+import androidx.core.app.ComponentActivity
+import androidx.core.app.ComponentActivity.ExtraData
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+
+
 
 
 class MainActivity : AppCompatActivity() {
 
 
     private val sessionDataFileName = "mmetool_data.csv"
-    private val sessionDataDownloadTitle = "MME tool data"
+    //private val sessionDataDownloadTitle = "mmetool_data"
+    private val sessionDataDownloadTitle = "mtdata"
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,22 +43,50 @@ class MainActivity : AppCompatActivity() {
         webView.settings.allowFileAccess = true
         webView.webViewClient = WebViewClient()
         webView.loadUrl(getHtmlURL())
-        webView.setDownloadListener { url, _, _, _, _ -> onDownload(url) }
+        webView.setDownloadListener(DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
+            Log.i("DL","Listener")
+            Log.i("DL","url: $url")
+            Log.i("DL","agent: $userAgent")
+            Log.i("DL","disp: $contentDisposition")
+            Log.i("DL","type: $mimetype")
+            Log.i("DL","length: $contentLength")
+
+
+
+            val dec = Uri.decode(url)
+            Log.i("DL","dec: $dec")
+
+
+         //   val i = Intent(Intent.ACTION_VIEW)
+          //  i.data = Uri.parse(url)
+          //  Log.i("DL","uri: ${i.data}")
+        //    startActivity(i)
+            onDownload(url)
+        })
+   //     webView.setDownloadListener { url, _, _, _, _ -> onDownload(url) }
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        Log.i("ares", "$data")
 
     }
 
     private fun getHtmlURL(): String {
         val dir = this.filesDir.absolutePath
+        /*
         Log.i("vfrgr", dir)
         var file = File(dir, "www")
-        Log.i("frewr", file.exists().toString())
+        Log.i("frewr", file.exists().toString())*/
 
         return "file:$dir/www/index.html"
     }
 
     private fun onDownload(url: String) {
+        val decodedURL = Uri.decode(url)
         Log.i("File Download", "Url:")
         Log.i("File Download", url)
+        Log.i("File Download", decodedURL)
 
         val builder = AlertDialog.Builder(this@MainActivity)
         builder.setTitle("Download")
@@ -58,7 +96,7 @@ class MainActivity : AppCompatActivity() {
             builder.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel()          }
         }
         else {
-            builder.setMessage("Saving file is not possible")
+            builder.setMessage("Saving file is not possible.\nIf device is connected to another device try disconnecting it.")
             builder.setNegativeButton("Ok")     { dialog, _ -> dialog.cancel()          }
         }
         val dialog: AlertDialog = builder.create()
@@ -71,30 +109,38 @@ class MainActivity : AppCompatActivity() {
 
     private fun saveFileToDownloads(url: String) {
 
-        if ( android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.P) {
+        Log.i("File Download", "Build version ${android.os.Build.VERSION.SDK_INT}")
 
-            val dir = File("//sdcard//Download//")
-            val file = File(dir, sessionDataFileName)
+        val decodedURL = Uri.decode(url)
+        val offset = decodedURL.indexOf("utf-8,") + "utf-8,".length
+        val fileData = decodedURL.substring(offset)
+        val uri = Uri.parse(url)
+
+        if ( android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.P) {
+            Log.i("File Download", "Save data to \"Downloads\" via DownloadManager")
+
+            val saveDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            val file = File(saveDir, sessionDataFileName)
+            file.writeText(fileData)
+
             val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             downloadManager.addCompletedDownload(
                 file.name,
                 file.name,
                 true,
-                "text/plain",
+                "text/csv",
                 file.absolutePath,
                 file.length(),
                 true
             )
         }
         else {
-
-            val offset = url.indexOf("utf-8,") + "utf-8,".length
-            val fileData = url.substring(offset)
+            Log.i("File Download", "Save data to \"Downloads\" via MediaStore")
 
             val values = ContentValues()
             values.put(MediaStore.Downloads.TITLE, sessionDataFileName)
             values.put(MediaStore.Downloads.DISPLAY_NAME, sessionDataDownloadTitle)
-            values.put(MediaStore.Downloads.MIME_TYPE, "text/plain")
+            values.put(MediaStore.Downloads.MIME_TYPE, "text/csv")
 
             val uri = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
             val outputStream = contentResolver.openOutputStream(uri!!)

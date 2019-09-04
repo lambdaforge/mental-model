@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="fill_parent"
-             android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        xmlns:tools="http://schemas.android.com/tools"
         android:orientation="vertical"
-        android:weightSum="3">
+        android:weightSum="3"
+        tools:context=".UploadActivity">
 
-    <RelativeLayout
+    <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="0dp"
+            android:orientation="vertical"
             android:layout_weight="1">
 
         <LinearLayout
@@ -23,17 +26,28 @@
                     android:paddingStart="20dp"/>
 
             <Button
-                    android:text="Choose File"
+                    android:text="Add File"
                     android:onClick="uploadVideo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
         </LinearLayout>
+        <ListView
+                android:id="@+id/VideoList"
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:paddingEnd="20dp"
+                android:paddingStart="20dp"
+                android:divider="@null"
+                android:dividerHeight="0dp"
+                android:fastScrollEnabled="true"/>
 
-    </RelativeLayout>
+    </LinearLayout>
 
-    <RelativeLayout
+    <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="0dp"
+            android:orientation="vertical"
             android:layout_weight="1">
         <LinearLayout
                 android:layout_width="match_parent"
@@ -48,17 +62,28 @@
                     android:paddingStart="20dp"/>
 
             <Button
-                    android:text="Choose File"
+                    android:text="Add File"
                     android:onClick="uploadAudio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
         </LinearLayout>
+        <ListView
+                android:id="@+id/AudioList"
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:paddingEnd="20dp"
+                android:paddingStart="20dp"
+                android:divider="@null"
+                android:dividerHeight="0dp"
+                android:fastScrollEnabled="true"/>
 
-    </RelativeLayout>
+    </LinearLayout>
 
-    <RelativeLayout
+    <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="0dp"
+            android:orientation="vertical"
             android:layout_weight="1">
         <LinearLayout
                 android:layout_width="match_parent"
@@ -73,12 +98,22 @@
                     android:paddingStart="20dp"/>
 
             <Button
-                    android:text="Choose File"
+                    android:text="Add File"
                     android:onClick="uploadImage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
         </LinearLayout>
+        <ListView
+                android:id="@+id/ImageList"
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:paddingEnd="20dp"
+                android:paddingStart="20dp"
+                android:divider="@null"
+                android:dividerHeight="0dp"
+                android:fastScrollEnabled="true"/>
 
-    </RelativeLayout>
+    </LinearLayout>
 
 </LinearLayout>

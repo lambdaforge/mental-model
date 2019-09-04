@@ -13,6 +13,19 @@ class StartActivity : AppCompatActivity() {
 
     private var prefs: SharedPreferences? = null
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_start)
+        prefs = getSharedPreferences("com.example.mmeandroid", MODE_PRIVATE)
+
+        val targetDir = this.filesDir.absolutePath
+        val webFileDir = File("$targetDir/www")
+
+    //    if (!webFileDir.exists()) {
+            copyAssetsTo("www", this.filesDir.absolutePath)
+     //   }
+    }
+
     private fun copyAssetsTo(assetPath: String, targetDir: String) {
         val assetManager = this.assets
         var assets: Array<String>? = null
@@ -63,20 +76,6 @@ class StartActivity : AppCompatActivity() {
 
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_start)
-        prefs = getSharedPreferences("com.example.mmeandroid", MODE_PRIVATE)
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-      //  if (prefs!!.getBoolean("firstrun", true)) {
-            copyAssetsTo("www", this.filesDir.absolutePath)
-            prefs!!.edit().putBoolean("firstrun", false).apply()
-       // }
-    }
 
     fun changeToUpload(v: View) {
         startActivity(Intent(this@StartActivity, UploadActivity::class.java))
