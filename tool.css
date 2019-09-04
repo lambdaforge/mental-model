@@ -10,6 +10,10 @@ html,body {
     padding: 0;
 }
 
+* {
+    box-sizing: border-box
+}
+
 div#mme-tool {
     margin: 0;
     padding: 0;
@@ -23,9 +27,16 @@ div#mme-tool {
     background-repeat: no-repeat;
 }
 
-#menu, #show-data, #settings {
+#menu, #settings {
     padding: 50px;
+    display: flex;
+    flex-flow: column;
 }
+
+#menu {
+    height: 100vh;
+}
+
 
 
 table {
@@ -40,30 +51,46 @@ video {
 button {
     font-size: 16px;
     height: 30px;
-    margin: 10px;
-}
-
-#steps {
-    width: 220px;
-    float: left;
-}
-
-.stepButtons {
-    width: 150px;
-}
-
-.boxed {
-    border: 1px solid gray;
-    width: 160px;
-    float: right;
-
-}
-
-.otherBtn {
-    width: 140px;
 }
 
 #options {
     width: 100%;
-    display: inline;
+    display: block;
 }
+
+#steps {
+    width: 220px;
+    display: block;
+    height: 35vh;
+}
+
+#other {
+    height: 30vh;
+}
+
+
+#btn-introduction {
+    width: 100%;
+}
+
+.stepButtons {
+    width: 150px;
+    margin: 10px;
+}
+
+.otherBtn {
+    width: 140px;
+    margin: 10px;
+}
+
+
+.boxed {
+    border: 1px solid gray;
+    width: 160px;
+
+}
+
+
+
+
+

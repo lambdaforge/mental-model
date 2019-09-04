@@ -708,9 +708,13 @@ downloadData = function() {
     data = data? data : "No data";
     csvContent += data;
 
+    console.log("Data to download:")
+    console.log(csvContent)
+
     var encodedUri = encodeURI(csvContent);
     var link = document.createElement("a");
     link.setAttribute("href", encodedUri);
+    console.log(encodedUri)
     link.setAttribute("download", "mmetool_data.csv");
     document.body.appendChild(link); // Required for firefox
 
