@@ -21,9 +21,9 @@ class StartActivity : AppCompatActivity() {
         val targetDir = this.filesDir.absolutePath
         val webFileDir = File("$targetDir/www")
 
-    //    if (!webFileDir.exists()) {
+        if (!webFileDir.exists()) {
             copyAssetsTo("www", this.filesDir.absolutePath)
-     //   }
+        }
     }
 
     private fun copyAssetsTo(assetPath: String, targetDir: String) {
@@ -51,14 +51,11 @@ class StartActivity : AppCompatActivity() {
     }
 
     private fun copyFile(filename: String, targetDir: String) {
-        val assetManager = this.assets
 
-        var inStream: InputStream? = null
-        var outStream: OutputStream? = null
         try {
-            inStream = assetManager.open(filename)
+            val inStream =  this.assets.open(filename)
             val newFileName =  "$targetDir/$filename"
-            outStream = FileOutputStream(newFileName)
+            val outStream = FileOutputStream(newFileName)
 
             val buffer = ByteArray(1024)
             //   var read: Int

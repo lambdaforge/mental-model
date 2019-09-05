@@ -185,16 +185,21 @@ class UploadActivity : AppCompatActivity() {
         file.flush()
         file.close()
 
+        Log.i("File Chooser", "MediaSources have been updated. New content is:")
+        Log.i("File Chooser", newContent)
+
     }
 
     private fun handleSingleFile(uri: Uri, fileType: String) {
+
         val webDir = this.filesDir.absolutePath + "/www"
         val fileDir = "$webDir/$fileType"
         val fileName = getFileName(uri)
         val newFileName = "$fileDir/$fileName"
 
-        val pos = listView[fileType]?.getPosition(fileName)
+        Log.i("File Chooser", "Import file: $fileName")
 
+        val pos = listView[fileType]?.getPosition(fileName)
         if( pos == -1 ) {
             listView[fileType]?.add(fileName)
             if (!File(newFileName).exists()) {
@@ -226,7 +231,7 @@ class UploadActivity : AppCompatActivity() {
                 for (i in 0..count) handleSingleFile(uris.getItemAt(i).uri, fileType)
 
             } else {
-                if (data.data != null)  handleSingleFile(data.data!!, fileType)
+                if (data.data != null) handleSingleFile(data.data!!, fileType)
                 else Log.i("File Chooser", "No File selected")
             }
         }
