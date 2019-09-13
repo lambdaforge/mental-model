@@ -12,14 +12,13 @@ import android.app.DownloadManager
 import android.content.ContentValues
 import android.content.Context
 import android.provider.MediaStore
-import android.content.Intent
 import android.net.Uri
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 
 
-private const val MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: Int = 1
+private const val PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: Int = 1
 
 
 class MainActivity : AppCompatActivity() {
@@ -29,8 +28,8 @@ class MainActivity : AppCompatActivity() {
     private val sessionDataDownloadTitle = "mmetool_data"
 
     private var sessionData = ""
-
-    //private val sessionDataDownloadTitle = "mtdata"
+    private val dTag = "File Download"
+    private val pTag = "Permissions"
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,10 +49,6 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        Log.i("ares", "$data")
-
-    }
 
     private fun getHtmlURL(): String {
         val dir = this.filesDir.absolutePath
@@ -61,14 +56,15 @@ class MainActivity : AppCompatActivity() {
         return "file:$dir/www/index.html"
     }
 
+
     private fun onDownload(url: String) {
         val decodedURL = Uri.decode(url)
-        Log.i("File Download", "Url:")
-        Log.i("File Download", url)
-        Log.i("File Download", decodedURL)
+        Log.i(dTag, "Url:")
+        Log.i(dTag, url)
+        Log.i(dTag, decodedURL)
 
         val builder = AlertDialog.Builder(this@MainActivity)
-        builder.setTitle("Download")
+        builder.setTitle(dTag)
         if (isExternalStorageWritable()) {
             builder.setMessage("Do you want to save $sessionDataFileName?")
             builder.setPositiveButton("Yes")    {      _, _ -> saveFileToDownloads(url) }
@@ -82,29 +78,30 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
+
     private fun isExternalStorageWritable(): Boolean {
         return Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
     }
 
+
     override fun onRequestPermissionsResult(requestCode: Int,
                                             permissions: Array<String>, grantResults: IntArray) {
         when (requestCode) {
-            MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE -> {
-                // If request is cancelled, the result arrays are empty.
+            PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    Log.i("Permissions", "WRITE_EXTERNAL_STORAGE granted")
+                    Log.i(pTag, "WRITE_EXTERNAL_STORAGE granted")
                     saveFileToDownloadsOnAPILowerQ()
                 } else {
-                    Log.i("Permissions", "WRITE_EXTERNAL_STORAGE denied")
+                    Log.i(pTag, "WRITE_EXTERNAL_STORAGE denied")
                 }
-                return
             }
 
             else -> {
-                Log.i("Permissions", "Code $requestCode is unknown")
+                Log.i(pTag, "Code $requestCode is unknown")
             }
         }
     }
+
 
     private fun saveFileToDownloadsOnAPILowerQ() {
         val saveDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
@@ -138,39 +135,39 @@ class MainActivity : AppCompatActivity() {
             writer.write(sessionData)
             writer.close()
         } else {
-            Log.i("File Download", "Function not applicable for APIs < Q")
+            Log.i(dTag, "Function not applicable for APIs < Q")
         }
     }
 
 
     private fun saveFileToDownloads(url: String) {
 
-        Log.i("File Download", "Build version ${android.os.Build.VERSION.SDK_INT}")
+        Log.i(dTag, "Build version ${android.os.Build.VERSION.SDK_INT}")
 
         val decodedURL = Uri.decode(url)
         val offset = decodedURL.indexOf("utf-8,") + "utf-8,".length
         sessionData = decodedURL.substring(offset)
 
         if ( android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) {
-            Log.i("File Download", "Save data to \"Downloads\" via DownloadManager")
+            Log.i(dTag, "Save data to \"Downloads\" via DownloadManager")
 
 
             if (ContextCompat.checkSelfPermission(this,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
-                Log.i("File Download", "Permission not granted yet. Ask permission.")
+                Log.i(dTag, "Permission not granted yet. Ask permission.")
                 ActivityCompat.requestPermissions(this@MainActivity,
                     arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                    MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE
+                    PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE
                 )
             } else {
-                Log.i("File Download", "Permission granted")
+                Log.i(dTag, "Permission granted")
                 saveFileToDownloadsOnAPILowerQ()
             }
         }
-        else { // working
-            Log.i("File Download", "Save data to \"Downloads\" via MediaStore")
+        else {
+            Log.i(dTag, "Save data to 'Downloads' via MediaStore")
             saveFileToDownloadsOnAPISinceQ()
         }
     }

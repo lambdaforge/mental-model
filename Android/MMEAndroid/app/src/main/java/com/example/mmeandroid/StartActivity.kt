@@ -7,58 +7,68 @@ import android.util.Log
 import android.view.View
 import java.io.*
 import android.content.SharedPreferences
+import androidx.appcompat.app.AlertDialog
 
 
 class StartActivity : AppCompatActivity() {
 
-    private var prefs: SharedPreferences? = null
+    private val aTag = "Asset Copying"
+    private val lTag = "Change Activity"
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_start)
-        prefs = getSharedPreferences("com.example.mmeandroid", MODE_PRIVATE)
 
         val targetDir = this.filesDir.absolutePath
         val webFileDir = File("$targetDir/www")
 
         if (!webFileDir.exists()) {
-            copyAssetsTo("www", this.filesDir.absolutePath)
+            copyAssetsTo("www", targetDir)
         }
     }
 
+
     private fun copyAssetsTo(assetPath: String, targetDir: String) {
         val assetManager = this.assets
-        var assets: Array<String>? = null
+        var assets: Array<String>?
         try {
             assets = assetManager.list(assetPath)
             if (assets!!.isEmpty()) {
                 copyFile(assetPath, targetDir)
-                Log.i("assets", "file: $assetPath")
+
+                Log.i(aTag, "file: $assetPath")
+
             } else {
                 val fullPath = "$targetDir/$assetPath"
-                Log.i("assets", "dir: $fullPath")
+
+                Log.i(aTag, "dir: $fullPath")
+
                 val dir = File(fullPath)
-                if (!dir.exists())
-                    dir.mkdir()
+                if (!dir.exists())  dir.mkdir()
+
                 for (i in assets.indices) {
                     copyAssetsTo(assetPath + "/" + assets[i], targetDir)
                 }
             }
         } catch (e: IOException) {
-            Log.e("assets", "I/O Exception", e)
+
+            val webFileDir = File("${this.filesDir.absolutePath}/www")
+            if (webFileDir.exists()) webFileDir.delete()
+            openInfoDialog("Initialization Error","Initializing app failed! You can try freeing up some space and restarting the app.")
         }
 
     }
 
+
     private fun copyFile(filename: String, targetDir: String) {
 
         try {
-            val inStream =  this.assets.open(filename)
+            val inStream = this.assets.open(filename)
             val newFileName =  "$targetDir/$filename"
             val outStream = FileOutputStream(newFileName)
 
             val buffer = ByteArray(1024)
-            //   var read: Int
             while (true) {
                 val bf = inStream.read(buffer)
                 if (bf == -1) break
@@ -68,7 +78,11 @@ class StartActivity : AppCompatActivity() {
             outStream.flush()
             outStream.close()
         } catch (e: Exception) {
-            Log.e("assets", e.message)
+            Log.e(aTag, "Assets could not be copied", e)
+
+            val webFileDir = File("${this.filesDir.absolutePath}/www")
+            if (webFileDir.exists()) webFileDir.delete()
+            openInfoDialog("Initialization Error","Initializing app failed! You can try freeing up some space and restarting the app.")
         }
 
     }
@@ -76,11 +90,23 @@ class StartActivity : AppCompatActivity() {
 
     fun changeToUpload(v: View) {
         startActivity(Intent(this@StartActivity, UploadActivity::class.java))
-        Log.i("Content", "Load upload layout")
+        Log.i(lTag, "Load upload layout")
     }
+
 
     fun changeToMain(v: View) {
         startActivity(Intent(this@StartActivity, MainActivity::class.java))
-        Log.i("Content", "Load main layout")
+        Log.i(lTag, "Load main layout")
+    }
+
+
+    private fun openInfoDialog(title: String, message: String) {
+        val builder = AlertDialog.Builder(this@StartActivity)
+        builder.setTitle(title)
+        builder.setMessage(message)
+        builder.setPositiveButton("OK")    { dialog, _ -> dialog.cancel()          }
+
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
     }
 }

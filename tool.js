@@ -27,14 +27,14 @@ var canvasStyle = null;
 
 // Load saved settings or use defaults
 settings = defaultSettings; // settings needs to be global
-/*
+
 var data = localStorage.getItem("mmetool_settings");
 
 if( data ) {
     settings = JSON.parse(data);
     console.log("Use stored settings");
 }
-else       console.log("Default settings used");*/
+else       console.log("Default settings used");
 
 console.log(settings);
 
@@ -88,28 +88,43 @@ resetUIstate = function() {
 };
 
 
+isPlaying = function(media) {
+    return media.currentTime > 0 && !media.paused && !media.ended && media.readyState > 2;
+}
+
+
 // Choose shown screen
 showScreen = function(screenName) {
+    var video = $("#video")[0]
+    var audio = $("#audio")[0]
+
+    // Prevent media to resume playing
+    if (isPlaying(audio)) audio.pause()
+    if (isPlaying(video)) video.pause()
+    audio.src = "";
+    video.src = "";
+
     $(".screen").hide();
     var screen = $("#" + screenName);
     screen.show();
 
     switch (screenName) {
         case "display-video":
-            if(uistate.video === "introduction")
-                $("#video")[0].src = "video/" + settings.introductionVideo;
-            else
-                $("#video")[0].src = "video/" + settings.instructionVideo;
+            if(uistate.video === "introduction") video.src = "video/" + settings.introductionVideo;
+            else                                 video.src = "video/" + settings.instructionVideo;
+            video.play()
             break;
         case "mapping-task":
             if (uistate.mapping === "practice") {
                 setupMapping();
-                $("#audio")[0].src = "audio/" + settings.practiceMappingAudio;
+                audio.src = "audio/" + settings.practiceMappingAudio;
+                audio.play()
             }
             else if (uistate.mapping === "main") {
                 setupMapping();
                 uistate.session.start = new Date();
-                $("#audio")[0].src = "audio/" + settings.mainMappingAudio;
+                audio.src = "audio/" + settings.mainMappingAudio;
+                audio.play()
             }
             break;
         case "thank-you":
@@ -118,7 +133,7 @@ showScreen = function(screenName) {
             sel.css("background-image", "url(" + url + ")");
             sel.css("height", canvasStyle.height);
             sel.css("background-position", "center");
-            $("#audio")[0].src = "audio/" + settings.thankYouAudio;
+            audio.src = "audio/" + settings.thankYouAudio;
             break;
         case "settings":
             break;
@@ -989,10 +1004,15 @@ window.onload = function() {
     $("#audio").on("loadeddata", function(a) {
         a.target.play();
     });
-    $("#video").on("ended", function(a) {
+    $("#video").on("ended", function() {
         uistate.mapping = (uistate.video === "introduction")? "practice" : "main";
         showScreen("mapping-task");
     });
+
+    $("button").on("click",function(){ // to avoid 'Uncaught (in promise) NotAllowedError: play() can only be initiated by a user gesture.'
+        $("audio")[0].play();
+        $("audio")[0].pause();
+        });
 
     // On menu screen
     $("#btn-introduction").on("click", function() {

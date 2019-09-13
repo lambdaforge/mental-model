@@ -39,7 +39,7 @@ getUsedArrows = function(weights, negativeUsed, mappingType) {
 };
 
 
-// get maximum absulute value of array
+// Get maximum absulute value of array
 getAbsoluteMax = function(array) {
     var max = 0;
     for (var i = 0; i < array.length; i++) {
@@ -66,12 +66,12 @@ getPixelSizes = function(w, h, mappingType, settings) { // "main" or "practice"
     var mappingCenterX = leftSideWidth + mappingScreenWidth/2;
 
     var arrowsUsed = getUsedArrows(settings.arrowWeights, settings.useNegativeArrows, mappingType);
-    var maxArrowWidth = h/80;
+    var maxArrowWidth = h/40;
     var minArrowWidth = 2;
     var maxAbsWeight = getAbsoluteMax(arrowsUsed);
     var arrowWidthSteps = (maxArrowWidth - minArrowWidth ) / (maxAbsWeight-1);
-    var arrowHeadSize = h / 40;
-    var iconSize = Math.min(0.9 * leftSideLineHeight, leftSideWidth/3)
+    var arrowHeadSize = h/20;
+    var iconSize = Math.min(0.9 * leftSideLineHeight, leftSideWidth/3);
 
     return {
         height: h,
@@ -88,7 +88,7 @@ getPixelSizes = function(w, h, mappingType, settings) { // "main" or "practice"
 
         practiceImageY: h * 1 / 4,
         practiceImageX: mappingCenterX,
-        practiceImageHeight: h * 0.5,
+        practiceImageHeight: h * 0.3,
 
         buttonSize: iconSize,
         iconSize: iconSize,
@@ -98,8 +98,8 @@ getPixelSizes = function(w, h, mappingType, settings) { // "main" or "practice"
         initialFactorPositions: factorPositions(leftSideLineHeight, leftSideWidth, nFactors, factorsPerRow),
         arrowPositions: arrowPositions(h, w, rightSideWidth, leftSideLineHeight, arrowsUsed.length),
 
-        maxArrowWidth: h / 80,
-        minArrowWidth: 2,
+        maxArrowWidth: maxArrowWidth,
+        minArrowWidth: minArrowWidth,
         arrowLength: 0.7 * rightSideWidth,
         arrowHead: arrowHeadSize,
         arrowButtonMargin: arrowHeadSize * 0.5,
