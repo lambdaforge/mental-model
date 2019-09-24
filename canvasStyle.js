@@ -62,7 +62,7 @@ getPixelSizes = function(w, h, mappingType, settings) { // "main" or "practice"
     var leftSideLineHeight = h / (2 + nFactorLines);
 
     var availableHeight = h - 2*leftSideLineHeight;
-    var mappingScreenWidth = w - leftSideLineHeight - leftSideWidth;
+    var mappingScreenWidth = w - leftSideWidth - rightSideWidth;
     var mappingCenterX = leftSideWidth + mappingScreenWidth/2;
 
     var arrowsUsed = getUsedArrows(settings.arrowWeights, settings.useNegativeArrows, mappingType);
@@ -80,6 +80,7 @@ getPixelSizes = function(w, h, mappingType, settings) { // "main" or "practice"
         rightSideWidth: rightSideWidth,
         leftSideWidth: leftSideWidth,
         borderWidth: 1,
+        availableWidth: mappingScreenWidth,
         availableHeight: availableHeight,
         leftSideLineHeight: leftSideLineHeight,
 

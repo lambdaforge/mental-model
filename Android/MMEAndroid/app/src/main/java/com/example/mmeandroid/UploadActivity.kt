@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.text.trimmedLength
 
 
+
 private const val IMAGE_IMPORT_CODE: Int = 1
 private const val AUDIO_IMPORT_CODE: Int = 2
 private const val VIDEO_IMPORT_CODE: Int = 3
@@ -59,6 +60,23 @@ class UploadActivity : AppCompatActivity() {
     }
 
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean { // Back button
+       // val intent = Intent(applicationContext, StartActivity::class.java)
+        //startActivityForResult(intent, 0)
+
+        when (item.itemId) {
+            android.R.id.home -> {
+                // API 5+ solution
+                onBackPressed()
+                return true
+            }
+
+            else -> return super.onOptionsItemSelected(item)
+        }
+
+    }
+
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         currentIntent = data
         if (resultCode == RESULT_OK) {
@@ -90,13 +108,6 @@ class UploadActivity : AppCompatActivity() {
                 Log.i(pTag, "Code $requestCode is unknown")
             }
         }
-    }
-
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean { // Back button
-        val intent = Intent(applicationContext, StartActivity::class.java)
-        startActivityForResult(intent, 0)
-        return true
     }
 
 

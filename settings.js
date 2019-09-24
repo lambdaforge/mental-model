@@ -1,40 +1,59 @@
 
 defaultSettings = {
 
-    audioBlock: true,
-    useNegativeArrows: true,
-    arrowWeights: [3, 2, 1, -1, -2, -3], // choose (limited) amount?
-    arrowColor: { positive: "blue", negative: "red" },
-    highlightColor: "lightskyblue",
-    customFactorNumber: 0,
-
     factors: {
-        main: {
+        drivers: {
             dynamic: [
                 "awareness", "breeding_grounds", "climate_change", "corruption", "demand", "destructive_gear",
                 "fishing_regulations", "monitoring", "open_access", "overfishing", "overpopulation", "pollution",
                 "poverty", "water_hyacinth", "water_level"
             ],
-            fixed: "nile_perch"
+            fixed: "nile_perch.png"
+        },
+
+        consequences: {
+            dynamic: [
+                "awareness", "breeding_grounds", "climate_change", "corruption", "demand", "destructive_gear",
+                "fishing_regulations", "monitoring", "open_access", "overfishing", "overpopulation", "pollution",
+                "poverty", "water_hyacinth", "water_level"
+            ],
+            fixed: "nile_perch.png"
         },
 
         practice: {
             dynamic: [
                 "work", "food", "money", "sleep", "friends"
             ],
-            fixed: "smile"
+            fixed: "smile.png"
         },
     },
 
 
+    //
+    // Fixed settings
+    //
+
     solutionImage: "solution.png",
     practiceSolution:  ["food\tsmile\t3", "work\tmoney\t2", "money\tsmile\t2",  "sleep\tsmile\t1"],
+
+    audioBlock: true,
+    arrowWeights: [3, 2, 1, -1, -2, -3],
+    arrowColor: { positive: "blue", negative: "red" },
+    highlightColor: "lightskyblue",
+    customFactorNumber: 0,
+
+
+    //
+    // Changeable settings
+    //
+
+    useNegativeArrows: true,
+    useMappings: "both", // "both", "drivers", "consequences"
 
 
     //
     // Changeable media
     //
-
 
     factorMedia: {
         "awareness":           {"name": "awareness",           "img": "awareness.png",           "audio": "awareness.m4a"          },
@@ -69,5 +88,7 @@ defaultSettings = {
     thankYouAudio: "thank_you.m4a",
 
     thankYouImage: "thank_you.png",
+
+
 
 };

@@ -8,8 +8,6 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
-
-
     <application
             android:usesCleartextTraffic="true"
             android:allowBackup="true"
@@ -29,26 +27,30 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity
+                android:label="Mental Model Elicitation"
+                android:name=".HomeActivity">
+        </activity>
 
         <activity
                 android:label="File Upload"
                 android:name=".UploadActivity"
-                android:parentActivityName=".StartActivity" >
+                android:parentActivityName=".HomeActivity" >
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".StartActivity" />
+                    android:value=".HomeActivity" />
 
         </activity>
 
         <activity android:name=".MainActivity"
                   android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
-                  android:parentActivityName=".StartActivity" >
+                  android:parentActivityName=".HomeActivity" >
 
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".StartActivity" />
+                    android:value=".HomeActivity" />
         </activity>
 
     </application>

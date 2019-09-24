@@ -15,7 +15,15 @@ import android.provider.MediaStore
 import android.net.Uri
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
+import android.media.AudioManager
+import android.os.Environment.getExternalStorageDirectory
 import androidx.core.content.ContextCompat
+import androidx.core.app.ComponentActivity
+import androidx.core.app.ComponentActivity.ExtraData
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+
+
 
 
 private const val PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: Int = 1
@@ -24,6 +32,7 @@ private const val PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: Int = 1
 class MainActivity : AppCompatActivity() {
 
 
+    private var webView: WebView? = null
     private val sessionDataFileName = "mmetool_data.csv"
     private val sessionDataDownloadTitle = "mmetool_data"
 
@@ -37,17 +46,37 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val webView: WebView = findViewById(R.id.webview)
-        webView.settings.javaScriptEnabled = true
-        webView.settings.databaseEnabled = true
-        webView.settings.domStorageEnabled = true
-        webView.settings.allowContentAccess = true
-        webView.settings.allowFileAccess = true
-        webView.webViewClient = WebViewClient()
-        webView.loadUrl(getHtmlURL())
-        webView.setDownloadListener { url, _, _, _, _ -> onDownload(url) }
+        webView = findViewById(R.id.webview)
+        webView!!.settings.javaScriptEnabled = true
+        webView!!.settings.databaseEnabled = true
+        webView!!.settings.domStorageEnabled = true
+        webView!!.settings.allowContentAccess = true
+        webView!!.settings.allowFileAccess = true
+        webView!!.webViewClient = WebViewClient()
+        webView!!.loadUrl(getHtmlURL())
+        webView!!.setDownloadListener { url, _, _, _, _ -> onDownload(url) }
 
     }
+
+    public override fun onPause() {
+        webView!!.onPause()
+        webView!!.pauseTimers()
+        super.onPause()
+    }
+
+    public override fun onResume() {
+        super.onResume()
+
+        volumeControlStream = AudioManager.STREAM_MUSIC // control volume with volume buttons
+        webView!!.resumeTimers()
+        webView!!.onResume()
+    }
+
+    override fun onDestroy() {
+        webView!!.destroy()
+        super.onDestroy()
+    }
+
 
 
     private fun getHtmlURL(): String {

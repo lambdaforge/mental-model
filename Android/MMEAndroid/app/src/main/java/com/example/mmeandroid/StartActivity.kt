@@ -3,29 +3,25 @@ package com.example.mmeandroid
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.content.Intent
+import android.media.AudioManager
 import android.util.Log
-import android.view.View
 import java.io.*
-import android.content.SharedPreferences
 import androidx.appcompat.app.AlertDialog
 
 
 class StartActivity : AppCompatActivity() {
 
     private val aTag = "Asset Copying"
-    private val lTag = "Change Activity"
 
+    private val mediaListFile = "mediaSources.js" // will only be copied once
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_start)
 
         val targetDir = this.filesDir.absolutePath
-        val webFileDir = File("$targetDir/www")
+        copyAssetsTo("www", targetDir)
 
-        if (!webFileDir.exists()) {
-            copyAssetsTo("www", targetDir)
-        }
+        startActivity(Intent(this@StartActivity, HomeActivity::class.java))
     }
 
 
@@ -35,11 +31,12 @@ class StartActivity : AppCompatActivity() {
         try {
             assets = assetManager.list(assetPath)
             if (assets!!.isEmpty()) {
+
                 copyFile(assetPath, targetDir)
 
                 Log.i(aTag, "file: $assetPath")
 
-            } else {
+            } else { // file is directory
                 val fullPath = "$targetDir/$assetPath"
 
                 Log.i(aTag, "dir: $fullPath")
@@ -48,14 +45,19 @@ class StartActivity : AppCompatActivity() {
                 if (!dir.exists())  dir.mkdir()
 
                 for (i in assets.indices) {
-                    copyAssetsTo(assetPath + "/" + assets[i], targetDir)
+                    val fileName = assets[i]
+                    val targetPath = File("$targetDir/$assetPath/$fileName")
+
+                    // Avoid overwriting changes made in this file
+                    if(!(fileName == mediaListFile && targetPath.exists()))
+                      copyAssetsTo( "$assetPath/$fileName", targetDir)
                 }
             }
         } catch (e: IOException) {
 
             val webFileDir = File("${this.filesDir.absolutePath}/www")
             if (webFileDir.exists()) webFileDir.delete()
-            openInfoDialog("Initialization Error","Initializing app failed! You can try freeing up some space and restarting the app.")
+            openExitDialog()
         }
 
     }
@@ -82,29 +84,20 @@ class StartActivity : AppCompatActivity() {
 
             val webFileDir = File("${this.filesDir.absolutePath}/www")
             if (webFileDir.exists()) webFileDir.delete()
-            openInfoDialog("Initialization Error","Initializing app failed! You can try freeing up some space and restarting the app.")
+
+            openExitDialog()
         }
 
     }
 
-
-    fun changeToUpload(v: View) {
-        startActivity(Intent(this@StartActivity, UploadActivity::class.java))
-        Log.i(lTag, "Load upload layout")
-    }
-
-
-    fun changeToMain(v: View) {
-        startActivity(Intent(this@StartActivity, MainActivity::class.java))
-        Log.i(lTag, "Load main layout")
-    }
-
-
-    private fun openInfoDialog(title: String, message: String) {
+    private fun openExitDialog() {
         val builder = AlertDialog.Builder(this@StartActivity)
-        builder.setTitle(title)
-        builder.setMessage(message)
-        builder.setPositiveButton("OK")    { dialog, _ -> dialog.cancel()          }
+        builder.setTitle("Initialization Error")
+        builder.setMessage("Initialization of app failed! You can try freeing up some space and restarting the app.")
+        builder.setPositiveButton("OK")    { dialog, _ ->
+            dialog.cancel()
+            super.finish() // Exit App
+        }
 
         val dialog: AlertDialog = builder.create()
         dialog.show()
