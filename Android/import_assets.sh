@@ -5,6 +5,8 @@ assetdir="MMEAndroid/app/src/main/assets/www"
 
 rm -r "$assetdir"
 mkdir "$assetdir"
+
+
 for f in $files;
 do
     echo "Copying $f"
