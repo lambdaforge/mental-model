@@ -38,7 +38,7 @@ defaultSettings = {
 
     audioBlock: true,
     arrowWeights: [3, 2, 1, -1, -2, -3],
-    arrowColor: { positive: "blue", negative: "red" },
+    arrowColor: { positive: "blue", negative: "red", neutral: "black"},
     highlightColor: "lightskyblue",
     customFactorNumber: 0,
 

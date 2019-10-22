@@ -539,8 +539,12 @@ onFactorIconClicked = function(options) {
 // Get color and line width from arrow weight
 arrowStyle = function(arrowWeight) {
     var width = canvasStyle.arrowLineWidth(Math.abs(arrowWeight));
-    var cChoice = settings.arrowColor;
-    var color =  arrowWeight < 0 ? cChoice.negative : cChoice.positive;
+    var colors = settings.arrowColor
+    var color = colors.neutral
+
+    if (settings.useNegativeArrows) {
+        color = arrowWeight < 0 ? colors.negative : colors.positive;
+    }
     return {"color": color, "lineWidth": width}
 };
 
