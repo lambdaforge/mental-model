@@ -27,13 +27,16 @@ div#mme-tool {
     background-repeat: no-repeat;
 }
 
-#menu, #settings {
+
+
+#settings {
     padding: 50px;
     display: flex;
     flex-flow: column;
 }
 
 #menu {
+    padding: 50px;
     height: 100vh;
 }
 
@@ -52,9 +55,17 @@ button {
     height: 30px;
 }
 
+
 #options {
-    width: 100%;
-    display: block;
+  display: inline-block;
+  text-align: center;
+}
+
+.inline {
+    display: inline-block;
+    height: 300px;
+    vertical-align: bottom;
+    padding: 30px;
 }
 
 
