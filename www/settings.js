@@ -47,7 +47,7 @@ defaultSettings = {
     // Changeable settings
     //
 
-    useNegativeArrows: true,
+    useNegativeArrows: false,
     useMappings: "both", // "both", "drivers", "consequences"
 
 
