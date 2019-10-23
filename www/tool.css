@@ -83,6 +83,11 @@ button {
     margin: 10px;
 }
 
+.explanation {
+    font-size: 14px;
+
+}
+
  /* Style the tab */
 .tab {
   overflow: hidden;
