@@ -1,13 +1,3 @@
-video
-audio
-images
-buttons
-!www/video
-!www/audio
-www/images
-www/buttons
-testfiles
-favicon.ico
 .idea
 .DS_Store
 Android/MMEAndroid/app/src/main/assets/*

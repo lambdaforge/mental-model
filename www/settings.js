@@ -3,21 +3,13 @@ defaultSettings = {
 
     factors: {
         drivers: {
-            dynamic: [
-                "awareness", "breeding_grounds", "climate_change", "corruption", "demand", "destructive_gear",
-                "fishing_regulations", "monitoring", "open_access", "overfishing", "overpopulation", "pollution",
-                "poverty", "water_hyacinth", "water_level"
-            ],
-            fixed: "nile_perch.png"
+            dynamic: [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O" ],
+            fixed: "Y.png"
         },
 
         consequences: {
-            dynamic: [
-                "awareness", "breeding_grounds", "climate_change", "corruption", "demand", "destructive_gear",
-                "fishing_regulations", "monitoring", "open_access", "overfishing", "overpopulation", "pollution",
-                "poverty", "water_hyacinth", "water_level"
-            ],
-            fixed: "nile_perch.png"
+            dynamic: [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O" ],
+            fixed: "Y.png"
         },
 
         practice: {
@@ -56,28 +48,28 @@ defaultSettings = {
     //
 
     factorMedia: {
-        "awareness":           {"name": "awareness",           "img": "awareness.png",           "audio": "awareness.m4a"          },
-        "breeding_grounds":    {"name": "breeding grounds",    "img": "breeding_grounds.png",    "audio": "breeding_grounds.m4a"   },
-        "climate_change":      {"name": "climate change",      "img": "climate_change.png",      "audio": "climate_change.m4a"     },
-        "corruption":          {"name": "corruption",          "img": "corruption.png",          "audio": "corruption.m4a"         },
-        "demand":              {"name": "demand",              "img": "demand.png",              "audio": "demand.m4a"             },
-        "destructive_gear":    {"name": "destructive gear",    "img": "destructive_gear.png",    "audio": "destructive_gear.m4a"   },
-        "fishing_regulations": {"name": "fishing regulations", "img": "fishing_regulations.png", "audio": "fishing_regulations.m4a"},
-        "monitoring":          {"name": "monitoring",          "img": "monitoring.png",          "audio": "monitoring.m4a"         },
-        "open_access":         {"name": "open access",         "img": "open_access.png",         "audio": "open_access.m4a"        },
-        "overfishing":         {"name": "overfishing",         "img": "overfishing.png",         "audio": "overfishing.m4a"        },
-        "overpopulation":      {"name": "overpopulation",      "img": "overpopulation.png",      "audio": "overpopulation.m4a"     },
-        "pollution":           {"name": "pollution",           "img": "pollution.png",           "audio": "pollution.m4a"          },
-        "poverty":             {"name": "poverty",             "img": "poverty.png",             "audio": "poverty.m4a"            },
-        "water_hyacinth":      {"name": "water hyacinth",      "img": "water_hyacinth.png",      "audio": "water_hyacinth.m4a"     },
-        "water_level":         {"name": "water level",         "img": "water_level.png",         "audio": "water_level.m4a"        },
-        "nile_perch":          {"name": "nile perch",          "img": "nile_perch.png"                                             },
-        "work":                {"name": "work",                "img": "work.png",                "audio": "work.m4a",              "practice": true},
-        "food":                {"name": "food",                "img": "food.png",                "audio": "food.m4a",              "practice": true},
-        "money":               {"name": "money",               "img": "money.png",               "audio": "money.m4a",             "practice": true},
-        "sleep":               {"name": "sleep",               "img": "sleep.png",               "audio": "sleep.m4a",             "practice": true},
-        "friends":             {"name": "friends",             "img": "friends.png",             "audio": "friends.m4a",           "practice": true},
-        "smile":               {"name": "smile",               "img": "smile.png",                                                 "practice": true},
+        "A":       {"name": "A",       "img": "A.png",       "audio": "A.m4a"},
+        "B":       {"name": "B",       "img": "B.png",       "audio": "B.m4a"},
+        "C":       {"name": "C",       "img": "C.png",       "audio": "C.m4a"},
+        "D":       {"name": "D",       "img": "D.png",       "audio": "D.m4a"},
+        "E":       {"name": "E",       "img": "E.png",       "audio": "E.m4a"},
+        "F":       {"name": "F",       "img": "F.png",       "audio": "F.m4a"},
+        "G":       {"name": "G",       "img": "G.png",       "audio": "G.m4a"},
+        "H":       {"name": "H",       "img": "H.png",       "audio": "H.m4a"},
+        "I":       {"name": "I",       "img": "I.png",       "audio": "I.m4a"},
+        "J":       {"name": "J",       "img": "J.png",       "audio": "J.m4a"},
+        "K":       {"name": "K",       "img": "K.png",       "audio": "K.m4a"},
+        "L":       {"name": "L",       "img": "L.png",       "audio": "L.m4a"},
+        "M":       {"name": "M",       "img": "M.png",       "audio": "M.m4a"},
+        "N":       {"name": "N",       "img": "N.png",       "audio": "N.m4a"},
+        "O":       {"name": "O",       "img": "O.png",       "audio": "O.m4a"},
+        "Y":       {"name": "Y",       "img": "Y.png"                        },
+        "work":    {"name": "work",    "img": "work.png",    "audio": "work.m4a",    "practice": true},
+        "food":    {"name": "food",    "img": "food.png",    "audio": "food.m4a",    "practice": true},
+        "money":   {"name": "money",   "img": "money.png",   "audio": "money.m4a",   "practice": true},
+        "sleep":   {"name": "sleep",   "img": "sleep.png",   "audio": "sleep.m4a",   "practice": true},
+        "friends": {"name": "friends", "img": "friends.png", "audio": "friends.m4a", "practice": true},
+        "smile":   {"name": "smile",   "img": "smile.png",                           "practice": true},
     },
 
     instructionVideo: "instructions.mp4",
