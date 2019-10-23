@@ -50,6 +50,7 @@ class UploadActivity : AppCompatActivity() {
         setContentView(R.layout.activity_upload)
 
         // Top bar with back button
+        setSupportActionBar(findViewById(R.id.toolbar_upload))
         val actionBar = supportActionBar
         actionBar!!.setDisplayHomeAsUpEnabled(true)
 
@@ -64,14 +65,14 @@ class UploadActivity : AppCompatActivity() {
        // val intent = Intent(applicationContext, StartActivity::class.java)
         //startActivityForResult(intent, 0)
 
-        when (item.itemId) {
+        return when (item.itemId) {
             android.R.id.home -> {
                 // API 5+ solution
                 onBackPressed()
-                return true
+                true
             }
 
-            else -> return super.onOptionsItemSelected(item)
+            else -> super.onOptionsItemSelected(item)
         }
 
     }

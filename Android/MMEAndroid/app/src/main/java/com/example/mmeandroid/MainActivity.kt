@@ -46,6 +46,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Top bar with back button
+        setSupportActionBar(findViewById(R.id.toolbar_main))
+        val actionBar = supportActionBar
+        actionBar!!.setDisplayHomeAsUpEnabled(true)
+
         webView = findViewById(R.id.webview)
         webView!!.settings.javaScriptEnabled = true
         webView!!.settings.databaseEnabled = true

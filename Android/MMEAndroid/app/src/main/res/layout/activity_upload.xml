@@ -1,119 +1,137 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        android:orientation="vertical"
-        android:weightSum="3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         tools:context=".UploadActivity">
 
+    <include layout="@layout/toolbar"
+            android:id="@+id/toolbar_upload" />
+
     <LinearLayout
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             android:orientation="vertical"
-            android:layout_weight="1">
+            android:weightSum="3"
+
+            app:layout_constraintTop_toBottomOf="@+id/toolbar_upload"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+>
 
         <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-            <TextView
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:text="Video Files"
-                    android:layout_width="150dip"
-                    android:layout_height="wrap_content"
-                    android:paddingEnd="20dp"
-                    android:paddingStart="20dp"/>
-
-            <Button
-                    android:text="Add File"
-                    android:onClick="uploadVideo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-        </LinearLayout>
-        <ListView
-                android:id="@+id/VideoList"
                 android:layout_width="fill_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
-                android:paddingEnd="20dp"
-                android:paddingStart="20dp"
-                android:divider="@null"
-                android:dividerHeight="0dp"
-                android:fastScrollEnabled="true"/>
+                android:orientation="vertical"
+                android:layout_weight="1">
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+                <TextView
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:text="Video Files"
+                        android:layout_width="150dip"
+                        android:layout_height="wrap_content"
+                        android:paddingEnd="20dp"
+                        android:paddingStart="20dp"/>
+
+                <Button
+                        android:text="Add File"
+                        android:onClick="uploadVideo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+            </LinearLayout>
+            <ListView
+                    android:id="@+id/VideoList"
+                    android:layout_width="fill_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:paddingEnd="20dp"
+                    android:paddingStart="20dp"
+                    android:divider="@null"
+                    android:dividerHeight="0dp"
+                    android:fastScrollEnabled="true"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                android:layout_weight="1">
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+                <TextView
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:text="Audio Files"
+                        android:layout_width="150dip"
+                        android:layout_height="wrap_content"
+                        android:paddingEnd="20dp"
+                        android:paddingStart="20dp"/>
+
+                <Button
+                        android:text="Add File"
+                        android:onClick="uploadAudio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+            </LinearLayout>
+            <ListView
+                    android:id="@+id/AudioList"
+                    android:layout_width="fill_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:paddingEnd="20dp"
+                    android:paddingStart="20dp"
+                    android:divider="@null"
+                    android:dividerHeight="0dp"
+                    android:fastScrollEnabled="true"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                android:layout_weight="1">
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+                <TextView
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:text="Image Files"
+                        android:layout_width="150dip"
+                        android:layout_height="wrap_content"
+                        android:paddingEnd="20dp"
+                        android:paddingStart="20dp"/>
+
+                <Button
+                        android:text="Add File"
+                        android:onClick="uploadImage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+            </LinearLayout>
+            <ListView
+                    android:id="@+id/ImageList"
+                    android:layout_width="fill_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:paddingEnd="20dp"
+                    android:paddingStart="20dp"
+                    android:divider="@null"
+                    android:dividerHeight="0dp"
+                    android:fastScrollEnabled="true"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
-    <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="0dp"
-            android:orientation="vertical"
-            android:layout_weight="1">
-        <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-            <TextView
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:text="Audio Files"
-                    android:layout_width="150dip"
-                    android:layout_height="wrap_content"
-                    android:paddingEnd="20dp"
-                    android:paddingStart="20dp"/>
-
-            <Button
-                    android:text="Add File"
-                    android:onClick="uploadAudio"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-        </LinearLayout>
-        <ListView
-                android:id="@+id/AudioList"
-                android:layout_width="fill_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:paddingEnd="20dp"
-                android:paddingStart="20dp"
-                android:divider="@null"
-                android:dividerHeight="0dp"
-                android:fastScrollEnabled="true"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="0dp"
-            android:orientation="vertical"
-            android:layout_weight="1">
-        <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-            <TextView
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:text="Image Files"
-                    android:layout_width="150dip"
-                    android:layout_height="wrap_content"
-                    android:paddingEnd="20dp"
-                    android:paddingStart="20dp"/>
-
-            <Button
-                    android:text="Add File"
-                    android:onClick="uploadImage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-        </LinearLayout>
-        <ListView
-                android:id="@+id/ImageList"
-                android:layout_width="fill_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:paddingEnd="20dp"
-                android:paddingStart="20dp"
-                android:divider="@null"
-                android:dividerHeight="0dp"
-                android:fastScrollEnabled="true"/>
-
-    </LinearLayout>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
