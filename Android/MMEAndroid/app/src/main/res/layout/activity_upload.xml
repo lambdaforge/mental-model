@@ -10,21 +10,36 @@
 
     <include layout="@layout/toolbar"
             android:id="@+id/toolbar_upload" />
+    <TextView
+            android:id="@+id/explain_upload"
+            android:textSize="14sp"
+            android:text="Here you can upload the relevant audio/video/image files to tailor NOMMET to your needs.\n\nOnce you have uploaded a file, it should show on this screen. Once you have uploaded all your files here, you can go to start session/settings to indicate where you want each file to operate within NOMMET."
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingEnd="20dp"
+            android:paddingStart="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+
+            app:layout_constraintTop_toBottomOf="@+id/toolbar_upload"
+            app:layout_constraintBottom_toTopOf="@+id/upload"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
 
     <LinearLayout
+            android:id="@+id/upload"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:orientation="vertical"
             android:weightSum="3"
 
-            app:layout_constraintTop_toBottomOf="@+id/toolbar_upload"
+            app:layout_constraintTop_toBottomOf="@+id/explain_upload"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
->
+            app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:orientation="vertical"
                 android:layout_weight="1">
@@ -49,7 +64,7 @@
             </LinearLayout>
             <ListView
                     android:id="@+id/VideoList"
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:paddingEnd="20dp"
@@ -61,7 +76,7 @@
         </LinearLayout>
 
         <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:orientation="vertical"
                 android:layout_weight="1">
@@ -85,7 +100,7 @@
             </LinearLayout>
             <ListView
                     android:id="@+id/AudioList"
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:paddingEnd="20dp"
@@ -97,7 +112,7 @@
         </LinearLayout>
 
         <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:orientation="vertical"
                 android:layout_weight="1">
@@ -121,7 +136,7 @@
             </LinearLayout>
             <ListView
                     android:id="@+id/ImageList"
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:paddingEnd="20dp"

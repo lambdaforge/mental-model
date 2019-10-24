@@ -32,6 +32,20 @@
             android:id="@+id/toolbar_home" />
 
     <TextView
+            android:id="@+id/midpoint"
+            android:layout_width="1dip"
+            android:layout_height="1dip"
+            android:text=""
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="spread">
+
+    </TextView>
+
+    <TextView
             android:id="@+id/welcome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -80,20 +94,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-            android:id="@+id/midpoint"
-            android:layout_width="1dip"
-            android:layout_height="1dip"
-            android:text=""
-
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="spread">
-
-    </TextView>
-
     <Button
             android:id="@+id/start"
             android:layout_width="150dip"
@@ -108,5 +108,18 @@
             app:layout_constraintStart_toStartOf="@+id/midpoint"
             app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+            android:id="@+id/manual"
+            android:layout_width="150dip"
+            android:layout_height="wrap_content"
+
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:onClick="changeToManual"
+            android:text="Show Manual"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/midpoint" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

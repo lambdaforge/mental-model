@@ -18,6 +18,12 @@
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="GoogleAppIndexingWarning">
 
+        <provider
+                android:name=".AssetProvider"
+                android:authorities="com.example.mmeandroid.assetprovider"
+                android:grantUriPermissions="true"
+                android:exported="true" />
+
 
         <activity
                 android:label="Mental Model Elicitation"
@@ -46,7 +52,6 @@
 
         <activity android:name=".MainActivity"
                   android:parentActivityName=".HomeActivity" >
-
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value=".HomeActivity" />

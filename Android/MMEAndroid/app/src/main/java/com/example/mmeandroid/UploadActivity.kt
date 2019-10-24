@@ -79,6 +79,9 @@ class UploadActivity : AppCompatActivity() {
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
+        super.onActivityResult(requestCode, resultCode, data)
+
         currentIntent = data
         if (resultCode == RESULT_OK) {
             currentImportFileType =  when (requestCode) {
