@@ -24,7 +24,6 @@
                 android:grantUriPermissions="true"
                 android:exported="true" />
 
-
         <activity
                 android:label="Mental Model Elicitation"
                 android:name=".StartActivity">
@@ -33,9 +32,14 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
         <activity
                 android:label="Mental Model Elicitation"
-                android:name=".HomeActivity">
+                android:name=".HomeActivity"
+                android:parentActivityName=".HomeActivity">
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".HomeActivity" />
         </activity>
 
         <activity
@@ -50,8 +54,10 @@
 
         </activity>
 
-        <activity android:name=".MainActivity"
-                  android:parentActivityName=".HomeActivity" >
+        <activity
+                android:label="Model Elicitation"
+                android:name=".MainActivity"
+                android:parentActivityName=".HomeActivity" >
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value=".HomeActivity" />

@@ -40,28 +40,11 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="spread">
-
-    </TextView>
-
-    <TextView
-            android:id="@+id/welcome"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Welcome to the NOn-verbal Mental Model Elicitation Tool (NOMMET)!"
-            android:textAlignment="center"
-            android:textColor="@color/black"
-            android:textSize="18sp"
-            android:textStyle="bold"
-
-            app:layout_constraintBottom_toTopOf="@+id/startExplain"
             app:layout_constraintTop_toBottomOf="@+id/toolbar_home"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintVertical_chainStyle="spread">
 
     </TextView>
+
 
     <TextView
             android:id="@+id/startExplain"
@@ -69,14 +52,15 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:text="Below you can choose to start uploading files to tailor the tool to your needs, or to choose start session to start mapping mental models, access the manual, change settings or to download your data. "
-            android:textAlignment="center"
+            android:text="Welcome to the NOn-verbal Mental Model Elicitation Tool (NOMMET)!\n\nBelow you can choose to start uploading files to tailor the tool to your needs, or to choose start session to start mapping mental models, change settings or to download your data. "
             android:textSize="14sp"
+            android:background="@drawable/box"
+            android:padding = "10dp"
 
             app:layout_constraintBottom_toTopOf="@+id/midpoint"
             app:layout_constraintEnd_toEndOf="@+id/right_guideline"
             app:layout_constraintStart_toStartOf="@+id/left_guideline"
-            app:layout_constraintTop_toBottomOf="@+id/welcome"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="spread">
 
     </TextView>
@@ -89,37 +73,40 @@
             android:onClick="changeToUpload"
             android:text="Upload Files"
 
+            app:layout_constraintTop_toBottomOf="@+id/toolbar_home"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/midpoint"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toStartOf="@+id/start"
+            app:layout_constraintVertical_chainStyle="spread"/>
 
     <Button
             android:id="@+id/start"
             android:layout_width="150dip"
             android:layout_height="wrap_content"
-
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:onClick="changeToMain"
             android:text="Start Session"
+
+            app:layout_constraintTop_toBottomOf="@+id/toolbar_home"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/midpoint"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintVertical_chainStyle="spread" />
 
     <Button
             android:id="@+id/manual"
             android:layout_width="150dip"
             android:layout_height="wrap_content"
-
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:onClick="changeToManual"
             android:text="Show Manual"
+
+            app:layout_constraintTop_toBottomOf="@+id/toolbar_home"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/start"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/midpoint" />
+            app:layout_constraintVertical_chainStyle="spread"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

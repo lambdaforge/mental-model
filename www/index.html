@@ -9,8 +9,10 @@
         <div id="mme-tool">
             <audio id="audio" src=""></audio>
             <div id="menu" class="screen">
+                <div id="wrapper">
+                <div class="filler"></div>
                 <div id="options">
-                <div class="inline" id="infoinput">
+                    <div class="inline" id="infoinput">
                         <table>
                             <tr>
                                 <td colspan="2">
@@ -51,7 +53,8 @@
                         <button class="otherBtn" id="btn-download" type="button">Download Data</button><br>
                     </div>
                 </div>
-
+            <div class="filler"></div>
+            </div>
             </div>
             <div id="display-video" class="screen">
                 <video id="video" src="" controls></video>
@@ -69,9 +72,14 @@
             </div>
              <div id="settings" class="screen">
                 <h2><i>Settings</i></h2>
+                <div class="box">
+                     <p class="explanation">Here you can use the files you have uploaded to populate the tool. Select the audio or video file from the dropdown box, for the respective NOMMET parts.</p>
+                    <p class="explanation">Select the factors you would like to use for the drivers mapping and consequences mapping by selecting the image and audio file for each factor and select if you would like these factors to show on the drivers mapping screen or the consequences mapping screen.</p>
+                </div>
+
                     <table>
                         <tr>
-                            <td>Mapping</td>
+                            <td>Mapping:</td>
                             <td>
                                 <table id="mappingTypesTable">
                                     <tr>
@@ -88,8 +96,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td><label for="negativeArrows">Add negative arrows?</label></td>
-                            <td><input id="negativeArrows" type="checkbox"></td>
+                            <td><label for="negativeArrows">Add negative arrows:</label></td>
+                            <td><input id="negativeArrows" type="checkbox">&ensp;<div class="tooltip">?<span class="tooltiptext">Select the negative arrow option if you would like respondents to indicate both positive and negative relations in their mental model.</span></div></td>
                         </tr>
                         <tr>
                             <td><label for="introductionVideo">Introduction video:</label></td>

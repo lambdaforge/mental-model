@@ -9,19 +9,8 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
 import android.webkit.MimeTypeMap
-import androidx.core.content.FileProvider
 import android.database.MatrixCursor
 import android.provider.OpenableColumns
-import android.content.res.AssetManager
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-
-
-
-
-
-
 
 
 class AssetProvider : ContentProvider() {
@@ -66,7 +55,6 @@ class AssetProvider : ContentProvider() {
             projection = COLUMNS
         }
 
-        Log.i(tag, "query")
         val am = context!!.assets
         val path = getRelativePath(uri)
         var fileSize: Long = 0
@@ -78,7 +66,7 @@ class AssetProvider : ContentProvider() {
             Log.e(tag, "Can't open asset file", e)
         }
 
-        val cols = arrayOfNulls<String>(projection!!.size)
+        val cols = arrayOfNulls<String>(projection.size)
         val values = arrayOfNulls<Any>(projection.size)
         var i = 0
         for (col in projection) {
@@ -97,44 +85,34 @@ class AssetProvider : ContentProvider() {
     }
 
     override fun getType(uri: Uri): String? {
-        Log.i(tag, "type")
-        val file_name = uri.lastPathSegment
-        val lastDot = file_name!!.lastIndexOf('.')
+        val filename = uri.lastPathSegment
+        val lastDot = filename!!.lastIndexOf('.')
         if (lastDot >= 0) {
-            val extension = file_name.substring(lastDot + 1)
+            val extension = filename.substring(lastDot + 1)
             val mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
             if (mime != null) {
                 Log.i(tag, "$mime")
                 return mime
             }
         }
-        Log.i(tag, "default type")
 
         return "application/octet-stream"
     }
 
     override fun delete(p1: Uri, p2: String?, p3: Array<String>?): Int {
-        Log.i(tag, "del.")
-        // TODO: Implement this method
         return 0
     }
 
 
     override fun insert(p1: Uri, p2: ContentValues?): Uri? {
-        // TODO: Implement this method
-        Log.i("AP", "insert.")
         return null
     }
 
     override fun onCreate(): Boolean {
-        // TODO: Implement this method
-        Log.i("AP", "create.")
         return false
     }
 
     override fun update(p1: Uri, p2: ContentValues?, p3: String?, p4: Array<String>?): Int {
-        Log.i("AP", "update.")
-        // TODO: Implement this method
         return 0
     }
 

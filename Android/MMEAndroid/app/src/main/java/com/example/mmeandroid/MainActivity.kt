@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this@MainActivity)
         builder.setTitle(dTag)
         if (isExternalStorageWritable()) {
-            builder.setMessage("Do you want to save $sessionDataFileName?")
+            builder.setMessage("Do you want to save $sessionDataFileName to your 'Downloads' directory?")
             builder.setPositiveButton("Yes")    {      _, _ -> saveFileToDownloads(url) }
             builder.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel()          }
         }
