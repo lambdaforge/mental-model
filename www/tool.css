@@ -31,7 +31,6 @@ div#mme-tool {
 
 #settings {
     padding: 50px;
-    display: flex;
     flex-flow: column;
 }
 
@@ -40,11 +39,10 @@ div#mme-tool {
 }
 
 #session, #comment {
-    size: "20";
+    size: 20px;
 }
 
 #wrapper {
-
   display: flex;
   flex-flow: column;
   height: 100%;
@@ -91,8 +89,7 @@ button {
 }
 
 .explanation {
-    font-size: 14px;
-
+    font-size: 16px;
 }
 
  /* Style the tab */

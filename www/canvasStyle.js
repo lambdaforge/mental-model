@@ -31,7 +31,7 @@ arrowPositions = function(h, w, rightSideWidth, leftSideLineHeight, nArrows) {
 getUsedArrows = function(weights, negativeUsed, mappingType) {
     var arrows = [];
     for (var i = 0; i < weights.length; i++) {
-        if (weights[i] > 0 || (negativeUsed && !(mappingType== "practice")) ) {
+        if (weights[i] > 0 || (negativeUsed && !(mappingType === "practice")) ) {
             arrows.push(weights[i]);
         }
     }
@@ -39,7 +39,7 @@ getUsedArrows = function(weights, negativeUsed, mappingType) {
 };
 
 
-// Get maximum absulute value of array
+// Get maximum absolute value of array
 getAbsoluteMax = function(array) {
     var max = 0;
     for (var i = 0; i < array.length; i++) {

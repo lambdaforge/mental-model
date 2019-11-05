@@ -53,14 +53,14 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:text="Welcome to the NOn-verbal Mental Model Elicitation Tool (NOMMET)!\n\nBelow you can choose to start uploading files to tailor the tool to your needs, or to choose start session to start mapping mental models, change settings or to download your data. "
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:background="@drawable/box"
             android:padding = "10dp"
 
             app:layout_constraintBottom_toTopOf="@+id/midpoint"
             app:layout_constraintEnd_toEndOf="@+id/right_guideline"
             app:layout_constraintStart_toStartOf="@+id/left_guideline"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar_home"
             app:layout_constraintVertical_chainStyle="spread">
 
     </TextView>
