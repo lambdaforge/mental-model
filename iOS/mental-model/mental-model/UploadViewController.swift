@@ -62,6 +62,8 @@ class UploadViewController:  UIViewController,
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.navigationController?.navigationBar.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 120.0) // otherwise not taken into account
+        
         view.backgroundColor = .white
         
         imageListView = makeMediaView(row: 0, type: "Image", uploaded: imageList, addAction: #selector(uploadImage))
