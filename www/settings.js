@@ -4,19 +4,22 @@ defaultSettings = {
     factors: {
         drivers: {
             dynamic: [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O" ],
-            fixed: "Y.png"
+            fixed: "Y.png",
+            fixedPosition: "right"
         },
 
         consequences: {
             dynamic: [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O" ],
-            fixed: "Y.png"
+            fixed: "Y.png",
+            fixedPosition: "left"
         },
 
         practice: {
             dynamic: [
                 "work", "food", "money", "sleep", "friends"
             ],
-            fixed: "smile.png"
+            fixed: "smile.png",
+            fixedPosition: "right"
         },
     },
 
@@ -41,6 +44,7 @@ defaultSettings = {
 
     useNegativeArrows: false,
     useMappings: "both", // "both", "drivers", "consequences"
+
 
 
     //
@@ -76,11 +80,9 @@ defaultSettings = {
     introductionVideo: "introduction.mp4",
 
     practiceMappingAudio: "practice.m4a",
-    mainMappingAudio: "main.m4a",
+    driversMappingAudio: "main.m4a",
+    consequencesMappingAudio: "main.m4a",
     thankYouAudio: "thank_you.m4a",
 
     thankYouImage: "thank_you.png",
-
-
-
 };

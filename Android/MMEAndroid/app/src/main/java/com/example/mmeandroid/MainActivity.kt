@@ -17,6 +17,11 @@ import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
 import android.media.AudioManager
 import androidx.core.content.ContextCompat
+import androidx.core.app.ComponentActivity.ExtraData
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+
+
 
 
 private const val PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: Int = 1
@@ -53,6 +58,10 @@ class MainActivity : AppCompatActivity() {
         webView!!.webViewClient = WebViewClient()
         webView!!.loadUrl(getHtmlURL())
         webView!!.setDownloadListener { url, _, _, _, _ -> onDownload(url) }
+
+        if (android.os.Build.VERSION.SDK_INT > 16) {
+            webView!!.settings.mediaPlaybackRequiresUserGesture = false
+        }
 
     }
 

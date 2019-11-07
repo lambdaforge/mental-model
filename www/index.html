@@ -97,31 +97,67 @@
                         </tr>
                         <tr>
                             <td><label for="negativeArrows">Add negative arrows:</label></td>
-                            <td><input id="negativeArrows" type="checkbox">&ensp;<div class="tooltip">?<span class="tooltiptext">Select the negative arrow option if you would like respondents to indicate both positive and negative relations in their mental model.</span></div></td>
+                            <td><input id="negativeArrows" type="checkbox">
+                                <div class="toolTip">?
+                                    <span class="toolTipText">Select the negative arrow option if you would like respondents to indicate both positive and negative relations in their mental model.</span>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
                             <td><label for="introductionVideo">Introduction video:</label></td>
-                            <td><select id="introductionVideo" class="videoChooser"></select></td>
+                            <td><select id="introductionVideo" class="videoChooser"></select>
+                                <div class="toolTip">?
+                                    <span class="toolTipText">This video introduces the tool to participants by demonstrating the practice tasks.</span>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
                             <td><label for="instructionVideo">Instruction video:</label></td>
-                            <td><select id="instructionVideo" class="videoChooser"></select></td>
+                            <td><select id="instructionVideo" class="videoChooser"></select>
+                                <div class="toolTip">?
+                                    <span class="toolTipText">This video introduces the factors to the participant.</span>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
                             <td><label for="practiceMappingAudio">Practice audio:</label></td>
-                            <td><select id="practiceMappingAudio" class="audioChooser"></select></td>
+                            <td><select id="practiceMappingAudio" class="audioChooser"></select>
+                                <div class="toolTip">?
+                                    <span class="toolTipText">This is the audio file played during the practice task.</span>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
-                            <td><label for="mainMappingAudio">Mapping audio:</label></td>
-                            <td><select id="mainMappingAudio" class="audioChooser"></select></td>
+                            <td><label for="driversMappingAudio">Mapping drivers audio:</label></td>
+                            <td><select id="driversMappingAudio" class="audioChooser"><option value="">None</option></select>
+                                <div class="toolTip">?
+                                    <span class="toolTipText">This is the audio file played during the mapping drivers task.</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label for="consequencesMappingAudio">Mapping consequences audio:</label></td>
+                            <td><select id="consequencesMappingAudio" class="audioChooser"><option value="">None</option></select>
+                                <div class="toolTip">?
+                                    <span class="toolTipText">This is the audio file played during the mapping consequences task.</span>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
                             <td><label for="thankYouAudio">Thank you audio:</label></td>
-                            <td><select id="thankYouAudio" class="audioChooser"></select></td>
+                            <td><select id="thankYouAudio" class="audioChooser"></select>
+                                <div class="toolTip">?
+                                    <span class="toolTipText">This is the audio file played for the thank you screen.</span>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
                             <td><label for="thankYouImage">Thank you image:</label></td>
-                            <td><select id="thankYouImage" class="imageChooser"></select></td>
+                            <td><select id="thankYouImage" class="imageChooser"></select>
+                                <div class="toolTip">?
+                                    <span class="toolTipText">the image displayed on the thank you screen</span>
+                                </div>
+                            </td>
                         </tr>
                     </table>
 
@@ -136,6 +172,16 @@
                         <br>
                         <div class="fixed-factor"><label>Fixed factor: <select id="fixed-factor-drivers"></select></label></div>
                         <br>
+                        <div class="fixed-factor-pos">
+                            <label>Fixed factor position:
+                                <select id="fixed-factor-drivers-pos">
+                                    <option>left</option>
+                                    <option>middle</option>
+                                    <option>right</option>
+                                </select>
+                            </label>
+                        </div>
+                        <br>
                         <table class="factor-media" id="factor-media-drivers">
                             <tr><td>Use?</td><td>Name</td><td>Image</td><td>Explanation (optional)</td></tr>
                         </table>
@@ -146,6 +192,16 @@
                    <div id="consequences" class="tabContent">
                        <br>
                        <div class="fixed-factor"><label>Fixed factor: <select id="fixed-factor-consequences"></select></label></div>
+                       <br>
+                       <div class="fixed-factor-pos">
+                           <label>Fixed factor position:
+                               <select id="fixed-factor-consequences-pos">
+                                   <option>left</option>
+                                   <option>middle</option>
+                                   <option>right</option>
+                               </select>
+                          </label>
+                       </div>
                        <br>
                         <table class="factor-media" id="factor-media-consequences">
                             <tr><td>Use?</td><td>Name</td><td>Image</td><td>Explanation (optional)</td></tr>

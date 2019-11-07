@@ -14,6 +14,11 @@ initSettingsScreen = function() {
     $("#negativeArrows")[0].checked = settings.useNegativeArrows;
     $("input[name='mappingTypes'][value='" + settings.useMappings + "']" )[0].checked = true;
 
+    let element1 = document.getElementById("fixed-factor-drivers-pos");
+    element1.value = settings.factors.drivers.fixedPosition;
+    let element2 = document.getElementById("fixed-factor-consequences-pos");
+    element2.value = settings.factors.consequences.fixedPosition;
+
     if( settings.useMappings === "consequences") {
          $("#tab-consequences").click();
          $("#tab-drivers").hide();
@@ -171,9 +176,9 @@ listFactors = function(mappingType) {
 
 // Add elements to media selection
 populateSelection = function(element, mediaType, defaultValue, optional) {
-
+    var option;
     if (optional) {
-        var option = document.createElement("option");
+         option = document.createElement("option");
 
         option.value = "";
         option.textContent = "None";
@@ -185,7 +190,7 @@ populateSelection = function(element, mediaType, defaultValue, optional) {
     var files = mediaSources[mediaType];
     for (var fileInd = 0; fileInd < files.length; fileInd++) {
         var filename = files[fileInd];
-        var option = document.createElement("option");
+        option = document.createElement("option");
 
         option.value = filename;
         option.textContent = filename;
@@ -228,7 +233,14 @@ saveSettings = function() {
 
     // Set negative arrows option
     var arrowOption = document.getElementById("negativeArrows");
-    if (arrowOption) settings.useNegativeArrows = arrowOption.checked;
+    settings.useNegativeArrows = arrowOption.checked;
+
+    // Set fixed symbol positions
+    var fixedPos1 = document.getElementById("fixed-factor-drivers-pos");
+    settings.factors.drivers.fixedPosition = fixedPos1.value;
+
+    var fixedPos2 = document.getElementById("fixed-factor-consequences-pos");
+    settings.factors.consequences.fixedPosition = fixedPos2.value;
 
     // Set decision on which mappings are used
     settings.useMappings = $(":checked[name='mappingTypes']")[0].value;
@@ -247,14 +259,12 @@ saveSettings = function() {
     }
 
     // Set media
-    var mediaList = [ "instructionVideo", "introductionVideo", "thankYouImage",
-        "thankYouAudio", "mainMappingAudio", "practiceMappingAudio"];
+    var mediaList = [ "instructionVideo", "introductionVideo", "thankYouImage", "thankYouAudio",
+        "driversMappingAudio", "consequencesMappingAudio", "practiceMappingAudio"];
 
     for (var mediaInd = 0; mediaInd < mediaList.length; mediaInd++) {
         var item = mediaList[mediaInd];
-        var element = document.getElementById(item);
-        var mediaFile = element.options[element.selectedIndex].value;
-        if (mediaFile && mediaFile !== "") settings[item] = mediaFile;
+        settings[item] = document.getElementById(item).value;
     }
 
     // Set used factors
@@ -263,7 +273,7 @@ saveSettings = function() {
     saveFactors("consequences");
 
     // Store settings
-    console.log("Settings changed to:", settings)
+    console.log("Settings changed to:", settings);
     localStorage.setItem("mmetool_settings", JSON.stringify(settings));
 };
 

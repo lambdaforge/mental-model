@@ -118,12 +118,12 @@ displayMapping = function(mappingType, startNewMapping) {
         case "drivers":
             showScreen("mapping-task");
             uistate.activeCanvas = "mapping-canvas";
-            playAudio(settings.mainMappingAudio);
+            playAudio(settings.driversMappingAudio);
             break;
         case "consequences":
             showScreen("mapping-task-consequences");
             uistate.activeCanvas = "mapping-canvas-consequences";
-            playAudio(settings.mainMappingAudio);
+            playAudio(settings.consequencesMappingAudio);
             break;
         default:
             console.log("Unknown mapping type");
@@ -184,13 +184,15 @@ leaveAndSaveSettings = function() {
 
 
 // Action after instructions have ended or after next button on mapping screen
-goToNextMapping = function() {
+goToNextMapping = function(startNewMapping) {
+    var setup = (startNewMapping === undefined)? false : startNewMapping;
+
     var available = true;
     if (uistate.mapping === "none") {
         switch (settings.useMappings) {
-            case "drivers":      displayMapping("drivers",      true); break;
-            case "consequences": displayMapping("consequences", true); break;
-            case "both":         displayMapping("drivers",      true); break;
+            case "drivers":      displayMapping("drivers",      setup); break;
+            case "consequences": displayMapping("consequences", setup); break;
+            case "both":         displayMapping("drivers",      setup); break;
             default:
                 console.log("Unknown mapping setting");
                 available = false;
@@ -198,7 +200,7 @@ goToNextMapping = function() {
     }
     else {
         if (uistate.mapping === "drivers" && settings.useMappings === "both")
-                                 displayMapping("consequences", true);
+                                 displayMapping("consequences", setup);
         else available = false;
     }
 
@@ -207,13 +209,15 @@ goToNextMapping = function() {
 
 
 // Action for button on 'thank you' screen or previous button on mapping screen
-goToLastMapping = function() {
+goToLastMapping = function(startNewMapping) {
+    var setup = (startNewMapping === undefined)? false : startNewMapping;
+
     var available = true;
     if (uistate.mapping === "finished") {
         switch (settings.useMappings) {
-            case "drivers":      displayMapping("drivers",      true); break;
-            case "consequences": displayMapping("consequences", true); break;
-            case "both":         displayMapping("consequences", true); break;
+            case "drivers":      displayMapping("drivers",      setup); break;
+            case "consequences": displayMapping("consequences", setup); break;
+            case "both":         displayMapping("consequences", setup); break;
             default:
                 console.log("Unknown mapping setting");
                 available = false;
@@ -221,7 +225,7 @@ goToLastMapping = function() {
     }
     else {
         if (uistate.mapping === "consequences" && settings.useMappings === "both")
-                                 displayMapping("drivers",      true);
+                                 displayMapping("drivers",      setup);
         else available = false;
     }
 
@@ -237,7 +241,7 @@ window.onload = function() {
 
     $("#video").on("ended", function() {
         if (uistate.video === "introduction" )  displayMapping("practice",     true);
-        else                                    goToNextMapping();
+        else                                    goToNextMapping(true);
     });
 
     $("#audio").on("click", function(a) {

@@ -84,10 +84,13 @@ getPixelSizes = function(w, h, mappingType, settings) { // "main" or "practice"
         availableHeight: availableHeight,
         leftSideLineHeight: leftSideLineHeight,
 
-        xFixedFactor: w - rightSideWidth - 1.5*iconSize,
+    //    xFixedFactor: w - rightSideWidth - 1.5*iconSize,
+        xFixedFactor: { right: w - rightSideWidth - 1.5*iconSize,
+                        left:  leftSideWidth + 1.5*iconSize,
+                        middle: leftSideWidth + 0.5*mappingScreenWidth },
         yFixedFactor: (mappingType === "practice") ? h * 3 / 4 : h / 2,
 
-        practiceImageY: h * 1 / 4,
+        practiceImageY: h * 0.15,
         practiceImageX: mappingCenterX,
         practiceImageHeight: h * 0.3,
 

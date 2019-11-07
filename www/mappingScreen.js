@@ -30,8 +30,8 @@ setupMapping = function(mappingType) {
     canvas[uistate.activeCanvas].clear();
 
     var factors =  settings.factors[mappingType];
-    var dynamicFactors = factors["dynamic"];
-    var fixedFactor = factors["fixed"];
+    var dynamicFactors = factors.dynamic;
+    var fixedFactor = factors.fixed;
 
     // Adjust Sizes
     var h = $(window).height();
@@ -43,7 +43,8 @@ setupMapping = function(mappingType) {
     setupArrows();
     setupFactorMenu(dynamicFactors);
 
-    var xFixed = canvasStyle.xFixedFactor;
+    var xFixed = canvasStyle.xFixedFactor[factors.fixedPosition];
+    console.log(xFixed, factors.fixedPosition); // TODO: delete!
     var yFixed = canvasStyle.yFixedFactor;
 
     drawFactorIcon(fixedFactor, xFixed,  yFixed, true);
@@ -354,17 +355,18 @@ onCanvasClicked = function(event) {
 
     if (!event.target && uistate.newArrow.state === "select-arrow") {
 
-        console.log("Canvas is empty, move factor: " + uistate.highlight);
+        console.log("No object hit and no arrow selected, move factor: " + uistate.highlight);
 
         var icon = getIconByName(uistate.highlight);
-        if (icon && (icon.iconType === "factor")) {
+
+        removeHighlight();
+
+        if (icon && (icon.iconType === "factor") && (icon.iconFixed === false)) {
             var pointer = canvas[uistate.activeCanvas].getPointer(event.e);
             var x = pointer.x;
             var y = pointer.y;
 
             if (!tooCloseToOtherFactors(pointer) && !withinMappingArea(x, y)) {
-
-                removeHighlight();
 
                 icon.left = x;
                 icon.top = y;
@@ -377,6 +379,8 @@ onCanvasClicked = function(event) {
                 redrawConnections(icon);
             }
         }
+    } else {
+        console.log("Object hit or arrow selected");
     }
 };
 

@@ -142,14 +142,14 @@ td {
   margin-right: auto;
 }
 
-.tooltip {
+.toolTip {
   position: relative;
   display: inline-block;
   border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
 }
 
 /* Tooltip text */
-.tooltip .tooltiptext {
+.toolTip .toolTipText {
   visibility: hidden;
   width: 120px;
   background-color: black;
@@ -164,7 +164,7 @@ td {
 }
 
 /* Show the tooltip text when you mouse over the tooltip container */
-.tooltip:hover .tooltiptext {
+.toolTip:hover .toolTipText {
   visibility: visible;
 }
 
