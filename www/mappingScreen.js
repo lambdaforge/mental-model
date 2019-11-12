@@ -44,7 +44,6 @@ setupMapping = function(mappingType) {
     setupFactorMenu(dynamicFactors);
 
     var xFixed = canvasStyle.xFixedFactor[factors.fixedPosition];
-    console.log(xFixed, factors.fixedPosition); // TODO: delete!
     var yFixed = canvasStyle.yFixedFactor;
 
     drawFactorIcon(fixedFactor, xFixed,  yFixed, true);

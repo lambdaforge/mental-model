@@ -55,7 +55,6 @@ class MainActivity : AppCompatActivity() {
         webView!!.settings.domStorageEnabled = true
         webView!!.settings.allowContentAccess = true
         webView!!.settings.allowFileAccess = true
-        webView!!.webViewClient = WebViewClient()
         webView!!.loadUrl(getHtmlURL())
         webView!!.setDownloadListener { url, _, _, _, _ -> onDownload(url) }
 
@@ -87,9 +86,8 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun getHtmlURL(): String {
-        val dir = this.filesDir.absolutePath
 
-        return "file:$dir/www/index.html"
+        return "file:${this.filesDir.absolutePath}/www/index.html"
     }
 
 
