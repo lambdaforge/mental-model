@@ -1,3 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <resources>
-    <string name="app_name">MME Android</string>
+    <string name="app_name">NOMMET</string>
+
+    <string name="home_explanation">Welcome to the NOn-verbal Mental Model Elicitation Tool (NOMMET)!\n\nBelow you can choose to start uploading files to tailor the tool to your needs, or to choose start session to start mapping mental models, change settings or to download your data. View the manual if you want to learn more about how to use NOMMET.
+</string>
+    <string name="upload_button">Upload Files</string>
+    <string name="session_button">Start Session</string>
+    <string name="manual_button">Show Manual</string>
+
+    <string name="upload_title">File Import</string>
+    <string name="upload_explanation">Here you can upload the relevant audio/video/image files to tailor NOMMET to your needs.\n\nOnce you have uploaded a file, it should show on this screen. Once you have uploaded all your files here, you can go to start session/settings to indicate where you want each file to operate within NOMMET.
+</string>
+    <string name="add_file_button">Add File</string>
+    <string name="audio_section_title">Audio Files</string>
+    <string name="video_section_title">Video Files</string>
+    <string name="image_section_title">Image Files</string>
+
+    <string name="name_downloaded_file">nommet_data.csv</string>
+    <string name="mediastore_display_name_downloaded_file">NOMMET Data</string>
+
 </resources>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-
 <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -52,10 +51,10 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:text="Welcome to the NOn-verbal Mental Model Elicitation Tool (NOMMET)!\n\nBelow you can choose to start uploading files to tailor the tool to your needs, or to choose start session to start mapping mental models, change settings or to download your data. View the manual if you want to learn more about how to use NOMMET."
+            android:text="@string/home_explanation"
             android:textSize="16sp"
             android:background="@drawable/box"
-            android:padding = "10dp"
+            android:padding="10dp"
 
             app:layout_constraintBottom_toTopOf="@+id/midpoint"
             app:layout_constraintEnd_toEndOf="@+id/right_guideline"
@@ -71,7 +70,7 @@
             android:layout_width="150dip"
             android:layout_height="wrap_content"
             android:onClick="changeToUpload"
-            android:text="Upload Files"
+            android:text="@string/upload_button"
 
             app:layout_constraintTop_toBottomOf="@+id/toolbar_home"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -86,7 +85,7 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:onClick="changeToMain"
-            android:text="Start Session"
+            android:text="@string/session_button"
 
             app:layout_constraintTop_toBottomOf="@+id/toolbar_home"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -101,7 +100,7 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:onClick="changeToManual"
-            android:text="Show Manual"
+            android:text="@string/manual_button"
 
             app:layout_constraintTop_toBottomOf="@+id/toolbar_home"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -5,20 +5,18 @@ import android.os.Bundle
 import android.content.Intent
 import android.util.Log
 import java.io.*
-import androidx.appcompat.app.AlertDialog
 
 
 class StartActivity : AppCompatActivity() {
 
     private val aTag = "Asset Copying"
-
     private val mediaListFile = "mediaSources.js" // will only be copied once
+    private val webDirName = "www"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val targetDir = this.filesDir.absolutePath
-        copyAssetsTo("www", targetDir)
+        copyAssetsTo(webDirName, this.filesDir.absolutePath)
 
         startActivity(Intent(this@StartActivity, HomeActivity::class.java))
     }
@@ -53,10 +51,8 @@ class StartActivity : AppCompatActivity() {
                 }
             }
         } catch (e: IOException) {
-
-            val webFileDir = File("${this.filesDir.absolutePath}/www")
-            if (webFileDir.exists()) webFileDir.delete()
-            openExitDialog()
+            Log.e(aTag, "Assets could not be copied", e)
+            informUserAndExit()
         }
 
     }
@@ -80,25 +76,20 @@ class StartActivity : AppCompatActivity() {
             outStream.close()
         } catch (e: Exception) {
             Log.e(aTag, "Assets could not be copied", e)
-
-            val webFileDir = File("${this.filesDir.absolutePath}/www")
-            if (webFileDir.exists()) webFileDir.delete()
-
-            openExitDialog()
+            informUserAndExit()
         }
 
     }
 
-    private fun openExitDialog() {
-        val builder = AlertDialog.Builder(this@StartActivity)
-        builder.setTitle("Initialization Error")
-        builder.setMessage("Initialization of app failed! You can try freeing up some space and restarting the app.")
-        builder.setPositiveButton("OK")    { dialog, _ ->
-            dialog.cancel()
-            super.finish() // Exit App
-        }
+    private fun informUserAndExit() {
+        val dialog = Dialog(this@StartActivity)
+        val title = "Initialization Error"
+        val msg = "Initialization of app failed! You may try freeing up some space and restarting the app."
+        dialog.showInformation(title, msg)
 
-        val dialog: AlertDialog = builder.create()
-        dialog.show()
+        val webFileDir = File("${this.filesDir.absolutePath}/$webDirName")
+        if (webFileDir.exists()) webFileDir.delete()
+
+        super.finish() // Exit App
     }
 }

@@ -14,12 +14,10 @@ import java.io.*
 import org.json.*
 import android.widget.ListView
 import android.widget.ArrayAdapter
-import androidx.appcompat.app.AlertDialog
 import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.trimmedLength
-
 
 
 private const val IMAGE_IMPORT_CODE: Int = 1
@@ -53,6 +51,7 @@ class UploadActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar_upload))
         val actionBar = supportActionBar
         actionBar!!.setDisplayHomeAsUpEnabled(true)
+        actionBar.setDisplayShowTitleEnabled(false)
 
         // Connect data arrays and table views
         prepareListViewFor("images", R.id.ImageList)
@@ -198,7 +197,7 @@ class UploadActivity : AppCompatActivity() {
             fileContent = String(buffer)
         }
         catch (e: Exception) {
-            openInfoDialog(tag, warningOnImportFailure)
+            Dialog(this@UploadActivity).showInformation(tag, warningOnImportFailure)
             Log.e(tag, "Failure while reading file $fileName!")
             e.printStackTrace()
 
@@ -207,18 +206,6 @@ class UploadActivity : AppCompatActivity() {
 
         return fileContent
     }
-
-
-    private fun openInfoDialog(title: String, message: String) {
-        val builder = AlertDialog.Builder(this@UploadActivity)
-        builder.setTitle(title)
-        builder.setMessage(message)
-        builder.setPositiveButton("OK")    { dialog, _ -> dialog.cancel()          }
-
-        val dialog: AlertDialog = builder.create()
-        dialog.show()
-    }
-
 
     private fun copyFile(inStream: InputStream, outStream: FileOutputStream): Boolean {
         val buffer = ByteArray(1024)
@@ -249,7 +236,7 @@ class UploadActivity : AppCompatActivity() {
         val prefix = content.substringBefore("{")
 
         if (json.trimmedLength() < 1 || prefix.trimmedLength() < 1) {
-            openInfoDialog(tag, warningOnImportFailure)
+            Dialog(this@UploadActivity).showInformation(tag, warningOnImportFailure)
             Log.e(tag, "Content of mediaSources.js file is erroneous. Content must have format 'mediaSources = JSONOBJECT'.")
             return false
         }
@@ -295,9 +282,10 @@ class UploadActivity : AppCompatActivity() {
         val fileDir = "$webDir/$fileType"
         val fileName = getFileName(uri)
         val newFileName = "$fileDir/$fileName"
+        val dialog = Dialog(this@UploadActivity)
 
         if (fileName == "") {
-            openInfoDialog(tag, warningOnImportFailure)
+            dialog.showInformation(tag, warningOnImportFailure)
             Log.e(tag, "Importing file '$fileName' failed since no filename could be established")
         }
         else {
@@ -320,13 +308,13 @@ class UploadActivity : AppCompatActivity() {
                     }
                     else {
                         Log.i(tag, "File could not be imported.")
-                        openInfoDialog(tag, warningOnImportFailure)
+                        dialog.showInformation(tag, warningOnImportFailure)
                     }
                 }
                 else {
                     val msg = "File $fileName has already been imported!"
                     Log.i(tag, msg)
-                    openInfoDialog(tag, msg)
+                    dialog.showInformation(tag, msg)
                 }
 
             } else {

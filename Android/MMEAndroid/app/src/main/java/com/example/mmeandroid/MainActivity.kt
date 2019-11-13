@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.webkit.*
-import androidx.appcompat.app.AlertDialog
 import android.util.Log
 import java.io.*
 import android.app.DownloadManager
@@ -17,11 +16,6 @@ import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
 import android.media.AudioManager
 import androidx.core.content.ContextCompat
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-
-
 
 
 private const val PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: Int = 1
@@ -31,9 +25,6 @@ class MainActivity : AppCompatActivity() {
 
 
     private var webView: WebView? = null
-    private val sessionDataFileName = "mmetool_data.csv"
-    private val sessionDataDownloadTitle = "mmetool_data"
-
     private var sessionData = ""
     private val dTag = "File Download"
     private val pTag = "Permissions"
@@ -48,8 +39,9 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar_main))
         val actionBar = supportActionBar
         actionBar!!.setDisplayHomeAsUpEnabled(true)
+        actionBar.setDisplayShowTitleEnabled(false)
 
-        webView = findViewById(R.id.webview)
+        webView = findViewById(R.id.webView)
         webView!!.settings.javaScriptEnabled = true
         webView!!.settings.databaseEnabled = true
         webView!!.settings.domStorageEnabled = true
@@ -84,7 +76,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
     private fun getHtmlURL(): String {
 
         return "file:${this.filesDir.absolutePath}/www/index.html"
@@ -92,24 +83,16 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun onDownload(url: String) {
-        val decodedURL = Uri.decode(url)
-        Log.i(dTag, "Url:")
-        Log.i(dTag, url)
-        Log.i(dTag, decodedURL)
+        val dialog = Dialog(this@MainActivity)
 
-        val builder = AlertDialog.Builder(this@MainActivity)
-        builder.setTitle(dTag)
         if (isExternalStorageWritable()) {
-            builder.setMessage("Do you want to save $sessionDataFileName to your 'Downloads' directory?")
-            builder.setPositiveButton("Yes")    {      _, _ -> saveFileToDownloads(url) }
-            builder.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel()          }
+            val msg = "Do you want to save ${getString(R.string.name_downloaded_file)} to your 'Downloads' directory?"
+            dialog.showDoOrNotChoice(dTag, msg) { saveFileToDownloads(url) }
         }
         else {
-            builder.setMessage("Saving file is not possible.\nIf device is connected to another device try disconnecting it.")
-            builder.setNegativeButton("Ok")     { dialog, _ -> dialog.cancel()          }
+            val msg = "Saving file is not possible.\nIf device is connected to another device try disconnecting it."
+            dialog.showInformation(dTag, msg)
         }
-        val dialog: AlertDialog = builder.create()
-        dialog.show()
     }
 
 
@@ -139,7 +122,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun saveFileToDownloadsOnAPILowerQ() {
         val saveDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        val file = File(saveDir, sessionDataFileName)
+        val file = File(saveDir, getString(R.string.name_downloaded_file))
         file.createNewFile()
         file.writeText(sessionData)
 
@@ -159,8 +142,8 @@ class MainActivity : AppCompatActivity() {
     private fun saveFileToDownloadsOnAPISinceQ() {
         if ( android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
             val values = ContentValues()
-            values.put(MediaStore.Downloads.TITLE, sessionDataFileName)
-            values.put(MediaStore.Downloads.DISPLAY_NAME, sessionDataDownloadTitle)
+            values.put(MediaStore.Downloads.TITLE, getString(R.string.name_downloaded_file))
+            values.put(MediaStore.Downloads.DISPLAY_NAME, getString(R.string.mediastore_display_name_downloaded_file))
             values.put(MediaStore.Downloads.MIME_TYPE, "text/csv")
 
             val uri = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)

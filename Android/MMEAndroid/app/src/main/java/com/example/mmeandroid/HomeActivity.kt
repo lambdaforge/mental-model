@@ -7,7 +7,6 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.view.View
-import androidx.appcompat.app.AlertDialog
 
 
 class HomeActivity : AppCompatActivity() {
@@ -54,19 +53,10 @@ class HomeActivity : AppCompatActivity() {
         }
         catch (e: ActivityNotFoundException)
         {
-            openInfoDialog("Manual", "No Application available to view PDF!")
+            val dialog = Dialog(this@HomeActivity)
+            dialog.showInformation("Manual", "No Application available to view PDF!")
             Log.i("Manual", "PDF Viewer Missing")
 
         }
-    }
-
-    private fun openInfoDialog(title: String, message: String) {
-        val builder = AlertDialog.Builder(this@HomeActivity)
-        builder.setTitle(title)
-        builder.setMessage(message)
-        builder.setPositiveButton("OK")    { dialog, _ -> dialog.cancel()          }
-
-        val dialog: AlertDialog = builder.create()
-        dialog.show()
     }
 }
