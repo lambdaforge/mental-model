@@ -9,6 +9,12 @@
 import UIKit
 
 class ViewController: UIViewController {
+
+    var bannerView: UIView!
+    var imageView: UIImageView!
+    
+    var explanationView: UIView!
+    var explanation: TextBox!
     
     var leftButton: UIButton!
     var leftColumn: UIView!
@@ -16,6 +22,7 @@ class ViewController: UIViewController {
     var middleColumn: UIView!
     var rightButton: UIButton!
     var rightColumn: UIView!
+    
     
     @IBAction func changeToUpload(sender: UIButton!) {
         print("upload")
@@ -31,59 +38,46 @@ class ViewController: UIViewController {
     
     @IBAction func showManual(sender: UIButton!) {
         print("manual")
-        let webView = WebViewController()
-        self.navigationController?.pushViewController(webView, animated: true)
+        let pdfView = PdfViewController()
+        self.navigationController?.pushViewController(pdfView, animated: true)
     }
-    /*
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        let height: CGFloat = 200 //whatever height you want to add to the existing height
-        let bounds = self.navigationController!.navigationBar.bounds
-        self.navigationController?.navigationBar.frame = CGRect(x: 0, y: 0, width: bounds.width, height: height)
-    }*/
-    /*
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        let height = CGFloat(72)
-        self.navigationController?.navigationBar.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: height)
-    }*/
     
     override func viewWillLayoutSubviews() {
-        
-        leftButton.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-        leftButton.centerXAnchor.constraint(equalTo: leftColumn.centerXAnchor).isActive = true
-        middleButton.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-        middleButton.centerXAnchor.constraint(equalTo: middleColumn.centerXAnchor).isActive = true
-        rightButton.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-        rightButton.centerXAnchor.constraint(equalTo: rightColumn.centerXAnchor).isActive = true
         
         imageView.centerYAnchor.constraint(equalTo: bannerView.centerYAnchor).isActive = true
         imageView.centerXAnchor.constraint(equalTo: bannerView.centerXAnchor).isActive = true
         
+        leftButton.centerYAnchor.constraint(equalTo: leftColumn.centerYAnchor).isActive = true
+        leftButton.centerXAnchor.constraint(equalTo: leftColumn.centerXAnchor).isActive = true
+        middleButton.centerYAnchor.constraint(equalTo: middleColumn.centerYAnchor).isActive = true
+        middleButton.centerXAnchor.constraint(equalTo: middleColumn.centerXAnchor).isActive = true
+        rightButton.centerYAnchor.constraint(equalTo: rightColumn.centerYAnchor).isActive = true
+        rightButton.centerXAnchor.constraint(equalTo: rightColumn.centerXAnchor).isActive = true
+        
     }
     
-    var bannerView: UIView!
-    var imageView: UIImageView!
+    override func viewDidLayoutSubviews() {
+        explanation.center = explanationView.center
+    }
     
-    func addBanner() {
-        let width = self.view.frame.size.width
+    
+    private func addBanner() {
+        let w = Int(view.frame.size.width)
+        let h = Int(BannerHeight)
         
-        bannerView = UIView(frame: CGRect(x: 0, y: 0, width: width, height: 120))
+        bannerView = UIView(frame: CGRect(x: 0, y: 0, width: w, height: h))
 
-        let bgImage = UIImage(named: "bannerBG")
-        
-        let bgView = UIImageView(frame: CGRect(x: 0, y: 0, width: width, height: 120))
-        bgView.image = bgImage
+        let bgView = UIImageView(frame: CGRect(x: 0, y: 0, width: w, height: h))
+        bgView.image = UIImage(named: "bannerBG")
         bannerView.addSubview(bgView)
         
-        imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: width, height: 120))
+        imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: w, height: h))
         imageView.contentMode = .scaleAspectFit
         imageView.image = UIImage(named: "bannerImage")
         bannerView.addSubview(imageView)
         
-        self.navigationController?.navigationBar.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 120.0)
+        self.navigationController?.navigationBar.frame = CGRect(x: 0, y: 0, width: w, height: h)
         self.navigationController?.navigationBar.insertSubview(bannerView, at: 2)
-        
         self.navigationController?.navigationBar.tintColor = .white;
         
     }
@@ -91,25 +85,51 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        addBanner() //
-        
-        let thirdWidth = view.frame.width / 3.0
         view.backgroundColor = .white
         
+        addBanner() // for all views
+        addButtonRow()
+        addExplanationBox()
+    }
+    
+    private func addExplanationBox() {
+        
+        let w: CGFloat = self.view.frame.width * CGFloat(ExplanationBoxWidthFraction)
+        let leftBound = (view.frame.width - w) / 2.0
+        let hButtons = leftButton.frame.size.height
+        let hBanner = bannerView.frame.size.height
+        let h = (view.safeAreaLayoutGuide.layoutFrame.size.height - hBanner - hButtons) / 2
+
+        explanationView = UIView(frame: CGRect(x: leftBound, y: ScreenTop, width: w, height: h))
+        view.addSubview(explanationView)
+
+        explanation = TextBox(frame: CGRect(x: 0, y: 0, width: w, height: h))
+        explanation.text = Explanation.home
+        explanation.adjustSize()
+        view.addSubview(explanation)
+    }
+    
+    private func yOffset() -> CGFloat {
+        return bannerView.frame.size.height + UIApplication.shared.statusBarFrame.height
+    }
+    
+    private func addButtonRow() {
+        let thirdWidth = view.frame.width / 3.0
+        
         leftColumn = UIView()
-        leftColumn.frame = CGRect(x: 0, y: 100, width: thirdWidth, height: view.frame.height)
+        leftColumn.frame = CGRect(x: 0, y: yOffset(), width: thirdWidth, height: view.frame.height - yOffset())
         leftButton = makeButton(label: "Upload Files", action: #selector(changeToUpload))
         leftColumn.addSubview(leftButton)
         view.addSubview(leftColumn)
         
         middleColumn = UIView()
-        middleColumn.frame = CGRect(x: thirdWidth, y: 0, width: thirdWidth, height: view.frame.height)
+        middleColumn.frame = CGRect(x: thirdWidth, y: yOffset(), width: thirdWidth, height: view.frame.height - yOffset())
         middleButton = makeButton(label: "Start Session", action: #selector(changeToWebApp))
         middleColumn.addSubview(middleButton)
         view.addSubview(middleColumn)
         
         rightColumn = UIView()
-        rightColumn.frame = CGRect(x: 2*thirdWidth, y: 0, width: thirdWidth, height: view.frame.height)
+        rightColumn.frame = CGRect(x: 2*thirdWidth, y: yOffset(), width: thirdWidth, height: view.frame.height - yOffset())
         rightButton = makeButton(label: "Show Manual", action: #selector(showManual))
         rightColumn.addSubview(rightButton)
         view.addSubview(rightColumn)

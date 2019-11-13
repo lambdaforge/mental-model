@@ -25,11 +25,7 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        /*
-         // load from same directory as html file
-         if let url = Bundle.main.url(forResource: "www/index", withExtension: "html") {
-         webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
-         }*/
+        
         let htmlURL = Bundle.main.url(forResource: "www/index", withExtension: "html")
         let request = URLRequest(url: htmlURL!)
         webView.load(request)
@@ -68,8 +64,8 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
     
     private func showMessage(message: String) {
         let alert = UIAlertController(title: "Download", message: message, preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        alert.addAction(cancelAction)
+        let button = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+        alert.addAction(button)
         self.present(alert, animated: true)
     }
     

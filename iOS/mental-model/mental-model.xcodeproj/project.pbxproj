@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		BC03DF94233A63EC00C77076 /* www in Resources */ = {isa = PBXBuildFile; fileRef = BC03DF93233A63EC00C77076 /* www */; };
+		BC30A2A9237B3006005F74C6 /* TextBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC30A2A8237B3006005F74C6 /* TextBox.swift */; };
+		BC30A2AB237C5DDD005F74C6 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC30A2AA237C5DDD005F74C6 /* Constants.swift */; };
 		BCD634CA2304682000144A31 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD634C92304682000144A31 /* AppDelegate.swift */; };
 		BCD634CF2304682000144A31 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BCD634CD2304682000144A31 /* Main.storyboard */; };
 		BCD634D12304682200144A31 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BCD634D02304682200144A31 /* Assets.xcassets */; };
@@ -18,6 +20,8 @@
 		BCD634FB230468A600144A31 /* UploadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD634F8230468A600144A31 /* UploadViewController.swift */; };
 		BCD634FC230468A600144A31 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD634F9230468A600144A31 /* ViewController.swift */; };
 		BCE58B0C2327FBC700942D1F /* MediaListDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE58B0B2327FBC700942D1F /* MediaListDataSource.swift */; };
+		BCFA5B6F23735F1300B735B0 /* PdfViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCFA5B6E23735F1300B735B0 /* PdfViewController.swift */; };
+		BCFA5B7123735FB900B735B0 /* ManualNOMMET.pdf in Resources */ = {isa = PBXBuildFile; fileRef = BCFA5B7023735FB900B735B0 /* ManualNOMMET.pdf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,6 +43,8 @@
 
 /* Begin PBXFileReference section */
 		BC03DF93233A63EC00C77076 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = ../../www; sourceTree = "<group>"; };
+		BC30A2A8237B3006005F74C6 /* TextBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextBox.swift; sourceTree = "<group>"; };
+		BC30A2AA237C5DDD005F74C6 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		BCD634C62304682000144A31 /* mental-model.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "mental-model.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BCD634C92304682000144A31 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BCD634CE2304682000144A31 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -55,6 +61,8 @@
 		BCD634F8230468A600144A31 /* UploadViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UploadViewController.swift; sourceTree = "<group>"; };
 		BCD634F9230468A600144A31 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		BCE58B0B2327FBC700942D1F /* MediaListDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaListDataSource.swift; sourceTree = "<group>"; };
+		BCFA5B6E23735F1300B735B0 /* PdfViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PdfViewController.swift; sourceTree = "<group>"; };
+		BCFA5B7023735FB900B735B0 /* ManualNOMMET.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = ManualNOMMET.pdf; path = ../../resources/ManualNOMMET.pdf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,6 +93,7 @@
 		BCD634BD2304682000144A31 = {
 			isa = PBXGroup;
 			children = (
+				BCFA5B7023735FB900B735B0 /* ManualNOMMET.pdf */,
 				BC03DF93233A63EC00C77076 /* www */,
 				BCD634C82304682000144A31 /* mental-model */,
 				BCD634DD2304682200144A31 /* mental-modelTests */,
@@ -110,11 +119,14 @@
 				BCD634F9230468A600144A31 /* ViewController.swift */,
 				BCE58B0B2327FBC700942D1F /* MediaListDataSource.swift */,
 				BCD634F7230468A600144A31 /* WebViewController.swift */,
+				BCFA5B6E23735F1300B735B0 /* PdfViewController.swift */,
 				BCD634C92304682000144A31 /* AppDelegate.swift */,
 				BCD634CD2304682000144A31 /* Main.storyboard */,
 				BCD634D02304682200144A31 /* Assets.xcassets */,
 				BCD634D22304682200144A31 /* LaunchScreen.storyboard */,
 				BCD634D52304682200144A31 /* Info.plist */,
+				BC30A2A8237B3006005F74C6 /* TextBox.swift */,
+				BC30A2AA237C5DDD005F74C6 /* Constants.swift */,
 			);
 			path = "mental-model";
 			sourceTree = "<group>";
@@ -241,6 +253,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BCFA5B7123735FB900B735B0 /* ManualNOMMET.pdf in Resources */,
 				BC03DF94233A63EC00C77076 /* www in Resources */,
 				BCD634D42304682200144A31 /* LaunchScreen.storyboard in Resources */,
 				BCD634D12304682200144A31 /* Assets.xcassets in Resources */,
@@ -274,6 +287,9 @@
 				BCD634FC230468A600144A31 /* ViewController.swift in Sources */,
 				BCE58B0C2327FBC700942D1F /* MediaListDataSource.swift in Sources */,
 				BCD634FA230468A600144A31 /* WebViewController.swift in Sources */,
+				BC30A2A9237B3006005F74C6 /* TextBox.swift in Sources */,
+				BCFA5B6F23735F1300B735B0 /* PdfViewController.swift in Sources */,
+				BC30A2AB237C5DDD005F74C6 /* Constants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

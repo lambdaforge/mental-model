@@ -16,14 +16,17 @@ enum ImportError: Error {
 class UploadViewController:  UIViewController,
         UIImagePickerControllerDelegate, UINavigationControllerDelegate,
         MPMediaPickerControllerDelegate {
+   
+    var explanationView: UIView!
+    var explanation: TextBox!
+    
+    var imageListView: UITableView!
+    var videoListView: UITableView!
+    var musicListView: UITableView!
     
     var imageList = MediaListDataSource(labels: [String]())
     var videoList = MediaListDataSource(labels: [String]())
     var musicList = MediaListDataSource(labels: [String]())
-    
-    var imageListView: UITableView? = UITableView()
-    var videoListView: UITableView? = UITableView()
-    var musicListView: UITableView? = UITableView()
     
     let webDir = Bundle.main.resourceURL!.appendingPathComponent("www")
 
@@ -62,30 +65,50 @@ class UploadViewController:  UIViewController,
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.navigationController?.navigationBar.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 120.0) // otherwise not taken into account
+        self.navigationController?.navigationBar.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: BannerHeight) // otherwise not taken into account
         
         view.backgroundColor = .white
         
-        imageListView = makeMediaView(row: 0, type: "Image", uploaded: imageList, addAction: #selector(uploadImage))
-        videoListView = makeMediaView(row: 1, type: "Video", uploaded: videoList, addAction: #selector(uploadVideo))
-        musicListView = makeMediaView(row: 2, type: "Music", uploaded: musicList, addAction: #selector(uploadMusic))
+        let space = (view.frame.height - ScreenTop) / 4.0
+        let mediaViewOffset = ScreenTop + space
+        
+        addExplanationBox(maxH: space)
+        
+        imageListView = makeMediaView(row: 0, type: "Image", uploaded: imageList, addAction: #selector(uploadImage), offset: mediaViewOffset, space: space)
+        videoListView = makeMediaView(row: 1, type: "Video", uploaded: videoList, addAction: #selector(uploadVideo), offset: mediaViewOffset, space: space)
+        musicListView = makeMediaView(row: 2, type: "Music", uploaded: musicList, addAction: #selector(uploadMusic), offset: mediaViewOffset, space: space)
         
     }
     
-    private func makeMediaView(row: Int, type: String, uploaded: MediaListDataSource, addAction: Selector) -> UITableView {
+    override func viewDidLayoutSubviews() {
+        explanation.center = explanationView.center
+    }
+    
+    private func addExplanationBox(maxH: CGFloat) {
+        
+        let w: CGFloat = self.view.frame.width * CGFloat(ExplanationBoxWidthFraction)
+        let leftBound = (view.frame.width - w) / 2.0
+        
+        explanationView = UIView(frame: CGRect(x: leftBound, y: ScreenTop, width: w, height: maxH))
+        view.addSubview(explanationView)
+        
+        explanation = TextBox(frame: CGRect(x: 0, y: 0, width: w, height: maxH))
+        explanation.text = Explanation.upload
+        explanation.adjustSize()
+        view.addSubview(explanation)
+    }
+    
+    private func makeMediaView(row: Int, type: String, uploaded: MediaListDataSource, addAction: Selector, offset: CGFloat, space: CGFloat) -> UITableView {
         let subview = UIView()
         let table = UITableView()
-        let backBarHeight = navigationController!.navigationBar.frame.size.height
-        let offset = backBarHeight * 2
-        let thirdHeight = (view.frame.height - backBarHeight * 3) / 3.0
-        let yPos = offset + (CGFloat(row) * thirdHeight)
+        let yPos = offset + (CGFloat(row) * space)
         
         table.delegate = uploaded
         table.dataSource = uploaded
         table.separatorStyle = .none
         table.register(UITableViewCell.self, forCellReuseIdentifier: "label")
         
-        subview.frame = CGRect(x: 0, y: yPos, width: view.frame.width, height: thirdHeight)
+        subview.frame = CGRect(x: 0, y: yPos, width: view.frame.width, height: space)
         subview.addSubview(label(text: "     \(type) Files  "))
         subview.addSubview(button(text: "Add File", action: addAction))
         subview.addSubview(table)
