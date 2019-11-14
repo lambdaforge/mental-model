@@ -26,7 +26,7 @@ mediaSources = {
         "friendship.m4a",
         "money.m4a",
         "sleep.m4a",
-        "work.m4a",
+        "work.m4a"
     ],
     "images": [
         "thank_you.png",
@@ -50,6 +50,6 @@ mediaSources = {
         "friendship.png",
         "money.png",
         "sleep.png",
-        "work.png",
+        "work.png"
     ]
 }

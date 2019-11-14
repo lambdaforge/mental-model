@@ -18,6 +18,8 @@ import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.trimmedLength
+import org.json.JSONArray
+
 
 
 private const val IMAGE_IMPORT_CODE: Int = 1
@@ -41,6 +43,11 @@ class UploadActivity : AppCompatActivity() {
     private var currentImportFileType = ""
     private var currentIntent: Intent? = null
 
+    private var mediaListPrefix: String? = null
+    private var mediaList: JSONObject? = null
+    private var mediaListing = HashMap<String, JSONArray?>()
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -53,6 +60,9 @@ class UploadActivity : AppCompatActivity() {
         actionBar!!.setDisplayHomeAsUpEnabled(true)
         actionBar.setDisplayShowTitleEnabled(false)
 
+        // Read media list file
+        initMediaList()
+
         // Connect data arrays and table views
         prepareListViewFor("images", R.id.ImageList)
         prepareListViewFor("video", R.id.VideoList)
@@ -61,8 +71,6 @@ class UploadActivity : AppCompatActivity() {
 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean { // Back button
-       // val intent = Intent(applicationContext, StartActivity::class.java)
-        //startActivityForResult(intent, 0)
 
         return when (item.itemId) {
             android.R.id.home -> {
@@ -184,7 +192,7 @@ class UploadActivity : AppCompatActivity() {
     
     // Returns content of file or null on failure
     private fun readMediaSourcesFile(fileName: String): String? {
-        var fileContent: String?
+        val fileContent: String?
 
         try {
             val buffer = StringBuffer("")
@@ -198,14 +206,12 @@ class UploadActivity : AppCompatActivity() {
         }
         catch (e: Exception) {
             Dialog(this@UploadActivity).showInformation(tag, warningOnImportFailure)
-            Log.e(tag, "Failure while reading file $fileName!")
-            e.printStackTrace()
-
-            fileContent = null
+            throw java.lang.Exception("Failure while reading file $fileName!")
         }
 
         return fileContent
     }
+
 
     private fun copyFile(inStream: InputStream, outStream: FileOutputStream): Boolean {
         val buffer = ByteArray(1024)
@@ -217,7 +223,6 @@ class UploadActivity : AppCompatActivity() {
             }
         } catch (e: IOException) {
             Log.e(tag, "Failure while copying file!")
-            e.printStackTrace()
             return false
         } finally {
             inStream.close()
@@ -228,33 +233,39 @@ class UploadActivity : AppCompatActivity() {
     }
 
 
-    private fun saveToMediaList(fileName: String, mediaType: String): Boolean {
+    private fun initMediaList() {
         val path = this.filesDir.absolutePath + mediaSourcesSubPath
-        val content = readMediaSourcesFile(path)?: return false
+        val content = readMediaSourcesFile(path)
 
-        val json = content.substringAfter('=')
+        val json = content!!.substringAfter('=')
         val prefix = content.substringBefore("{")
 
         if (json.trimmedLength() < 1 || prefix.trimmedLength() < 1) {
-            Dialog(this@UploadActivity).showInformation(tag, warningOnImportFailure)
-            Log.e(tag, "Content of mediaSources.js file is erroneous. Content must have format 'mediaSources = JSONOBJECT'.")
-            return false
+            throw java.lang.Exception("Content of mediaSources.js have format 'mediaSources = JSONOBJECT'.")
         }
 
-        val jsonObj: JSONObject?
-        val jsonList: JSONArray?
-
+        mediaListPrefix = prefix
         try {
-             jsonObj = JSONObject(json)
-             jsonList = jsonObj.getJSONArray(mediaType)
+            mediaList = JSONObject(json)
         }
         catch (e: ClassCastException) {
-            Log.e(tag, "Content of mediaSources.js must have format 'mediaSources = JSONOBJECT'. Property '$mediaType' of JSON object must exist and contain a list of file names.")
-            return false
-        }
+            throw java.lang.Exception( "Content of mediaSources.js must have format 'mediaSources = JSONOBJECT'.")
 
-        jsonList.put(fileName)
-        val newContent = prefix + jsonObj.toString(2)
+        }
+        try {
+            mediaListing["audio"] = mediaList!!.getJSONArray("audio")
+            mediaListing["video"] = mediaList!!.getJSONArray("video")
+            mediaListing["images"] = mediaList!!.getJSONArray("images")
+        }
+        catch (e: ClassCastException) {
+            throw java.lang.Exception("Properties 'audio', 'video' and 'images' must exist in JSON object and contain a list of file names.")
+        }
+    }
+
+
+    private fun saveMediaListFile(): Boolean {
+        val path = this.filesDir.absolutePath + mediaSourcesSubPath
+        val newContent = mediaListPrefix + mediaList!!.toString(2)
 
         val file = FileWriter(path)
         try {
@@ -276,12 +287,110 @@ class UploadActivity : AppCompatActivity() {
     }
 
 
-    private fun handleSingleFile(uri: Uri, fileType: String) {
+    private fun updateMediaListFile(fileName: String, mediaType: String): Boolean {
+
+        if (!fileInMediaList(fileName, mediaType)) {
+            mediaListing[mediaType]!!.put(fileName)
+            return saveMediaListFile()
+        }
+        else {
+            Log.i(tag, "Filename already listed in media list")
+        }
+
+        return true
+    }
+
+
+    private fun fileInMediaList(fileName: String, mediaType: String): Boolean {
+        return positionInMediaList(fileName, mediaType) != -1
+    }
+
+
+    private fun positionInMediaList(fileName: String, mediaType: String): Int {
+        var index = -1
+        Log.i(tag, "${mediaListing} ")
+        Log.i(tag, "${mediaListing[mediaType]} ")
+        Log.i(tag, "${mediaType} ")
+        Log.i(tag, "${mediaListing[mediaType]} ")
+        Log.i(tag, "${mediaListing[mediaType]!!} ")
+
+        Log.i(tag, "${mediaListing[mediaType]!!.length()} ")
+        for (i in 0 until mediaListing[mediaType]!!.length())
+            if (mediaListing[mediaType]!!.getString(i) == fileName)
+                index = i
+        return index
+    }
+
+
+    private fun deleteFromMediaList(fileName: String, mediaType: String) {
+        val mlPos = positionInMediaList(fileName, mediaType)
+        if( mlPos != -1 ) {
+            val list = JSONArray()
+            for (i in 0 until mediaListing[mediaType]!!.length()) {
+                // Excluding the item at position
+                if (i != mlPos) {
+                    list.put(mediaListing[mediaType]!!.get(i))
+                }
+            }
+
+            mediaListing[mediaType] = list
+            mediaList!!.put(mediaType, mediaListing[mediaType])
+            Log.i(tag, "New media list: $mediaList")
+        }
+    }
+
+
+    private fun fileInListView(fileName: String, mediaType: String): Boolean {
+        return listView[mediaType]!!.getPosition(fileName) != -1
+
+    }
+
+
+    private fun importFile(uri: Uri, mediaType: String) {
+        val fileDir = "${this.filesDir.absolutePath + webDirSubPath}/$mediaType"
+        val fileName = getFileName(uri)
+        val targetFilePath = "$fileDir/$fileName"
+        val dialog = Dialog(this@UploadActivity)
+
+        val newFile = File(targetFilePath)
+        if( newFile.exists() ) { // try to avoid IOExceptions
+            applicationContext.deleteFile(newFile.name)
+            deleteFromMediaList(fileName, mediaType)
+            saveMediaListFile()
+            Log.i(tag, "Deleted duplicate file.")
+        }
+
+        Log.i(tag, "Read $uri")
+        val inStream = contentResolver.openInputStream(uri)!!
+
+        Log.i(tag, "Write $targetFilePath")
+        val outStream = FileOutputStream(targetFilePath)
+        val copySuccess = copyFile(inStream, outStream)
+        if( copySuccess ) {
+            Log.i(tag, "Written $targetFilePath")
+
+            val registerSuccess = updateMediaListFile(fileName, mediaType)
+
+            if( registerSuccess ) {
+                Log.i(tag, "Media file updated")
+                if( !fileInListView(fileName, mediaType) ) listView[mediaType]!!.add(fileName)
+            }
+            else {
+                Log.w(tag, "File could not be imported. Registering to media list failed.")
+                dialog.showInformation(tag, warningOnImportFailure)
+            }
+        }
+        else {
+            Log.w(tag, "File could not be imported. Copying file failed.")
+            dialog.showInformation(tag, warningOnImportFailure)
+        }
+    }
+
+
+    private fun handleSingleFile(uri: Uri, mediaType: String) {
 
         val webDir = this.filesDir.absolutePath + webDirSubPath
-        val fileDir = "$webDir/$fileType"
         val fileName = getFileName(uri)
-        val newFileName = "$fileDir/$fileName"
         val dialog = Dialog(this@UploadActivity)
 
         if (fileName == "") {
@@ -291,37 +400,17 @@ class UploadActivity : AppCompatActivity() {
         else {
             Log.i(tag, "Import file: $fileName")
 
-            val pos = listView[fileType]?.getPosition(fileName)
-            if( pos == -1 ) {
-                if (!File(newFileName).exists()) {
-                    Log.i(tag, "Read $uri")
-                    val inStream = contentResolver.openInputStream(uri)!!
-
-                    Log.i(tag, "Write $newFileName")
-                    val outStream = FileOutputStream(newFileName)
-                    val copySuccess = copyFile(inStream, outStream)
-                    val registerSuccess = saveToMediaList(fileName, fileType)
-
-                    if( copySuccess && registerSuccess ) {
-                        listView[fileType]?.add(fileName)
-                        Log.i(tag, "Written $newFileName")
-                    }
-                    else {
-                        Log.i(tag, "File could not be imported.")
-                        dialog.showInformation(tag, warningOnImportFailure)
-                    }
-                }
-                else {
-                    val msg = "File $fileName has already been imported!"
-                    Log.i(tag, msg)
-                    dialog.showInformation(tag, msg)
-                }
-
-            } else {
-                Log.i(tag, "File $fileName already in list view.")
+            val fileExists = File("$webDir/$mediaType/$fileName").exists()
+            if( !(fileExists && fileInMediaList(fileName, mediaType)) ) {
+                importFile(uri, mediaType)
             }
-        }
+            else {
+                Log.w(tag, "File $fileName already exists in directory")
+                val msg = "File $fileName has already been imported! Do you want to overwrite the existing file?"
+                dialog.showDoOrNotChoice("File Import", msg) { importFile(uri, mediaType) }
+            }
 
+        }
     }
 
 

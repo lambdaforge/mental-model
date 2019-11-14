@@ -1,6 +1,6 @@
 uistate = {
 
-    mapping: "drivers", // "practice", "none", "drivers", "consequences" or "finished"
+    mapping: "none", // "practice", "none", "drivers", "consequences" or "finished"
     video: "", // "introduction", "instructions"
     factorSettings: "both", // "drivers", "consequences" or "both"
     factorTabOpen: "",
@@ -188,6 +188,7 @@ goToNextMapping = function(startNewMapping) {
     var setup = (startNewMapping === undefined)? false : startNewMapping;
 
     var available = true;
+    console.log(uistate.mapping);
     if (uistate.mapping === "none") {
         switch (settings.useMappings) {
             case "drivers":      displayMapping("drivers",      setup); break;

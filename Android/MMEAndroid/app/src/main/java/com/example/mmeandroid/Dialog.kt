@@ -21,5 +21,8 @@ class Dialog(private val context: Context) {
         builder.setMessage(message)
         builder.setPositiveButton("Yes")    {      _, _ -> action()        }
         builder.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
+
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
     }
 }
