@@ -67,12 +67,15 @@ class UploadViewController:  UIViewController,
         
         self.navigationController?.navigationBar.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: BannerHeight) // otherwise not taken into account
         
-        view.backgroundColor = .white
+        view.backgroundColor = BackgroundColor
         
         let space = (view.frame.height - ScreenTop) / 4.0
+        let explanationBoxOffset = ScreenTop + Title.height
         let mediaViewOffset = ScreenTop + space
         
-        addExplanationBox(maxH: space)
+        
+        addTitle(offset: ScreenTop + Title.topPadding, height: Title.height)
+        addExplanationBox(offset: explanationBoxOffset, maxHeight: mediaViewOffset - explanationBoxOffset)
         
         imageListView = makeMediaView(row: 0, type: "Image", uploaded: imageList, addAction: #selector(uploadImage), offset: mediaViewOffset, space: space)
         videoListView = makeMediaView(row: 1, type: "Video", uploaded: videoList, addAction: #selector(uploadVideo), offset: mediaViewOffset, space: space)
@@ -84,22 +87,30 @@ class UploadViewController:  UIViewController,
         explanation.center = explanationView.center
     }
     
-    private func addExplanationBox(maxH: CGFloat) {
+    private func addTitle(offset: CGFloat, height: CGFloat) {
+        let label = UILabel(frame: CGRect(x: 0, y: offset, width: view.frame.width, height: height))
+        label.text = Title.importScreen
+        label.font = UIFont.boldSystemFont(ofSize: Title.height)
+        label.textAlignment = .center;
+        view.addSubview(label)
+    }
+    
+    private func addExplanationBox(offset: CGFloat, maxHeight: CGFloat) {
         
         let w: CGFloat = self.view.frame.width * CGFloat(ExplanationBoxWidthFraction)
         let leftBound = (view.frame.width - w) / 2.0
         
-        explanationView = UIView(frame: CGRect(x: leftBound, y: ScreenTop, width: w, height: maxH))
+        explanationView = UIView(frame: CGRect(x: leftBound, y: offset, width: w, height: maxHeight))
         view.addSubview(explanationView)
         
-        explanation = TextBox(frame: CGRect(x: 0, y: 0, width: w, height: maxH))
+        explanation = TextBox(frame: CGRect(x: 0, y: 0, width: w, height: maxHeight))
         explanation.text = Explanation.upload
         explanation.adjustSize()
         view.addSubview(explanation)
     }
     
     private func makeMediaView(row: Int, type: String, uploaded: MediaListDataSource, addAction: Selector, offset: CGFloat, space: CGFloat) -> UITableView {
-        let subview = UIView()
+        let titleBar = UIView()
         let table = UITableView()
         let yPos = offset + (CGFloat(row) * space)
         
@@ -107,19 +118,21 @@ class UploadViewController:  UIViewController,
         table.dataSource = uploaded
         table.separatorStyle = .none
         table.register(UITableViewCell.self, forCellReuseIdentifier: "label")
+        table.backgroundColor = BackgroundColor
         
-        subview.frame = CGRect(x: 0, y: yPos, width: view.frame.width, height: space)
-        subview.addSubview(label(text: "     \(type) Files  "))
-        subview.addSubview(button(text: "Add File", action: addAction))
-        subview.addSubview(table)
+        
+        titleBar.frame = CGRect(x: 0, y: yPos, width: view.frame.width, height: space)
+        titleBar.addSubview(label(text: "     \(type) Files  "))
+        titleBar.addSubview(button(text: "Add File", action: addAction))
+        titleBar.addSubview(table)
         
         table.translatesAutoresizingMaskIntoConstraints = false
-        table.topAnchor.constraint(equalTo: subview.topAnchor, constant: 50).isActive = true
-        table.leftAnchor.constraint(equalTo: subview.leftAnchor, constant: 20).isActive = true
-        table.bottomAnchor.constraint(equalTo: subview.bottomAnchor).isActive = true
-        table.rightAnchor.constraint(equalTo: subview.rightAnchor).isActive = true
+        table.topAnchor.constraint(equalTo: titleBar.topAnchor, constant: 50).isActive = true
+        table.leftAnchor.constraint(equalTo: titleBar.leftAnchor, constant: 20).isActive = true
+        table.bottomAnchor.constraint(equalTo: titleBar.bottomAnchor).isActive = true
+        table.rightAnchor.constraint(equalTo: titleBar.rightAnchor).isActive = true
         
-        view.addSubview(subview)
+        view.addSubview(titleBar)
         
         return table
     }

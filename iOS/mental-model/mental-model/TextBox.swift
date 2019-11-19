@@ -29,17 +29,21 @@ class TextBox:  UITextView {
     private func setup() {
         textContainerInset = insets
         textColor = color
+        
         textAlignment = NSTextAlignment.left
+        
         font = textFont
         isEditable = false
         isSelectable = false
         layer.borderColor = color.cgColor
         layer.borderWidth = borderWidth
-    }
+        layer.backgroundColor = BackgroundColor.cgColor
+        
+        
+     }
     
     func adjustSize() {
         let adjustedH = self.contentSize.height + 2*vSpacing
-        //let adjustedW = self.contentSize.width + 2*hSpacing
         let adjustedW = self.contentSize.width
         
         frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: adjustedW, height: adjustedH)

@@ -85,7 +85,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .white
+        view.backgroundColor = BackgroundColor
         
         addBanner() // for all views
         addButtonRow()

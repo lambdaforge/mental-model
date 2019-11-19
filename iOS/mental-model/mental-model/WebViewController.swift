@@ -12,7 +12,6 @@ import WebKit
 class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
     
     var webView: WKWebView!
-    var downloadFileName = "mme_tool.csv"
     
     override func loadView() {
         print("Webapp loaded")
@@ -26,6 +25,7 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.backgroundColor = BackgroundColor
         let htmlURL = Bundle.main.url(forResource: "www/index", withExtension: "html")
         let request = URLRequest(url: htmlURL!)
         webView.load(request)
@@ -41,7 +41,7 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
         if (url.starts(with: "data"))  {
             let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
             let documentsDirectory = paths[0]
-            let targetFile = documentsDirectory.appendingPathComponent(downloadFileName)
+            let targetFile = documentsDirectory.appendingPathComponent(DownloadFileName)
             
         
             decisionHandler(WKNavigationActionPolicy.cancel);
@@ -50,7 +50,7 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
             
             do {
                 try dataString.write(to: targetFile, atomically: true, encoding: String.Encoding.utf8)
-                showMessage(message: "File \(downloadFileName) was saved to Documents directory")
+                showMessage(message: "File \(DownloadFileName) was saved to Documents directory")
                 
             } catch {
                 showMessage(message: "Data could not be downloaded")
