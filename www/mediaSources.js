@@ -23,7 +23,7 @@ mediaSources = {
         "N.m4a",
         "O.m4a",
         "food.m4a",
-        "friendship.m4a",
+        "friends.m4a",
         "money.m4a",
         "sleep.m4a",
         "work.m4a"
@@ -47,7 +47,7 @@ mediaSources = {
         "O.png",
         "Y.png",
         "food.png",
-        "friendship.png",
+        "friends.png",
         "money.png",
         "sleep.png",
         "work.png"
