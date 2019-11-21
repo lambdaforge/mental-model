@@ -8,6 +8,8 @@
     <body>
         <div id="mme-tool">
             <audio id="audio" src=""></audio>
+
+            <!-- Menu Screen -->
             <div id="menu" class="screen">
                 <div id="wrapper">
                 <div class="filler"></div>
@@ -39,10 +41,11 @@
 
                   <div class="inline" id="steps">
                         <i>Or jump to...</i> <br><br>
-                        <button class="stepButtons" id="btn-practice"             type="button">Practice            </button><br>
-                        <button class="stepButtons" id="btn-instructions"         type="button">Instructions        </button><br>
-                        <button class="stepButtons" id="btn-mapping-drivers"      type="button">Mapping Drivers     </button><br>
-                        <button class="stepButtons" id="btn-mapping-consequences" type="button">Mapping Consequences</button><br>
+                        <button class="stepButtons" id="btn-practice"                  type="button">Practice                  </button><br>
+                        <button class="stepButtons" id="btn-instructions-drivers"      type="button">Instructions Drivers      </button><br>
+                        <button class="stepButtons" id="btn-mapping-drivers"           type="button">Mapping Drivers           </button><br>
+                        <button class="stepButtons" id="btn-instructions-consequences" type="button">Instructions Consequences </button><br>
+                        <button class="stepButtons" id="btn-mapping-consequences"      type="button">Mapping Consequences      </button><br>
                         <br>
                    </div>
 
@@ -56,20 +59,30 @@
             <div class="filler"></div>
             </div>
             </div>
+
+            <!-- Video Screen -->
             <div id="display-video" class="screen">
                 <video id="video" src="" controls></video>
             </div>
+
+            <!-- Thank You Screen -->
             <div id="thank-you" class="screen">
                 <button id="btn-ty-back" type="button">Back to Mapping</button>
+                <button id="btn-ty-to-main" type="button">Go to Session Main Screen</button>
+            </div>
 
-                <button id="btn-ty-tomain" type="button">Go to Session Main Screen</button>
+            <!-- Mapping Screens -->
+            <div id="mapping-practice" class="screen">
+                <canvas id="mapping-canvas-practice" ></canvas>
             </div>
-            <div id="mapping-task" class="screen">
-                <canvas id="mapping-canvas" ></canvas>
+            <div id="mapping-drivers" class="screen">
+                <canvas id="mapping-canvas-drivers" ></canvas>
             </div>
-            <div id="mapping-task-consequences" class="screen">
+            <div id="mapping-consequences" class="screen">
                 <canvas id="mapping-canvas-consequences" ></canvas>
             </div>
+
+            <!-- Settings Screen -->
              <div id="settings" class="screen">
                 <h2><i>Settings</i></h2>
                 <div class="box">
@@ -96,8 +109,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td><label for="negativeArrows">Add negative arrows:</label></td>
-                            <td><input id="negativeArrows" type="checkbox">
+                            <td><label for="negative-arrows">Add negative arrows:</label></td>
+                            <td><input id="negative-arrows" type="checkbox">
                                 <div class="toolTip">?
                                     <span class="toolTipText">Select the negative arrow option if you would like respondents to indicate both positive and negative relations in their mental model.</span>
                                 </div>
@@ -112,32 +125,40 @@
                             </td>
                         </tr>
                         <tr>
-                            <td><label for="instructionVideo">Instruction video:</label></td>
-                            <td><select id="instructionVideo" class="videoChooser"></select>
+                            <td><label for="instructionVideoDrivers">Instruction video for drivers:</label></td>
+                            <td><select id="instructionVideoDrivers" class="videoChooser"></select>
                                 <div class="toolTip">?
-                                    <span class="toolTipText">This video introduces the factors to the participant.</span>
+                                    <span class="toolTipText">This video introduces the driver factors to the participant.</span>
                                 </div>
                             </td>
                         </tr>
                         <tr>
-                            <td><label for="practiceMappingAudio">Practice audio:</label></td>
-                            <td><select id="practiceMappingAudio" class="audioChooser"></select>
+                            <td><label for="instructionVideoConsequences">Instruction video for consequences:</label></td>
+                            <td><select id="instructionVideoConsequences" class="videoChooser"></select>
+                                <div class="toolTip">?
+                                    <span class="toolTipText">This video introduces the consequence factors to the participant.</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label for="mappingAudioPractice">Practice audio:</label></td>
+                            <td><select id="mappingAudioPractice" class="audioChooser"></select>
                                 <div class="toolTip">?
                                     <span class="toolTipText">This is the audio file played during the practice task.</span>
                                 </div>
                             </td>
                         </tr>
                         <tr>
-                            <td><label for="driversMappingAudio">Mapping drivers audio:</label></td>
-                            <td><select id="driversMappingAudio" class="audioChooser"><option value="">None</option></select>
+                            <td><label for="mappingAudioDrivers">Mapping drivers audio:</label></td>
+                            <td><select id="mappingAudioDrivers" class="audioChooser"><option value="">None</option></select>
                                 <div class="toolTip">?
                                     <span class="toolTipText">This is the audio file played during the mapping drivers task.</span>
                                 </div>
                             </td>
                         </tr>
                         <tr>
-                            <td><label for="consequencesMappingAudio">Mapping consequences audio:</label></td>
-                            <td><select id="consequencesMappingAudio" class="audioChooser"><option value="">None</option></select>
+                            <td><label for="mappingAudioConsequences">Mapping consequences audio:</label></td>
+                            <td><select id="mappingAudioConsequences" class="audioChooser"><option value="">None</option></select>
                                 <div class="toolTip">?
                                     <span class="toolTipText">This is the audio file played during the mapping consequences task.</span>
                                 </div>
@@ -217,6 +238,8 @@
     </body>
     <script src="jquery-1.12.4.min.js" type="text/javascript"></script>
     <script src="fabric-3.2.0.min.js" type="text/javascript"></script>
+    <script src="enums.js" type="text/javascript"></script>
+    <script src="state.js" type="text/javascript"></script>
     <script src="settings.js" type="text/javascript"></script>
     <script src="canvasStyle.js" type="text/javascript"></script>
     <script src="mediaSources.js" type="text/javascript"></script>

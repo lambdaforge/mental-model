@@ -84,7 +84,6 @@ getPixelSizes = function(w, h, mappingType, settings) { // "main" or "practice"
         availableHeight: availableHeight,
         leftSideLineHeight: leftSideLineHeight,
 
-    //    xFixedFactor: w - rightSideWidth - 1.5*iconSize,
         xFixedFactor: { right: w - rightSideWidth - 1.5*iconSize,
                         left:  leftSideWidth + 1.5*iconSize,
                         middle: leftSideWidth + 0.5*mappingScreenWidth },
@@ -118,6 +117,12 @@ getPixelSizes = function(w, h, mappingType, settings) { // "main" or "practice"
 
         centerRightSide: w - rightSideWidth/2,
         centerLeftSide: leftSideWidth/2,
+
+        color: {
+            sidePanels: "#EAEAEA",
+            leftDivider: "#BBBBBB",
+            rightDivider: "#AAAAAA"
+        }
 
     };
 

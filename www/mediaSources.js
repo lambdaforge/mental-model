@@ -52,4 +52,4 @@ mediaSources = {
         "sleep.png",
         "work.png"
     ]
-}
+};

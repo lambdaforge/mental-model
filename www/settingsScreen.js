@@ -4,29 +4,29 @@
 // Set up settings screen
 initSettingsScreen = function() {
 
-    listFactors("drivers");
-    listFactors("consequences");
+    listFactors(MappingType.drivers);
+    listFactors(MappingType.consequences);
 
-    populateSelectionForClass("videoChooser", "video");
-    populateSelectionForClass("audioChooser", "audio");
-    populateSelectionForClass("imageChooser", "images");
+    populateSelectionForClass(HtmlClass.chooser.video, "video");
+    populateSelectionForClass(HtmlClass.chooser.audio, "audio");
+    populateSelectionForClass(HtmlClass.chooser.image, "images");
 
-    $("#negativeArrows")[0].checked = settings.useNegativeArrows;
+    $("#negative-arrows")[0].checked = settings.useNegativeArrows;
     $("input[name='mappingTypes'][value='" + settings.useMappings + "']" )[0].checked = true;
 
-    let element1 = document.getElementById("fixed-factor-drivers-pos");
+    let element1 = document.getElementById(SettingID.fixedFactorPos.drivers);
     element1.value = settings.factors.drivers.fixedPosition;
-    let element2 = document.getElementById("fixed-factor-consequences-pos");
+    let element2 = document.getElementById(SettingID.fixedFactorPos.consequences);
     element2.value = settings.factors.consequences.fixedPosition;
 
-    if( settings.useMappings === "consequences") {
+    if( settings.useMappings === MappingSetting.consequences) {
          $("#tab-consequences").click();
          $("#tab-drivers").hide();
     }
     else {
          $("#tab-drivers").click();
 
-         if( settings.useMappings === "drivers" ) {
+         if( settings.useMappings === MappingSetting.drivers ) {
             $("#tab-consequences").hide();
          }
     }
@@ -64,15 +64,15 @@ changeShownTabs = function() {
     var consequenceSelector = $("#tab-consequences");
 
         switch (chosenValue) {
-            case "consequences":
+            case MappingType.consequences:
                 driverSelector.hide();
                 consequenceSelector.show();
-                openTab("consequences");
+                openTab(MappingType.consequences);
                 break;
-            case "drivers":
+            case MappingType.drivers:
                 driverSelector.show();
                 consequenceSelector.hide();
-                openTab("drivers");
+                openTab(MappingType.drivers);
                 break;
             default:
                 driverSelector.show();
@@ -232,35 +232,40 @@ addFactorRow = function(mappingType) {
 saveSettings = function() {
 
     // Set negative arrows option
-    var arrowOption = document.getElementById("negativeArrows");
+    var arrowOption = document.getElementById(SettingID.negativeArrows);
     settings.useNegativeArrows = arrowOption.checked;
 
     // Set fixed symbol positions
-    var fixedPos1 = document.getElementById("fixed-factor-drivers-pos");
+    var fixedPos1 = document.getElementById(SettingID.fixedFactorPos.drivers);
     settings.factors.drivers.fixedPosition = fixedPos1.value;
 
-    var fixedPos2 = document.getElementById("fixed-factor-consequences-pos");
+    var fixedPos2 = document.getElementById(SettingID.fixedFactorPos.consequences);
     settings.factors.consequences.fixedPosition = fixedPos2.value;
 
     // Set decision on which mappings are used
     settings.useMappings = $(":checked[name='mappingTypes']")[0].value;
     switch (settings.useMappings) {
-        case "consequences":
+        case MappingSetting.consequences:
             $("#btn-mapping-drivers").hide();
+            $("#btn-instructions-drivers").hide();
             $("#btn-mapping-consequences").show();
+            $("#btn-instructions-consequences").show();
             break;
-        case "drivers":
+        case MappingSetting.drivers:
             $("#btn-mapping-drivers").show();
+            $("#btn-instructions-drivers").show();
             $("#btn-mapping-consequences").hide();
+            $("#btn-instructions-consequences").hide();
             break;
         default:
             $("#btn-mapping-drivers").show();
+            $("#btn-instructions-drivers").show();
             $("#btn-mapping-consequences").show();
+            $("#btn-instructions-consequences").show();
     }
 
     // Set media
-    var mediaList = [ "instructionVideo", "introductionVideo", "thankYouImage", "thankYouAudio",
-        "driversMappingAudio", "consequencesMappingAudio", "practiceMappingAudio"];
+    var mediaList = SettingID.media;
 
     for (var mediaInd = 0; mediaInd < mediaList.length; mediaInd++) {
         var item = mediaList[mediaInd];
@@ -269,12 +274,12 @@ saveSettings = function() {
 
     // Set used factors
     saveFactorMedia(uistate.factorTabOpen);
-    saveFactors("drivers");
-    saveFactors("consequences");
+    saveFactors(MappingType.drivers);
+    saveFactors(MappingType.consequences);
 
     // Store settings
     console.log("Settings changed to:", settings);
-    localStorage.setItem("mmetool_settings", JSON.stringify(settings));
+    localStorage.setItem(BrowserStorageKey.settings, JSON.stringify(settings));
 };
 
 

@@ -1,7 +1,12 @@
 
 var canvasStyle = null;
 
-var canvas = {"mapping-canvas": null, "mapping-canvas-consequences": null};
+var canvas = {
+    "mapping-canvas-practice": null,
+    "mapping-canvas-drivers": null,
+    "mapping-canvas-consequences": null
+};
+
 
 // ---------------------------------------------------------------------
 // Setting up the canvas layout
@@ -50,15 +55,15 @@ setupMapping = function(mappingType) {
 
     // Setup buttons
     var halfButton = canvasStyle.buttonSize / 2;
-    drawButton("question", canvasStyle.centerLeftSide,  h - halfButton, onQuestionButtonClicked);
-    drawButton("next",     canvasStyle.centerRightSide, h - halfButton, onNextButtonClicked);
-    drawButton("bin",      canvasStyle.centerRightSide,           halfButton, onBinButtonClicked);
+    drawButton(Button.question, canvasStyle.centerLeftSide,  h - halfButton, onQuestionButtonClicked);
+    drawButton(Button.next,     canvasStyle.centerRightSide, h - halfButton, onNextButtonClicked);
+    drawButton(Button.bin,      canvasStyle.centerRightSide,           halfButton, onBinButtonClicked);
 
-    if (mappingType === "consequences" && settings.useMappings === "both") {
-        drawButton("previous", canvasStyle.centerLeftSide, halfButton, onPreviousButtonClicked);
+    if (mappingType === MappingType.consequences && settings.useMappings === MappingSetting.all) {
+        drawButton(Button.previous, canvasStyle.centerLeftSide, halfButton, onPreviousButtonClicked);
     }
 
-    if (mappingType === "practice") {
+    if (mappingType === MappingType.practice) {
         fabric.Image.fromURL("images/" + settings.solutionImage, function(image) {
             var maxHeightScale = canvasStyle.practiceImageHeight / image.height;
             var maxWidthScale = canvasStyle.availableWidth / image.width;
@@ -88,7 +93,7 @@ divideCanvas = function() {
         left: 0,
         width: canvasStyle.leftSideWidth,
         height: canvasStyle.height,
-        fill: "#EAEAEA",
+        fill: canvasStyle.color.sidePanels,
         selectable: false
     });
     var leftBorder = new fabric.Rect({
@@ -96,7 +101,7 @@ divideCanvas = function() {
         left: canvasStyle.leftSideWidth,
         width: canvasStyle.borderWidth,
         height: canvasStyle.height,
-        fill: "#BBBBBB",
+        fill: canvasStyle.color.leftDivider,
         selectable: false
     });
     var rightSide = new fabric.Rect({
@@ -104,7 +109,7 @@ divideCanvas = function() {
         left: canvasStyle.width - canvasStyle.rightSideWidth,
         width: canvasStyle.rightSideWidth,
         height: canvasStyle.height,
-        fill: "#EAEAEA",
+        fill: canvasStyle.color.sidePanels,
         selectable: false
     });
     var rightBorder = new fabric.Rect({
@@ -112,7 +117,7 @@ divideCanvas = function() {
         left: canvasStyle.width - canvasStyle.rightSideWidth - canvasStyle.borderWidth,
         width: canvasStyle.borderWidth,
         height: canvasStyle.height,
-        fill: "#AAAAAA",
+        fill: canvasStyle.color.rightDivider,
         selectable: false
     });
 
@@ -196,7 +201,7 @@ drawButton = function(name, xLeft, yTop, onmousedown) {
         icon.originX = "center";
         icon.originY = "middle";
         icon.selectable = false;
-        icon.iconType = "button";
+        icon.iconType = IconType.button;
         icon.iconName = name;
         icon.on("mousedown", onmousedown);
         canvas[uistate.activeCanvas].add(icon);
@@ -226,7 +231,7 @@ drawFactorIcon = function(iconName, xLeft, yTop, fixed) {
         icon.borderColor = "transparent";
         icon.top = yTop;
         icon.left = xLeft;
-        icon.iconType = "factor";
+        icon.iconType = IconType.factor;
         icon.originX = "center";
         icon.originY = "middle";
         icon.on("mousedown", onFactorIconClicked);
@@ -278,7 +283,7 @@ drawConnection = function(startIconName, endIconName, weight) {
         arrow.borderColor = "transparent";
         arrow.hasControls = false;
         arrow.selectable = false;
-        arrow.iconType = "connection";
+        arrow.iconType = IconType.connection;
         arrow.iconName = startIconName + "-" + endIconName;
         arrow.connectionWeight = weight;
         arrow.on("mousedown", onArrowClicked);
@@ -352,7 +357,7 @@ onCanvasClicked = function(event) {
 
     console.log("Canvas clicked");
 
-    if (!event.target && uistate.newArrow.state === "select-arrow") {
+    if (!event.target && uistate.newArrow.state === ArrowDrawing.notStarted) {
 
         console.log("No object hit and no arrow selected, move factor: " + uistate.highlight);
 
@@ -360,7 +365,7 @@ onCanvasClicked = function(event) {
 
         removeHighlight();
 
-        if (icon && (icon.iconType === "factor") && (icon.iconFixed === false)) {
+        if (icon && (icon.iconType === IconType.factor) && (icon.iconFixed === false)) {
             var pointer = canvas[uistate.activeCanvas].getPointer(event.e);
             var x = pointer.x;
             var y = pointer.y;
@@ -397,11 +402,11 @@ onQuestionButtonClicked = function() {
 // Behaviour when bin is clicked
 onBinButtonClicked = function() {
     console.log("Bin clicked");
-    if (uistate.newArrow.state === "select-arrow") {
+    if (uistate.newArrow.state === ArrowDrawing.notStarted) {
         console.log(uistate.highlight);
         var icon = getIconByName(uistate.highlight);
         if (icon && !icon.iconFixed) {
-            if (icon.iconType === "factor") {
+            if (icon.iconType === IconType.factor) {
                 console.log("Removing factor:", icon.iconName);
 
                 removeConnections(icon);
@@ -412,7 +417,7 @@ onBinButtonClicked = function() {
                 canvas[uistate.activeCanvas].add(icon);
                 canvas[uistate.activeCanvas].bringToFront(icon);
 
-            } else if (icon.iconType === "connection") {
+            } else if (icon.iconType === IconType.connection) {
                 canvas[uistate.activeCanvas].remove(icon);
             }
         }
@@ -421,33 +426,39 @@ onBinButtonClicked = function() {
 };
 
 
-// Behaviour when next is clicked
+// Behaviour when next is clicked; change to respective video instruction for next mapping
 onNextButtonClicked = function() {
     console.log("Next clicked");
-    if (uistate.mapping === "practice") {
+    if (uistate.session.state === State.practiceMapping) {
         if (practiceSolutionCorrect()) {
             console.log("Practice solution is correct");
-            uistate.mapping = "none";
-            displayVideo("instructions");
+
+            var nextState = nextSessionState();
+            displayVideo(nextState);
+
         } else {
             console.log("Practice solution is incorrect");
         }
 
     } else {
-        saveResult(uistate.mapping);
-        if (!goToNextMapping()) {
-            uistate.mapping = "finished";
-            displayThankYouScreen();
-        }
+        saveResult(uistate.session.state);
+
+        var nextState = nextSessionState();
+        if (nextState === State.thankYouScreen) displayThankYouScreen();
+        else                                    displayVideo(nextState);
+
     }
 
 };
 
 
-// Behaviour when next is clicked
+// Behaviour when previous is clicked
 onPreviousButtonClicked = function() {
     console.log("Previous clicked");
-    goToLastMapping();
+    var nextState = previousMappingState();
+    if (nextState !== State.none) displayMapping(nextState);
+    else                          console.log("No previous mapping state");
+
 };
 
 
@@ -458,7 +469,7 @@ onArrowButtonClicked = function(options) {
         if (uistate.newArrow.weight !== icon.connectionWeight) {
 
             resetUIstate();
-            uistate.newArrow.state = "select-start";
+            uistate.newArrow.state = ArrowDrawing.typeSelected;
             uistate.newArrow.weight = icon.connectionWeight;
             drawHighlight(icon);
         } else {
@@ -504,14 +515,14 @@ onFactorIconClicked = function(options) {
     if (icon.left > canvasStyle.leftSideWidth ) {
         console.log("Factor is on canvas");
         switch (uistate.newArrow.state) {
-            case "select-arrow":
+            case ArrowDrawing.notStarted:
                 break;
-            case "select-start":
-                console.log("Select start: " + icon.iconName);
-                uistate.newArrow.state = "select-end";
+            case ArrowDrawing.typeSelected:
+                console.log("Select start for " + icon.iconName);
+                uistate.newArrow.state = ArrowDrawing.tailPositioned;
                 uistate.newArrow.startIcon = icon.iconName;
                 break;
-            case "select-end":
+            case ArrowDrawing.tailPositioned:
                 if (uistate.newArrow.startIcon === icon.iconName) {
                     console.log("Undo start selection");
                     undoArrowStartSelection();
@@ -542,8 +553,8 @@ onFactorIconClicked = function(options) {
 // Get color and line width from arrow weight
 arrowStyle = function(arrowWeight) {
     var width = canvasStyle.arrowLineWidth(Math.abs(arrowWeight));
-    var colors = settings.arrowColor
-    var color = colors.neutral
+    var colors = settings.arrowColor;
+    var color = colors.neutral;
 
     if (settings.useNegativeArrows) {
         color = arrowWeight < 0 ? colors.negative : colors.positive;
@@ -580,7 +591,7 @@ getIconsOfType = function(type) {
 
 // Get arrow objects from canvas
 getConnectionStrings = function() {
-    var icons = getIconsOfType("connection");
+    var icons = getIconsOfType(IconType.connection);
 
     var arrows = [];
     for (var arrowInd = 0; arrowInd < icons.length; arrowInd++) {
@@ -599,7 +610,7 @@ getConnectionStrings = function() {
 
 // Get icons connected to given icon
 getFactorConnectionIcons = function(factor) {
-    var connections = getIconsOfType("connection");
+    var connections = getIconsOfType(IconType.connection);
 
     var connectedIcons = [];
     for (var arrowInd = 0; arrowInd < connections.length; arrowInd++) {
@@ -614,7 +625,7 @@ getFactorConnectionIcons = function(factor) {
 
 // Revert to of arrow start icon selection
 undoArrowStartSelection = function() {
-    uistate.newArrow.state = "select-start";
+    uistate.newArrow.state = ArrowDrawing.notStarted;
     uistate.newArrow.startIcon = "";
     var arrow = getIconByName("addConnection" + uistate.newArrow.weight);
     drawHighlight(arrow);
@@ -719,7 +730,7 @@ practiceSolutionCorrect = function() {
 // Reset state on screen change?
 resetUIstate = function() {
     removeHighlight();
-    uistate.newArrow.state = "select-arrow";
+    uistate.newArrow.state = ArrowDrawing.notStarted;
     uistate.newArrow.weight = 0;
     uistate.newArrow.startIcon = "";
     uistate.audioCue = false;
@@ -727,12 +738,13 @@ resetUIstate = function() {
 
 
 // Save drawing and info to local storage
-saveResult = function(mappingType) {
-    var duration = Math.round((new Date() -  uistate.session.start) / 100) / 10;
+saveResult = function(mappingState) {
+    var mappingType = (mappingState === State.driversMapping)? MappingType.drivers : MappingType.consequences;
+    var duration = Math.round((new Date() -  uistate.session.start[mappingType]) / 100) / 10;
 
     var newInfo = "session\t" + uistate.session.name +
                   "\ncomment\t" + uistate.session.comment +
-                  "\nstart\t" +  uistate.session.start +
+                  "\nstart\t" +  uistate.session.start[mappingType] +
                   "\nduration\t" + duration +
                   "\nmapping type\t" + mappingType +
                   "\nconnections\n" +
@@ -740,8 +752,8 @@ saveResult = function(mappingType) {
 
     console.log(newInfo);
 
-    var oldInfo = localStorage.getItem("mmetool");
+    var oldInfo = localStorage.getItem(BrowserStorageKey.data);
     oldInfo = (oldInfo == null ? "" : oldInfo);
 
-    localStorage.setItem("mmetool", oldInfo + "\n" + newInfo + "\n");
+    localStorage.setItem(BrowserStorageKey.data, oldInfo + "\n" + newInfo + "\n");
 };

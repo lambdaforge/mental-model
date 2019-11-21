@@ -1,34 +1,36 @@
+
+
+// Program state
 uistate = {
 
-    mapping: "none", // "practice", "none", "drivers", "consequences" or "finished"
-    video: "", // "introduction", "instructions"
-    factorSettings: "both", // "drivers", "consequences" or "both"
+    factorSettings: MappingSetting.all,
     factorTabOpen: "",
 
     session: {
-        start: null,
+        start: { drivers: null, consequences: null },
         name: "",
-        comment: ""
+        comment: "",
+        state: State.homeScreen
     },
 
     newArrow: {
-        state: "select-arrow", // select-start, select-end
         startIcon: "",
-        weight: 0
+        weight: 0,
+        state: ArrowDrawing.notStarted
     },
 
     iconPositions: [],
     highlight: "",
     audioCue: false,
     blockUI: false,
-    activeCanvas: "mapping-canvas", // "mapping-canvas" or "mapping-canvas-consequences"
+    activeCanvas: CanvasID.practice,
 };
 
 
 // Load saved settings or use defaults
 settings = defaultSettings;
 
-var data = localStorage.getItem("mmetool_settings");
+var data = localStorage.getItem(BrowserStorageKey.settings);
 
 if( data ) {
     settings = JSON.parse(data);
@@ -43,7 +45,7 @@ console.log("Current settings:", settings);
 
 // Load video file and activate DOM video element
 playVideo = function(videoFile) {
-    var video = document.getElementById("video");
+    var video = document.getElementById(HtmlID.video);
     console.log("Play Video: " + videoFile);
     video.src = "video/" + videoFile;
     video.play();
@@ -52,7 +54,7 @@ playVideo = function(videoFile) {
 
 // Load audio file and activate DOM audio element
 playAudio = function(audioFile) {
-    var audio = document.getElementById("audio");
+    var audio = document.getElementById(HtmlID.audio);
     console.log("Play Audio: " + audioFile);
     audio.src = "audio/" + audioFile;
     audio.click();
@@ -67,10 +69,10 @@ isPlaying = function(media) {
 
 // Choose shown screen; stop media from previous screen
 showScreen = function(screenName) {
-    var screens = document.getElementsByClassName("screen");
+    var screens = document.getElementsByClassName(HtmlClass.screen);
     var currentScreen = document.getElementById(screenName);
-    var video = document.getElementById("video");
-    var audio = document.getElementById("audio");
+    var video = document.getElementById(HtmlID.video);
+    var audio = document.getElementById(HtmlID.audio);
 
     // Prevent media to resume playing
     if (isPlaying(audio)) audio.pause();
@@ -87,72 +89,82 @@ showScreen = function(screenName) {
 
 
 // Change to video screen
-displayVideo = function(videoType) {
-    showScreen("display-video");
-    uistate.video = videoType;
-    if(videoType === "introduction") playVideo(settings.introductionVideo);
-    else                             playVideo(settings.instructionVideo);
+displayVideo = function(videoState) {
 
+    uistate.session.state = videoState;
+
+    showScreen("display-video");
+    switch (uistate.session.state) {
+        case State.introduction:             playVideo(settings.introductionVideo); break;
+        case State.driversInstructions:      playVideo(settings.instructionVideoDrivers); break;
+        case State.consequencesInstructions: playVideo(settings.instructionVideoConsequences); break;
+        default: console.log("Unknown or non-video state: ", uistate.session.state);
+    }
 };
 
 
 // Change to thank you screen
 displayThankYouScreen = function() {
-    showScreen("thank-you");
+
+    uistate.session.state = State.thankYouScreen;
+
+    showScreen(ScreenID.thankYou);
     playAudio(settings.thankYouAudio);
 };
 
 
 // Prepare and show mapping screen
-displayMapping = function(mappingType, startNewMapping) {
+displayMapping = function(mappingState) {
 
-    startNewMapping = (startNewMapping === undefined)? true : startNewMapping;
-    uistate.mapping = mappingType;
+    uistate.session.state = mappingState;
 
-    switch (mappingType) {
-        case "practice":
-            showScreen("mapping-task");
-            uistate.activeCanvas = "mapping-canvas";
-            playAudio(settings.practiceMappingAudio);
+    var mappingType;
+    switch (mappingState) {
+        case State.practiceMapping:
+            showScreen(ScreenID.mappingPractice);
+            uistate.activeCanvas = CanvasID.practice;
+            playAudio(settings.mappingAudioPractice);
+            mappingType = MappingType.practice;
             break;
-        case "drivers":
-            showScreen("mapping-task");
-            uistate.activeCanvas = "mapping-canvas";
-            playAudio(settings.driversMappingAudio);
+        case State.driversMapping:
+            showScreen(ScreenID.mappingDrivers);
+            uistate.activeCanvas = CanvasID.drivers;
+            playAudio(settings.mappingAudioDrivers);
+            mappingType = MappingType.drivers;
             break;
-        case "consequences":
-            showScreen("mapping-task-consequences");
-            uistate.activeCanvas = "mapping-canvas-consequences";
-            playAudio(settings.consequencesMappingAudio);
+        case State.consequencesMapping:
+            showScreen(ScreenID.mappingConsequences);
+            uistate.activeCanvas = CanvasID.consequences;
+            playAudio(settings.mappingAudioConsequences);
+            mappingType = MappingType.consequences;
             break;
         default:
-            console.log("Unknown mapping type");
+            console.log("Unknown or non-mapping state.");
+            return;
     }
 
     console.log("Start mapping: " + mappingType);
-    if (startNewMapping || !canvas[uistate.activeCanvas]) {
-        var sessionElement = document.getElementById("session");
-        var commentElement = document.getElementById("comment");
-
+    if (!canvas[uistate.activeCanvas]) {
+        startSession(mappingType);
         setupMapping(mappingType);
-
-        uistate.session.start = new Date();
-        uistate.session.name = sessionElement.value;
-        uistate.session.comment = commentElement.value;
     }
 
-
     resetUIstate();
-
-
 };
 
+startSession = function(mappingType) {
+    var sessionElement = document.getElementById(HtmlID.session);
+    var commentElement = document.getElementById(HtmlID.comment);
+    uistate.session.start[mappingType] = new Date();
+    uistate.session.name = sessionElement.value;
+    uistate.session.comment = commentElement.value;
+};
 
 // Download data, as defined in browser
 downloadData = function() {
     var csvContent = "data:text/csv;charset=utf-8,";
 
-    var data = localStorage.getItem("mmetool");
+    var data = localStorage.getItem(BrowserStorageKey.data);
     data = data? data : "No data";
     csvContent += data;
 
@@ -163,7 +175,7 @@ downloadData = function() {
     var link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     console.log(encodedUri);
-    link.setAttribute("download", "mmetool_data.csv");
+    link.setAttribute("download", settings.dataFileName);
     document.body.appendChild(link); // Required for firefox
 
     link.click();
@@ -172,65 +184,14 @@ downloadData = function() {
 
 // Action for settings button on menu screen
 displaySettings = function() {
-    showScreen("settings");
+    showScreen(ScreenID.settings);
 };
 
 
 // Action for apply button settings screen
 leaveAndSaveSettings = function() {
     saveSettings();
-    showScreen("menu");
-};
-
-
-// Action after instructions have ended or after next button on mapping screen
-goToNextMapping = function(startNewMapping) {
-    var setup = (startNewMapping === undefined)? false : startNewMapping;
-
-    var available = true;
-    console.log(uistate.mapping);
-    if (uistate.mapping === "none") {
-        switch (settings.useMappings) {
-            case "drivers":      displayMapping("drivers",      setup); break;
-            case "consequences": displayMapping("consequences", setup); break;
-            case "both":         displayMapping("drivers",      setup); break;
-            default:
-                console.log("Unknown mapping setting");
-                available = false;
-        }
-    }
-    else {
-        if (uistate.mapping === "drivers" && settings.useMappings === "both")
-                                 displayMapping("consequences", setup);
-        else available = false;
-    }
-
-    return available;
-};
-
-
-// Action for button on 'thank you' screen or previous button on mapping screen
-goToLastMapping = function(startNewMapping) {
-    var setup = (startNewMapping === undefined)? false : startNewMapping;
-
-    var available = true;
-    if (uistate.mapping === "finished") {
-        switch (settings.useMappings) {
-            case "drivers":      displayMapping("drivers",      setup); break;
-            case "consequences": displayMapping("consequences", setup); break;
-            case "both":         displayMapping("consequences", setup); break;
-            default:
-                console.log("Unknown mapping setting");
-                available = false;
-        }
-    }
-    else {
-        if (uistate.mapping === "consequences" && settings.useMappings === "both")
-                                 displayMapping("drivers",      setup);
-        else available = false;
-    }
-
-    return available;
+    showScreen(ScreenID.menu);
 };
 
 
@@ -238,11 +199,16 @@ goToLastMapping = function(startNewMapping) {
 window.onload = function() {
 
     $("#video")[0].src = "video/" + settings.introductionVideo;
-    $("#audio")[0].src = "audio/" + settings.practiceMappingAudio;
+    $("#audio")[0].src = "audio/" + settings.mappingAudioConsequences;
 
     $("#video").on("ended", function() {
-        if (uistate.video === "introduction" )  displayMapping("practice",     true);
-        else                                    goToNextMapping(true);
+        var nextState = nextSessionState();
+        switch (uistate.session.state) {
+            case State.introduction:              displayMapping(nextState); break;
+            case State.driversInstructions:       displayMapping(nextState); break;
+            case State.consequencesInstructions:  displayMapping(nextState); break;
+            default: console.log("Unknown or non-video session state: ", uistate.session.state)
+        }
     });
 
     $("#audio").on("click", function(a) {
@@ -256,56 +222,58 @@ window.onload = function() {
 
     // On menu screen
     $("#btn-introduction").on("click", function() {
-        displayVideo("introduction");
+        displayVideo(State.introduction);
     });
     $("#btn-practice").on("click", function() {
-        displayMapping("practice", true);
+        displayMapping(State.practiceMapping);
     });
-    $("#btn-instructions").on("click", function() {
-        displayVideo("instructions");
+    $("#btn-instructions-drivers").on("click", function() {
+        displayVideo(State.driversInstructions);
     });
     $("#btn-mapping-drivers").on("click", function() {
-        displayMapping("drivers", true);
+        displayMapping(State.driversMapping);
+    });
+    $("#btn-instructions-consequences").on("click", function() {
+        displayVideo(State.consequencesInstructions);
     });
     $("#btn-mapping-consequences").on("click", function() {
-        displayMapping("consequences", true);
+        displayMapping(State.consequencesMapping);
     });
     $("#btn-download").on("click", downloadData);
     $("#btn-settings").on("click", displaySettings);
 
     // On thank you screen
-    $("#btn-ty-back").on("click", goToLastMapping);
-    $("#btn-ty-tomain").on("click", function() {
-        showScreen("menu");
+    $("#btn-ty-back").on("click", onPreviousButtonClicked);
+    $("#btn-ty-to-main").on("click", function() {
+        canvas[CanvasID.practice] = null;
+        canvas[CanvasID.drivers] = null;
+        canvas[CanvasID.consequences] = null;
+        showScreen(ScreenID.menu);
     });
 
     // On settings screen
     $("#btn-save-settings").on("click", leaveAndSaveSettings);
     $("#btn-cancel-settings").on("click", function() {
-        showScreen("menu");
+        showScreen(ScreenID.menu);
     });
     $("#btn-add-drivers-factor").on("click", function() {
-        addFactorRow("drivers");
+        addFactorRow(MappingType.drivers);
     });
     $("#btn-add-consequences-factor").on("click", function() {
-        addFactorRow("consequences");
+        addFactorRow(MappingType.consequences);
     });
     $("#tab-drivers").on("click", function() {
-        openTab('drivers');
+        openTab(MappingType.drivers);
     });
     $("#tab-consequences").on("click", function() {
-        openTab('consequences');
+        openTab(MappingType.consequences);
     });
     $("[name='mappingTypes']").on("click", changeShownTabs);
 
-/*
-    $("#audio").on("loadeddata", function(a) {
-        a.target.play();
-    });*/
 
     initSettingsScreen();
 
-    showScreen("menu");
+    showScreen(ScreenID.menu);
 
 };
 

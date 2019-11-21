@@ -1,25 +1,26 @@
 
+
+
+// Settings used when started the first time in a browser
 defaultSettings = {
 
     factors: {
         drivers: {
             dynamic: [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O" ],
             fixed: "Y.png",
-            fixedPosition: "right"
+            fixedPosition: PositionOnCanvas.right
         },
 
         consequences: {
             dynamic: [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O" ],
             fixed: "Y.png",
-            fixedPosition: "left"
+            fixedPosition: PositionOnCanvas.left
         },
 
         practice: {
-            dynamic: [
-                "work", "food", "money", "sleep", "friends"
-            ],
+            dynamic: [ "work", "food", "money", "sleep", "friends" ],
             fixed: "smile.png",
-            fixedPosition: "right"
+            fixedPosition: PositionOnCanvas.right
         },
     },
 
@@ -36,6 +37,7 @@ defaultSettings = {
     arrowColor: { positive: "blue", negative: "red", neutral: "black"},
     highlightColor: "lightskyblue",
     customFactorNumber: 0,
+    dataFileName: "nommet_data.csv",
 
 
     //
@@ -43,8 +45,7 @@ defaultSettings = {
     //
 
     useNegativeArrows: false,
-    useMappings: "both", // "both", "drivers", "consequences"
-
+    useMappings: MappingSetting.all,
 
 
     //
@@ -76,13 +77,14 @@ defaultSettings = {
         "smile":   {"name": "smile",   "img": "smile.png",                           "practice": true},
     },
 
-    instructionVideo: "instructions.mp4",
     introductionVideo: "introduction.mp4",
+    instructionVideoDrivers: "instructions.mp4",
+    instructionVideoConsequences: "instructions.mp4",
 
-    practiceMappingAudio: "practice.m4a",
-    driversMappingAudio: "main.m4a",
-    consequencesMappingAudio: "main.m4a",
+    mappingAudioPractice: "practice.m4a",
+    mappingAudioDrivers: "main.m4a",
+    mappingAudioConsequences: "main.m4a",
+
     thankYouAudio: "thank_you.m4a",
-
-    thankYouImage: "thank_you.png",
+    thankYouImage: "thank_you.png"
 };
