@@ -24,9 +24,14 @@ div#mme-tool {
     margin: 0;
     display: none;
     background-repeat: no-repeat;
+    background-color: #FFFFFF;
 }
 
-
+#thank-you {
+    height: 100vh;
+    background-size: auto 50%;
+    background-position: center;
+}
 
 #settings {
     padding: 50px;
@@ -62,10 +67,12 @@ div#mme-tool {
     padding: 30px;
 }
 
-
-video {
+#video {
+    height: 100vh;
     width: 100%;
-    height: auto;
+}
+video {
+    object-fit: contain;
 }
 
 button {

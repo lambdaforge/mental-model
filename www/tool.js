@@ -215,11 +215,6 @@ window.onload = function() {
         a.target.play()
     });
 
-    var url = "images/" + settings.thankYouImage;
-    $("#thank-you").css("background-image", "url(" + url + ")");
-    $("#thank-you").css("height", $(window).height());
-    $("#thank-you").css("background-position", "center");
-
     // On menu screen
     $("#btn-introduction").on("click", function() {
         displayVideo(State.introduction);
@@ -243,6 +238,8 @@ window.onload = function() {
     $("#btn-settings").on("click", displaySettings);
 
     // On thank you screen
+    var url = "images/" + settings.thankYouImage;
+    $("#thank-you").css("background-image", "url(" + url + ")");
     $("#btn-ty-back").on("click", onPreviousButtonClicked);
     $("#btn-ty-to-main").on("click", function() {
         canvas[CanvasID.practice] = null;

@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity() {
         val dialog = Dialog(this@MainActivity)
 
         if (isExternalStorageWritable()) {
-            val msg = "Do you want to save ${getString(R.string.name_downloaded_file)} to your 'Downloads' directory?"
+            val msg = "Do you want to save ${R.string.name_downloaded_file} to your 'Downloads' directory?"
             dialog.showDoOrNotChoice(dTag, msg) { saveFileToDownloads(url) }
         }
         else {
