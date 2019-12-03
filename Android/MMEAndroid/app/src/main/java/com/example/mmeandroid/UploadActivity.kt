@@ -4,22 +4,22 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
-import java.io.*
-import org.json.*
-import android.widget.ListView
 import android.widget.ArrayAdapter
-import android.os.Build
+import android.widget.ListView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.trimmedLength
 import org.json.JSONArray
-
+import org.json.JSONObject
+import java.io.*
 
 
 private const val IMAGE_IMPORT_CODE: Int = 1
@@ -123,20 +123,17 @@ class UploadActivity : AppCompatActivity() {
 
 
     fun uploadVideo(v: View) {
-        val intent = openPicker("video/*")
-        startActivityForResult(intent, VIDEO_IMPORT_CODE)
+        openPicker("video/*", VIDEO_IMPORT_CODE)
     }
 
 
     fun uploadAudio(v: View) {
-        val intent = openPicker("audio/*")
-        startActivityForResult(intent, AUDIO_IMPORT_CODE)
+        openPicker("audio/*", AUDIO_IMPORT_CODE)
     }
 
 
     fun uploadImage(v: View) {
-        val intent = openPicker("image/*")
-        startActivityForResult(intent, IMAGE_IMPORT_CODE)
+        openPicker("image/*", IMAGE_IMPORT_CODE)
     }
 
 
@@ -147,19 +144,26 @@ class UploadActivity : AppCompatActivity() {
     }
 
 
-    private fun openPicker(fileType: String): Intent {
+    private fun openPicker(fileType: String, Icode: Int) {
 
-        val openIntent = Intent(Intent.ACTION_GET_CONTENT)
-
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR1 ) {
-            openIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        val intent: Intent
+        if (Build.VERSION.SDK_INT < 19) {
+            intent = Intent(Intent.ACTION_GET_CONTENT)
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR1 ) {
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+            }
+            intent.type = fileType
+            startActivityForResult(
+                Intent.createChooser(
+                    intent,"Select File"
+                ), Icode
+            )
+        } else {
+            intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+            intent.type = fileType
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+            startActivityForResult(intent, Icode)
         }
-
-        openIntent.addCategory(Intent.CATEGORY_OPENABLE)
-        openIntent.type = fileType
-
-        return openIntent
-
     }
 
 
@@ -308,13 +312,6 @@ class UploadActivity : AppCompatActivity() {
 
     private fun positionInMediaList(fileName: String, mediaType: String): Int {
         var index = -1
-        Log.i(tag, "${mediaListing} ")
-        Log.i(tag, "${mediaListing[mediaType]} ")
-        Log.i(tag, "${mediaType} ")
-        Log.i(tag, "${mediaListing[mediaType]} ")
-        Log.i(tag, "${mediaListing[mediaType]!!} ")
-
-        Log.i(tag, "${mediaListing[mediaType]!!.length()} ")
         for (i in 0 until mediaListing[mediaType]!!.length())
             if (mediaListing[mediaType]!!.getString(i) == fileName)
                 index = i
