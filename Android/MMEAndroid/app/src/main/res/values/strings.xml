@@ -3,7 +3,7 @@
 <resources>
     <string name="app_name">NOMMET</string>
 
-    <string name="home_explanation">Welcome to the NOn-verbal Mental Model Elicitation Tool (NOMMET)!\n\nBelow you can choose to start uploading files to tailor the tool to your needs, or to choose start session to start mapping mental models, change settings or to download your data. View the manual if you want to learn more about how to use NOMMET.
+    <string name="home_explanation">Welcome to the NOn-verbal Mental Model Elicitation Tool (NOMMET)!\n\nBelow you can choose to:\n - start uploading files to tailor the tool to your needs\n - start session to start mapping mental models, change settings or to download your data\n - show the manual if you want to learn more about how to use NOMMET
 </string>
     <string name="upload_button">Upload Files</string>
     <string name="session_button">Start Session</string>

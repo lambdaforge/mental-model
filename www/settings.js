@@ -77,13 +77,13 @@ defaultSettings = {
         "smile":   {"name": "smile",   "img": "smile.png",                           "practice": true},
     },
 
-    introductionVideo: "introduction.mp4",
-    instructionVideoDrivers: "instructions.mp4",
-    instructionVideoConsequences: "instructions.mp4",
+    introductionVideo: "Introduction.mp4",
+    instructionVideoDrivers: "Instructions.mp4",
+    instructionVideoConsequences: "Instructions.mp4",
 
     mappingAudioPractice: "practice.m4a",
-    mappingAudioDrivers: "main.m4a",
-    mappingAudioConsequences: "main.m4a",
+    mappingAudioDrivers: "mapping.m4a",
+    mappingAudioConsequences: "mapping.m4a",
 
     thankYouAudio: "thank_you.m4a",
     thankYouImage: "thank_you.png"

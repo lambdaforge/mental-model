@@ -1,7 +1,7 @@
 
 
 html,body {
-    font-family: Verdana, Arial;
+    font-family: Roboto, sans-serif;
     font-size: 16px;
     background-color: #EEEEEE;
     height: 100%;
@@ -34,8 +34,13 @@ div#mme-tool {
 }
 
 #settings {
-    padding: 50px;
+    padding: 0.6rem 50px;
     flex-flow: column;
+}
+
+h2 {
+    font-size: 26px;
+    font-weight: normal;
 }
 
 #menu {
@@ -85,7 +90,7 @@ button {
 }
 
 .stepButtons {
-    width: 220px;
+    width: 230px;
     margin: 10px;
 }
 

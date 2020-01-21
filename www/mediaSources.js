@@ -1,10 +1,10 @@
 mediaSources = {
     "video": [
-        "instructions.mp4",
-        "introduction.mp4"
+        "Instructions.mp4",
+        "Introduction.mp4"
     ],
     "audio": [
-        "main.m4a",
+        "mapping.m4a",
         "practice.m4a",
         "thank_you.m4a",
         "A.m4a",

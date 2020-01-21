@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.Log
 import android.view.MenuItem
@@ -134,6 +133,11 @@ class UploadActivity : AppCompatActivity() {
 
     fun uploadImage(v: View) {
         openPicker("image/*", IMAGE_IMPORT_CODE)
+    }
+
+    fun startSession(v: View) {
+        startActivity(Intent(this@UploadActivity, MainActivity::class.java))
+        Log.i(tag, "Load main layout")
     }
 
 
@@ -357,12 +361,17 @@ class UploadActivity : AppCompatActivity() {
             Log.i(tag, "Deleted duplicate file.")
         }
 
+        val progressDialog = dialog.showInformationNoCancel(tag, "Importing $fileName...")
+
         Log.i(tag, "Read $uri")
         val inStream = contentResolver.openInputStream(uri)!!
 
         Log.i(tag, "Write $targetFilePath")
         val outStream = FileOutputStream(targetFilePath)
         val copySuccess = copyFile(inStream, outStream)
+
+        progressDialog.cancel()
+
         if( copySuccess ) {
             Log.i(tag, "Written $targetFilePath")
 
@@ -443,6 +452,8 @@ class UploadActivity : AppCompatActivity() {
         }
         else Log.i(tag, "No data sent.")
     }
+
+
 
 }
 

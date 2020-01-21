@@ -15,6 +15,16 @@ class Dialog(private val context: Context) {
         dialog.show()
     }
 
+    fun showInformationNoCancel(title: String, message: String): AlertDialog {
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle(title)
+        builder.setMessage(message)
+
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
+        return dialog
+    }
+
     fun showDoOrNotChoice(title: String, message: String, action: () -> Any) {
         val builder = AlertDialog.Builder(context)
         builder.setTitle(title)
