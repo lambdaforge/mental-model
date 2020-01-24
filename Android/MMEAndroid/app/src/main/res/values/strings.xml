@@ -9,7 +9,7 @@
     <string name="session_button">Start Session</string>
     <string name="manual_button">Show Manual</string>
 
-    <string name="upload_title">File Import</string>
+    <string name="upload_title">Upload Files</string>
     <string name="upload_explanation">Here you can upload the relevant audio/video/image files to tailor NOMMET to your needs.\n\nOnce you have uploaded a file, it should show on this screen. Once you have uploaded all your files here, you can go to start session/settings to indicate where you want each file to operate within NOMMET.
 </string>
     <string name="add_file_button">Add File</string>
