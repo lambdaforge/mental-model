@@ -10,6 +10,8 @@
 		BC03DF94233A63EC00C77076 /* www in Resources */ = {isa = PBXBuildFile; fileRef = BC03DF93233A63EC00C77076 /* www */; };
 		BC30A2A9237B3006005F74C6 /* TextBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC30A2A8237B3006005F74C6 /* TextBox.swift */; };
 		BC30A2AB237C5DDD005F74C6 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC30A2AA237C5DDD005F74C6 /* Constants.swift */; };
+		BCABD85A23DA04C300060672 /* Banner.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCABD85923DA04C300060672 /* Banner.swift */; };
+		BCABD85E23DB507200060672 /* NOMMET_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = BCABD85D23DB507200060672 /* NOMMET_icon.png */; };
 		BCD634CA2304682000144A31 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD634C92304682000144A31 /* AppDelegate.swift */; };
 		BCD634CF2304682000144A31 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BCD634CD2304682000144A31 /* Main.storyboard */; };
 		BCD634D12304682200144A31 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BCD634D02304682200144A31 /* Assets.xcassets */; };
@@ -45,7 +47,9 @@
 		BC03DF93233A63EC00C77076 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = ../../www; sourceTree = "<group>"; };
 		BC30A2A8237B3006005F74C6 /* TextBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextBox.swift; sourceTree = "<group>"; };
 		BC30A2AA237C5DDD005F74C6 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
-		BCD634C62304682000144A31 /* mental-model.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "mental-model.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BCABD85923DA04C300060672 /* Banner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Banner.swift; sourceTree = "<group>"; };
+		BCABD85D23DB507200060672 /* NOMMET_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = NOMMET_icon.png; path = ../../../resources/NOMMET_icon.png; sourceTree = "<group>"; };
+		BCD634C62304682000144A31 /* NOMMET.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NOMMET.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BCD634C92304682000144A31 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BCD634CE2304682000144A31 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		BCD634D02304682200144A31 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -105,7 +109,7 @@
 		BCD634C72304682000144A31 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				BCD634C62304682000144A31 /* mental-model.app */,
+				BCD634C62304682000144A31 /* NOMMET.app */,
 				BCD634DA2304682200144A31 /* mental-modelTests.xctest */,
 				BCD634E52304682200144A31 /* mental-modelUITests.xctest */,
 			);
@@ -115,18 +119,20 @@
 		BCD634C82304682000144A31 /* mental-model */ = {
 			isa = PBXGroup;
 			children = (
-				BCD634F8230468A600144A31 /* UploadViewController.swift */,
 				BCD634F9230468A600144A31 /* ViewController.swift */,
-				BCE58B0B2327FBC700942D1F /* MediaListDataSource.swift */,
+				BCD634F8230468A600144A31 /* UploadViewController.swift */,
 				BCD634F7230468A600144A31 /* WebViewController.swift */,
 				BCFA5B6E23735F1300B735B0 /* PdfViewController.swift */,
+				BCE58B0B2327FBC700942D1F /* MediaListDataSource.swift */,
 				BCD634C92304682000144A31 /* AppDelegate.swift */,
 				BCD634CD2304682000144A31 /* Main.storyboard */,
 				BCD634D02304682200144A31 /* Assets.xcassets */,
 				BCD634D22304682200144A31 /* LaunchScreen.storyboard */,
 				BCD634D52304682200144A31 /* Info.plist */,
+				BCABD85D23DB507200060672 /* NOMMET_icon.png */,
 				BC30A2A8237B3006005F74C6 /* TextBox.swift */,
 				BC30A2AA237C5DDD005F74C6 /* Constants.swift */,
+				BCABD85923DA04C300060672 /* Banner.swift */,
 			);
 			path = "mental-model";
 			sourceTree = "<group>";
@@ -166,7 +172,7 @@
 			);
 			name = "mental-model";
 			productName = "mental-model";
-			productReference = BCD634C62304682000144A31 /* mental-model.app */;
+			productReference = BCD634C62304682000144A31 /* NOMMET.app */;
 			productType = "com.apple.product-type.application";
 		};
 		BCD634D92304682200144A31 /* mental-modelTests */ = {
@@ -256,6 +262,7 @@
 				BCFA5B7123735FB900B735B0 /* ManualNOMMET.pdf in Resources */,
 				BC03DF94233A63EC00C77076 /* www in Resources */,
 				BCD634D42304682200144A31 /* LaunchScreen.storyboard in Resources */,
+				BCABD85E23DB507200060672 /* NOMMET_icon.png in Resources */,
 				BCD634D12304682200144A31 /* Assets.xcassets in Resources */,
 				BCD634CF2304682000144A31 /* Main.storyboard in Resources */,
 			);
@@ -284,6 +291,7 @@
 			files = (
 				BCD634CA2304682000144A31 /* AppDelegate.swift in Sources */,
 				BCD634FB230468A600144A31 /* UploadViewController.swift in Sources */,
+				BCABD85A23DA04C300060672 /* Banner.swift in Sources */,
 				BCD634FC230468A600144A31 /* ViewController.swift in Sources */,
 				BCE58B0C2327FBC700942D1F /* MediaListDataSource.swift in Sources */,
 				BCD634FA230468A600144A31 /* WebViewController.swift in Sources */,
@@ -472,8 +480,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "io.lambdaforge.mental-model";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.uni-heidelberg.mmet";
+				PRODUCT_NAME = NOMMET;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -492,8 +500,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "io.lambdaforge.mental-model";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.uni-heidelberg.mmet";
+				PRODUCT_NAME = NOMMET;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

@@ -10,7 +10,7 @@ import UIKit
 
 class ViewController: UIViewController {
 
-    var bannerView: UIView!
+    var bannerView: Banner!
     var imageView: UIImageView!
     
     var explanationView: UIView!
@@ -44,9 +44,6 @@ class ViewController: UIViewController {
     
     override func viewWillLayoutSubviews() {
         
-        imageView.centerYAnchor.constraint(equalTo: bannerView.centerYAnchor).isActive = true
-        imageView.centerXAnchor.constraint(equalTo: bannerView.centerXAnchor).isActive = true
-        
         leftButton.centerYAnchor.constraint(equalTo: leftColumn.centerYAnchor).isActive = true
         leftButton.centerXAnchor.constraint(equalTo: leftColumn.centerXAnchor).isActive = true
         middleButton.centerYAnchor.constraint(equalTo: middleColumn.centerYAnchor).isActive = true
@@ -60,97 +57,75 @@ class ViewController: UIViewController {
         explanation.center = explanationView.center
     }
     
-    
-    private func addBanner() {
-        let w = Int(view.frame.size.width)
-        let h = Int(BannerHeight)
-        
-        bannerView = UIView(frame: CGRect(x: 0, y: 0, width: w, height: h))
-
-        let bgView = UIImageView(frame: CGRect(x: 0, y: 0, width: w, height: h))
-        bgView.image = UIImage(named: "bannerBG")
-        bannerView.addSubview(bgView)
-        
-        imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: w, height: h))
-        imageView.contentMode = .scaleAspectFit
-        imageView.image = UIImage(named: "bannerImage")
-        bannerView.addSubview(imageView)
-        
-        self.navigationController?.navigationBar.frame = CGRect(x: 0, y: 0, width: w, height: h)
-        self.navigationController?.navigationBar.insertSubview(bannerView, at: 2)
-        self.navigationController?.navigationBar.tintColor = .white;
-        
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.navigationController?.isNavigationBarHidden = true
         view.backgroundColor = BackgroundColor
+        view.addSubview(Banner(atTopOf: view))
         
-        addBanner() // for all views
         addButtonRow()
         addExplanationBox()
     }
     
+    
+    private func addButtonRow() {
+         let thirdWidth = view.frame.width / 3.0
+         
+         leftColumn = UIView()
+         leftColumn.frame = CGRect(x: 0, y: ScreenTop, width: thirdWidth, height: view.frame.height - ScreenTop)
+         leftButton = makeButton(label: "Upload Files", action: #selector(changeToUpload))
+         leftColumn.addSubview(leftButton)
+         view.addSubview(leftColumn)
+         
+         middleColumn = UIView()
+         middleColumn.frame = CGRect(x: thirdWidth, y: ScreenTop, width: thirdWidth, height: view.frame.height - ScreenTop)
+         middleButton = makeButton(label: "Start Session", action: #selector(changeToWebApp))
+         middleColumn.addSubview(middleButton)
+         view.addSubview(middleColumn)
+         
+         rightColumn = UIView()
+         rightColumn.frame = CGRect(x: 2*thirdWidth, y: ScreenTop, width: thirdWidth, height: view.frame.height - ScreenTop)
+         rightButton = makeButton(label: "Show Manual", action: #selector(showManual))
+         rightColumn.addSubview(rightButton)
+         view.addSubview(rightColumn)
+     }
+     
+     private func makeButton(label: String, action: Selector) -> UIButton {
+         let button = UIButton(type: .roundedRect)
+         let verticalSpacing: CGFloat = 8.0
+         let horizontalSpacing: CGFloat = 16.0
+         
+         button.frame = CGRect(x: 150, y: 0, width: 200, height: 30)
+         button.layer.borderWidth = 1
+         button.layer.borderColor = button.tintColor.cgColor
+         button.layer.cornerRadius = 5
+         button.contentEdgeInsets = UIEdgeInsets(top: verticalSpacing, left: horizontalSpacing,
+                                                 bottom: verticalSpacing, right: horizontalSpacing)
+         button.setTitle(label, for: .normal)
+         button.titleLabel?.font = UIFont.systemFont(ofSize: 20)
+         button.translatesAutoresizingMaskIntoConstraints = false
+         button.addTarget(self, action: action, for: .touchUpInside)
+         return button
+     }
+    
     private func addExplanationBox() {
         
-        let w: CGFloat = self.view.frame.width * CGFloat(ExplanationBoxWidthFraction)
+        let w: CGFloat = self.view.frame.width * CGFloat(ExplanationBox.widthFraction)
         let leftBound = (view.frame.width - w) / 2.0
         let hButtons = leftButton.frame.size.height
-        let hBanner = bannerView.frame.size.height
-        let h = (view.safeAreaLayoutGuide.layoutFrame.size.height - hBanner - hButtons) / 2
+        let h = (view.frame.height - ScreenTop) / 2.0 - hButtons / 2.0
 
+        // Helper view for centering explanation box
         explanationView = UIView(frame: CGRect(x: leftBound, y: ScreenTop, width: w, height: h))
         view.addSubview(explanationView)
 
-        explanation = TextBox(frame: CGRect(x: 0, y: 0, width: w, height: h))
+        explanation = TextBox(frame: CGRect(x: leftBound, y: ScreenTop, width: w, height: h))
         explanation.text = Explanation.home
-        explanation.adjustSize()
+        explanation.adjustSize(nLines: 6)
+        
         view.addSubview(explanation)
     }
     
-    private func yOffset() -> CGFloat {
-        return bannerView.frame.size.height + UIApplication.shared.statusBarFrame.height
-    }
-    
-    private func addButtonRow() {
-        let thirdWidth = view.frame.width / 3.0
-        
-        leftColumn = UIView()
-        leftColumn.frame = CGRect(x: 0, y: yOffset(), width: thirdWidth, height: view.frame.height - yOffset())
-        leftButton = makeButton(label: "Upload Files", action: #selector(changeToUpload))
-        leftColumn.addSubview(leftButton)
-        view.addSubview(leftColumn)
-        
-        middleColumn = UIView()
-        middleColumn.frame = CGRect(x: thirdWidth, y: yOffset(), width: thirdWidth, height: view.frame.height - yOffset())
-        middleButton = makeButton(label: "Start Session", action: #selector(changeToWebApp))
-        middleColumn.addSubview(middleButton)
-        view.addSubview(middleColumn)
-        
-        rightColumn = UIView()
-        rightColumn.frame = CGRect(x: 2*thirdWidth, y: yOffset(), width: thirdWidth, height: view.frame.height - yOffset())
-        rightButton = makeButton(label: "Show Manual", action: #selector(showManual))
-        rightColumn.addSubview(rightButton)
-        view.addSubview(rightColumn)
-    }
-    
-    private func makeButton(label: String, action: Selector) -> UIButton {
-        let button = UIButton(type: .roundedRect)
-        let verticalSpacing: CGFloat = 8.0
-        let horizontalSpacing: CGFloat = 16.0
-        
-        button.frame = CGRect(x: 150, y: 0, width: 200, height: 30)
-        button.layer.borderWidth = 1
-        button.layer.borderColor = button.tintColor.cgColor
-        button.layer.cornerRadius = 5
-        button.contentEdgeInsets = UIEdgeInsets(top: verticalSpacing, left: horizontalSpacing,
-                                                bottom: verticalSpacing, right: horizontalSpacing)
-        button.setTitle(label, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 20)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: action, for: .touchUpInside)
-        return button
-    }
+ 
 }
 

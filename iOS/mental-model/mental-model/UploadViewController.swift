@@ -36,7 +36,7 @@ class UploadViewController:  UIViewController,
     //
     
     @IBAction func uploadMusic(sender: UIButton!) {
-        print("Upload music")
+        print("Upload audio")
         let myMediaPickerVC = MPMediaPickerController(mediaTypes: MPMediaType.music)
         myMediaPickerVC.delegate = self
         myMediaPickerVC.allowsPickingMultipleItems = true
@@ -47,7 +47,6 @@ class UploadViewController:  UIViewController,
     
     @IBAction func uploadImage(sender: UIButton!) {
         print("Upload image")
-        
         let pickerController = visualMediaPicker(mediaType: "public.image")
         present(pickerController, animated: true, completion: nil)
     }
@@ -58,28 +57,61 @@ class UploadViewController:  UIViewController,
         present(pickerController, animated: true, completion: nil)
     }
     
+    @IBAction func startSession(sender: UIButton!) {
+        print("Start session")
+        let webView = WebViewController()
+        self.navigationController?.pushViewController(webView, animated: true)
+    }
+    
+    @IBAction func goBack(sender: UIButton!) {
+        print("Load home view")
+        self.dismiss(animated: true, completion: {});
+        self.navigationController?.popViewController(animated: true);
+    }
+    
     //
     // ViewController Methods
     //
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        self.navigationController?.navigationBar.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: BannerHeight) // otherwise not taken into account
-        
+        self.navigationController?.isNavigationBarHidden = true
         view.backgroundColor = BackgroundColor
+        let banner = Banner(atTopOf: view)
+        banner.addBackButton(target: self)
         
-        let space = (view.frame.height - ScreenTop) / 4.0
+        view.addSubview(banner)
+        
+        let hView = view.frame.height
         let explanationBoxOffset = ScreenTop + Title.height
-        let mediaViewOffset = ScreenTop + space
+        let sessionButtonRowOffset = hView - UploadScreen.buttonHeight - 2*Padding
         
+        let space = (sessionButtonRowOffset - ScreenTop) / 4.0
+        let mediaViewOffset = ScreenTop + space
         
         addTitle(offset: ScreenTop + Title.topPadding, height: Title.height)
         addExplanationBox(offset: explanationBoxOffset, maxHeight: mediaViewOffset - explanationBoxOffset)
+        addSessionButton(yOffset: sessionButtonRowOffset)
         
-        imageListView = makeMediaView(row: 0, type: "Image", uploaded: imageList, addAction: #selector(uploadImage), offset: mediaViewOffset, space: space)
         videoListView = makeMediaView(row: 1, type: "Video", uploaded: videoList, addAction: #selector(uploadVideo), offset: mediaViewOffset, space: space)
-        musicListView = makeMediaView(row: 2, type: "Music", uploaded: musicList, addAction: #selector(uploadMusic), offset: mediaViewOffset, space: space)
+        musicListView = makeMediaView(row: 2, type: "Audio", uploaded: musicList, addAction: #selector(uploadMusic), offset: mediaViewOffset, space: space)
+        imageListView = makeMediaView(row: 0, type: "Image", uploaded: imageList, addAction: #selector(uploadImage), offset: mediaViewOffset, space: space)
+        
+    }
+    
+    func addSessionButton(yOffset: CGFloat) {
+        let sessionButton = UIButton(type: .roundedRect)
+        let wView = view.frame.width
+        let x = wView - UploadScreen.buttonWidth - Padding
+        let y = yOffset + Padding
+        sessionButton.frame = CGRect(x: x, y: y, width: UploadScreen.buttonWidth, height: UploadScreen.buttonHeight)
+        sessionButton.layer.borderWidth = 1
+        sessionButton.layer.borderColor = sessionButton.tintColor.cgColor
+        sessionButton.layer.cornerRadius = 5
+        sessionButton.setTitle("Start Session", for: .normal)
+        sessionButton.addTarget(self, action: #selector(startSession), for: .touchUpInside)
+        
+        view.addSubview(sessionButton)
         
     }
     
@@ -90,14 +122,15 @@ class UploadViewController:  UIViewController,
     private func addTitle(offset: CGFloat, height: CGFloat) {
         let label = UILabel(frame: CGRect(x: 0, y: offset, width: view.frame.width, height: height))
         label.text = Title.importScreen
-        label.font = UIFont.boldSystemFont(ofSize: Title.height)
+        label.font = UIFont.boldSystemFont(ofSize: Title.fontSize)
+        label.textColor = Title.color
         label.textAlignment = .center;
         view.addSubview(label)
     }
     
     private func addExplanationBox(offset: CGFloat, maxHeight: CGFloat) {
         
-        let w: CGFloat = self.view.frame.width * CGFloat(ExplanationBoxWidthFraction)
+        let w: CGFloat = self.view.frame.width * CGFloat(ExplanationBox.widthFraction)
         let leftBound = (view.frame.width - w) / 2.0
         
         explanationView = UIView(frame: CGRect(x: leftBound, y: offset, width: w, height: maxHeight))
@@ -105,7 +138,8 @@ class UploadViewController:  UIViewController,
         
         explanation = TextBox(frame: CGRect(x: 0, y: 0, width: w, height: maxHeight))
         explanation.text = Explanation.upload
-        explanation.adjustSize()
+        explanation.adjustSize(nLines:4)
+        
         view.addSubview(explanation)
     }
     
@@ -119,7 +153,6 @@ class UploadViewController:  UIViewController,
         table.separatorStyle = .none
         table.register(UITableViewCell.self, forCellReuseIdentifier: "label")
         table.backgroundColor = BackgroundColor
-        
         
         titleBar.frame = CGRect(x: 0, y: yPos, width: view.frame.width, height: space)
         titleBar.addSubview(label(text: "     \(type) Files  "))
@@ -229,9 +262,10 @@ class UploadViewController:  UIViewController,
     }
     
     private func label(text: String!) -> UILabel {
-        let label = UILabel(frame: CGRect(x: 0, y: 0, width: 150, height: 30))
+        let label = UILabel(frame: CGRect(x: 0, y: 0, width: Section.labelWidth, height: 30))
         label.text = text
-        label.font = UIFont.boldSystemFont(ofSize: 20.0)
+        label.font = UIFont.boldSystemFont(ofSize: Section.titleFontSize)
+        label.textColor = Section.titleColor
         return label
     }
     
