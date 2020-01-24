@@ -2,12 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>UIRequiresFullScreen</key>
+	<string>YES</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>CFBundleIconName</key>
-	<string>NOMMET</string>
-	<key>CFBundleIconFiles</key>
-	<array>
-		<string>NOMMET_icon.png</string>
-	</array>
+	<string>AppIcon</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>

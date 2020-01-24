@@ -11,7 +11,7 @@
 		BC30A2A9237B3006005F74C6 /* TextBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC30A2A8237B3006005F74C6 /* TextBox.swift */; };
 		BC30A2AB237C5DDD005F74C6 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC30A2AA237C5DDD005F74C6 /* Constants.swift */; };
 		BCABD85A23DA04C300060672 /* Banner.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCABD85923DA04C300060672 /* Banner.swift */; };
-		BCABD85E23DB507200060672 /* NOMMET_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = BCABD85D23DB507200060672 /* NOMMET_icon.png */; };
+		BCABD86623DB5D8200060672 /* iOS in Resources */ = {isa = PBXBuildFile; fileRef = BCABD86523DB5D8200060672 /* iOS */; };
 		BCD634CA2304682000144A31 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD634C92304682000144A31 /* AppDelegate.swift */; };
 		BCD634CF2304682000144A31 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BCD634CD2304682000144A31 /* Main.storyboard */; };
 		BCD634D12304682200144A31 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BCD634D02304682200144A31 /* Assets.xcassets */; };
@@ -48,7 +48,7 @@
 		BC30A2A8237B3006005F74C6 /* TextBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextBox.swift; sourceTree = "<group>"; };
 		BC30A2AA237C5DDD005F74C6 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		BCABD85923DA04C300060672 /* Banner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Banner.swift; sourceTree = "<group>"; };
-		BCABD85D23DB507200060672 /* NOMMET_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = NOMMET_icon.png; path = ../../../resources/NOMMET_icon.png; sourceTree = "<group>"; };
+		BCABD86523DB5D8200060672 /* iOS */ = {isa = PBXFileReference; lastKnownFileType = folder; name = iOS; path = ../../resources/icon/iOS; sourceTree = "<group>"; };
 		BCD634C62304682000144A31 /* NOMMET.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NOMMET.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BCD634C92304682000144A31 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BCD634CE2304682000144A31 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -97,6 +97,7 @@
 		BCD634BD2304682000144A31 = {
 			isa = PBXGroup;
 			children = (
+				BCABD86523DB5D8200060672 /* iOS */,
 				BCFA5B7023735FB900B735B0 /* ManualNOMMET.pdf */,
 				BC03DF93233A63EC00C77076 /* www */,
 				BCD634C82304682000144A31 /* mental-model */,
@@ -129,7 +130,6 @@
 				BCD634D02304682200144A31 /* Assets.xcassets */,
 				BCD634D22304682200144A31 /* LaunchScreen.storyboard */,
 				BCD634D52304682200144A31 /* Info.plist */,
-				BCABD85D23DB507200060672 /* NOMMET_icon.png */,
 				BC30A2A8237B3006005F74C6 /* TextBox.swift */,
 				BC30A2AA237C5DDD005F74C6 /* Constants.swift */,
 				BCABD85923DA04C300060672 /* Banner.swift */,
@@ -262,8 +262,8 @@
 				BCFA5B7123735FB900B735B0 /* ManualNOMMET.pdf in Resources */,
 				BC03DF94233A63EC00C77076 /* www in Resources */,
 				BCD634D42304682200144A31 /* LaunchScreen.storyboard in Resources */,
-				BCABD85E23DB507200060672 /* NOMMET_icon.png in Resources */,
 				BCD634D12304682200144A31 /* Assets.xcassets in Resources */,
+				BCABD86623DB5D8200060672 /* iOS in Resources */,
 				BCD634CF2304682000144A31 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
