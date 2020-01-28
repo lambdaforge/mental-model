@@ -1,21 +1,22 @@
 package com.example.mmeandroid
 
 import android.Manifest
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.os.Environment
-import android.webkit.*
-import android.util.Log
-import java.io.*
 import android.app.DownloadManager
 import android.content.ContentValues
 import android.content.Context
-import android.provider.MediaStore
-import android.net.Uri
-import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
 import android.media.AudioManager
+import android.net.Uri
+import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import java.io.File
 
 
 private const val PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: Int = 1
@@ -42,18 +43,33 @@ class MainActivity : AppCompatActivity() {
         actionBar.setDisplayShowTitleEnabled(false)
 
         webView = findViewById(R.id.webView)
-        webView!!.settings.javaScriptEnabled = true
-        webView!!.settings.databaseEnabled = true
-        webView!!.settings.domStorageEnabled = true
-        webView!!.settings.allowContentAccess = true
-        webView!!.settings.allowFileAccess = true
-        webView!!.loadUrl(getHtmlURL())
         webView!!.setDownloadListener { url, _, _, _, _ -> onDownload(url) }
 
-        if (android.os.Build.VERSION.SDK_INT > 16) {
-            webView!!.settings.mediaPlaybackRequiresUserGesture = false
-        }
+        webView!!.setWebViewClient(object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
+                webView!!.loadUrl(url)
+                return true
+            }
+        })
 
+        if (savedInstanceState == null) {
+            webView!!.settings.javaScriptEnabled = true
+            webView!!.settings.databaseEnabled = true
+            webView!!.settings.domStorageEnabled = true
+            webView!!.settings.allowContentAccess = true
+            webView!!.settings.allowFileAccess = true
+
+            webView!!.settings.supportZoom()
+            webView!!.settings.builtInZoomControls = true
+            webView!!.settings.displayZoomControls = false
+            webView!!.settings.loadWithOverviewMode = true
+
+            webView!!.loadUrl(getHtmlURL())
+
+            if (android.os.Build.VERSION.SDK_INT > 16) {
+                webView!!.settings.mediaPlaybackRequiresUserGesture = false
+            }
+        }
     }
 
     public override fun onPause() {
@@ -73,6 +89,17 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         webView!!.destroy()
         super.onDestroy()
+    }
+
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        if (webView != null) webView!!.saveState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState!!)
+        if (webView != null) webView!!.restoreState(savedInstanceState)
     }
 
 
