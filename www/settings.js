@@ -37,7 +37,7 @@ defaultSettings = {
     arrowColor: { positive: "blue", negative: "red", neutral: "black"},
     highlightColor: "lightskyblue",
     customFactorNumber: 0,
-    dataFileName: "nommet_data.csv",
+    dataFileName: "mtool_data.csv",
 
 
     //
