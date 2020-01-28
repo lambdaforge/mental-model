@@ -12,7 +12,7 @@
             android:usesCleartextTraffic="true"
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
-            android:label="NOMMET"
+            android:label="M-TOOL"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme.NoActionBar"
@@ -34,7 +34,7 @@
         </activity>
 
         <activity
-                android:label="Mental Model Elicitation"
+                android:label="Mental Model Mapping"
                 android:name=".HomeActivity"
                 android:parentActivityName=".HomeActivity">
             <meta-data
@@ -55,7 +55,7 @@
         </activity>
 
         <activity
-                android:label="Model Elicitation"
+                android:label="Model Mapping"
                 android:name=".MainActivity"
                 android:parentActivityName=".HomeActivity" >
             <meta-data

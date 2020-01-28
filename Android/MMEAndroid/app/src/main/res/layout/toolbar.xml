@@ -7,11 +7,13 @@
         android:layout_height="120dp"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:background="@drawable/banner_gradient_small"
         app:theme="@style/ToolBarStyle">
         <ImageView
                 android:id="@+id/bannerImage"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
+                android:background="@drawable/banner_gradient_small"
                 app:srcCompat="@drawable/banner_narrow_small" />
 </androidx.appcompat.widget.Toolbar>
