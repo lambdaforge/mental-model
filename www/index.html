@@ -42,10 +42,10 @@
                   <div class="inline" id="steps">
                         <i>Or jump to...</i> <br><br>
                         <button class="stepButtons" id="btn-practice"                  type="button">Practice                  </button><br>
-                        <button class="stepButtons" id="btn-instructions-drivers"      type="button">Instructions Drivers      </button><br>
-                        <button class="stepButtons" id="btn-mapping-drivers"           type="button">Mapping Drivers           </button><br>
-                        <button class="stepButtons" id="btn-instructions-consequences" type="button">Instructions Consequences </button><br>
-                        <button class="stepButtons" id="btn-mapping-consequences"      type="button">Mapping Consequences      </button><br>
+                        <button class="stepButtons" id="btn-instructions-drivers"      type="button">Instructions 1      </button><br>
+                        <button class="stepButtons" id="btn-mapping-drivers"           type="button">Mapping 1           </button><br>
+                        <button class="stepButtons" id="btn-instructions-consequences" type="button">Instructions 2 </button><br>
+                        <button class="stepButtons" id="btn-mapping-consequences"      type="button">Mapping 2      </button><br>
                         <br>
                    </div>
 
@@ -87,7 +87,7 @@
                 <h2 align="center">Settings</h2>
                 <div class="box">
                     <p class="explanation">Here you can use the files you have uploaded to populate the tool. Select the audio or video file from the dropdown box for the respective M-TOOL parts.</p>
-                    <p class="explanation">Select the factors you would like to use for the drivers mapping and consequences mapping by selecting the image and audio file for each factor and select if you would like these factors to show on the drivers mapping screen or the consequences mapping screen.</p>
+                    <p class="explanation">Select the factors you would like to use for the mappings by selecting the image and audio file for each factor and select if you would like these factors to show on the first or the second mapping screen.</p>
                 </div>
 
                     <table>
@@ -96,9 +96,9 @@
                             <td>
                                 <table id="mappingTypesTable">
                                     <tr>
-                                        <td><label for="driverMapping">     Drivers     </label> </td>
-                                        <td><label for="consequenceMapping">Consequences</label> </td>
-                                        <td><label for="bothMappings">      Both        </label> </td>
+                                        <td><label for="driverMapping">     Mapping Screen 1 </label> </td>
+                                        <td><label for="consequenceMapping">Mapping Screen 2 </label> </td>
+                                        <td><label for="bothMappings">      Both             </label> </td>
                                     </tr>
                                     <tr>
                                         <td><input id="driverMapping"      class="hCentered" name="mappingTypes" value="drivers"      type="radio"></td>
@@ -125,18 +125,18 @@
                             </td>
                         </tr>
                         <tr>
-                            <td><label for="instructionVideoDrivers">Instruction video for drivers:</label></td>
+                            <td><label for="instructionVideoDrivers">Instruction video for mapping screen 1:</label></td>
                             <td><select id="instructionVideoDrivers" class="videoChooser"></select>
                                 <div class="toolTip">?
-                                    <span class="toolTipText">This video introduces the driver factors to the participant.</span>
+                                    <span class="toolTipText">This video introduces the factors on the first screen to the participant.</span>
                                 </div>
                             </td>
                         </tr>
                         <tr>
-                            <td><label for="instructionVideoConsequences">Instruction video for consequences:</label></td>
+                            <td><label for="instructionVideoConsequences">Instruction video for mapping screen 2:</label></td>
                             <td><select id="instructionVideoConsequences" class="videoChooser"></select>
                                 <div class="toolTip">?
-                                    <span class="toolTipText">This video introduces the consequence factors to the participant.</span>
+                                    <span class="toolTipText">This video introduces the factors on the second screen to the participant.</span>
                                 </div>
                             </td>
                         </tr>
@@ -149,18 +149,18 @@
                             </td>
                         </tr>
                         <tr>
-                            <td><label for="mappingAudioDrivers">Mapping drivers audio:</label></td>
+                            <td><label for="mappingAudioDrivers">Mapping screen 1 audio:</label></td>
                             <td><select id="mappingAudioDrivers" class="audioChooser"><option value="">None</option></select>
                                 <div class="toolTip">?
-                                    <span class="toolTipText">This is the audio file played during the mapping drivers task.</span>
+                                    <span class="toolTipText">This is the audio file played during the first mapping task.</span>
                                 </div>
                             </td>
                         </tr>
                         <tr>
-                            <td><label for="mappingAudioConsequences">Mapping consequences audio:</label></td>
+                            <td><label for="mappingAudioConsequences">Mapping screen 2 audio:</label></td>
                             <td><select id="mappingAudioConsequences" class="audioChooser"><option value="">None</option></select>
                                 <div class="toolTip">?
-                                    <span class="toolTipText">This is the audio file played during the mapping consequences task.</span>
+                                    <span class="toolTipText">This is the audio file played during the second mapping task.</span>
                                 </div>
                             </td>
                         </tr>
@@ -185,8 +185,8 @@
                     <h4>Factors: </h4>
 
                     <div class="tab">
-                        <button id="tab-drivers" class="tabLink">Drivers</button>
-                        <button id="tab-consequences" class="tabLink">Consequences</button>
+                        <button id="tab-drivers" class="tabLink">Mapping screen 1</button>
+                        <button id="tab-consequences" class="tabLink">Mapping screen 2</button>
                     </div>
 
                     <div id="drivers" class="tabContent">
