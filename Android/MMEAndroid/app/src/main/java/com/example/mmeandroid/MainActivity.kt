@@ -5,6 +5,7 @@ import android.app.DownloadManager
 import android.content.ContentValues
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.media.AudioManager
 import android.net.Uri
 import android.os.Bundle
@@ -43,16 +44,18 @@ class MainActivity : AppCompatActivity() {
         actionBar.setDisplayShowTitleEnabled(false)
 
         webView = findViewById(R.id.webView)
-        webView!!.setDownloadListener { url, _, _, _, _ -> onDownload(url) }
 
-        webView!!.setWebViewClient(object : WebViewClient() {
-            override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                webView!!.loadUrl(url)
-                return true
-            }
-        })
 
         if (savedInstanceState == null) {
+            webView!!.setDownloadListener { url, _, _, _, _ -> onDownload(url) }
+
+            webView!!.setWebViewClient(object : WebViewClient() {
+                override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
+                    webView!!.loadUrl(url)
+                    return true
+                }
+            })
+
             webView!!.settings.javaScriptEnabled = true
             webView!!.settings.databaseEnabled = true
             webView!!.settings.domStorageEnabled = true
@@ -70,7 +73,16 @@ class MainActivity : AppCompatActivity() {
                 webView!!.settings.mediaPlaybackRequiresUserGesture = false
             }
         }
+        else {
+            webView!!.restoreState(savedInstanceState)
+        }
     }
+
+
+    public override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+    }
+
 
     public override fun onPause() {
         webView!!.onPause()

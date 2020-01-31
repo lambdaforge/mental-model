@@ -145,6 +145,9 @@ class UploadActivity : AppCompatActivity() {
         listView[fileType] = ArrayAdapter(this, R.layout.list_row, ArrayList<String>())
         val list = findViewById<ListView>(viewID)
         list.adapter = listView[fileType]
+
+        list.isFastScrollAlwaysVisible = true
+
     }
 
 
@@ -214,7 +217,7 @@ class UploadActivity : AppCompatActivity() {
         }
         catch (e: Exception) {
             Dialog(this@UploadActivity).showInformation(tag, warningOnImportFailure)
-            throw java.lang.Exception("Failure while reading file $fileName!")
+            throw java.lang.Exception("Failure while reading media sources file $fileName!")
         }
 
         return fileContent
@@ -249,7 +252,7 @@ class UploadActivity : AppCompatActivity() {
         val prefix = content.substringBefore("{")
 
         if (json.trimmedLength() < 1 || prefix.trimmedLength() < 1) {
-            throw java.lang.Exception("Content of mediaSources.js have format 'mediaSources = JSONOBJECT'.")
+            throw java.lang.Exception("Content of media sources file must have format 'mediaSources = JSONOBJECT'.")
         }
 
         mediaListPrefix = prefix
@@ -257,7 +260,7 @@ class UploadActivity : AppCompatActivity() {
             mediaList = JSONObject(json)
         }
         catch (e: ClassCastException) {
-            throw java.lang.Exception( "Content of mediaSources.js must have format 'mediaSources = JSONOBJECT'.")
+            throw java.lang.Exception( "Content of media sources file must have format 'mediaSources = JSONOBJECT'.")
 
         }
         try {
@@ -268,6 +271,7 @@ class UploadActivity : AppCompatActivity() {
         catch (e: ClassCastException) {
             throw java.lang.Exception("Properties 'audio', 'video' and 'images' must exist in JSON object and contain a list of file names.")
         }
+
     }
 
 

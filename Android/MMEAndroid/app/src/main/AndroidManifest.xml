@@ -25,7 +25,7 @@
                 android:exported="true" />
 
         <activity
-                android:label="Mental Model Elicitation"
+                android:label="Mental Model Mapping"
                 android:name=".StartActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -54,9 +54,12 @@
 
         </activity>
 
+        <!-- Set config change to prevent webview from reloading on orientation change -->
         <activity
                 android:label="Model Mapping"
                 android:name=".MainActivity"
+                android:screenOrientation="landscape"
+                android:configChanges="keyboardHidden|orientation|screenSize|layoutDirection|uiMode"
                 android:parentActivityName=".HomeActivity" >
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
