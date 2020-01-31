@@ -158,7 +158,7 @@ factorRow = function(factorKey, used, defaultName, defaultImg, defaultAudio) {
 listFactors = function(mappingType) {
 
     var fixedFactorElement = document.getElementById("fixed-factor-" + mappingType);
-    populateSelection(fixedFactorElement, "images", settings.factors[mappingType].fixed, false);
+    populateSelection(fixedFactorElement, "images", settings.factors[mappingType].fixed, true);
 
     var factorTable = document.getElementById("factor-media-" + mappingType);
     for (var factorKey in settings.factorMedia){

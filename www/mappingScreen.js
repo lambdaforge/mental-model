@@ -48,10 +48,12 @@ setupMapping = function(mappingType) {
     setupArrows();
     setupFactorMenu(dynamicFactors);
 
-    var xFixed = canvasStyle.xFixedFactor[factors.fixedPosition];
-    var yFixed = canvasStyle.yFixedFactor;
+    if (fixedFactor != "") {
+        var xFixed = canvasStyle.xFixedFactor[factors.fixedPosition];
+        var yFixed = canvasStyle.yFixedFactor;
 
-    drawFactorIcon(fixedFactor, xFixed,  yFixed, true);
+        drawFactorIcon(fixedFactor, xFixed,  yFixed, true);
+    }
 
     // Setup buttons
     var halfButton = canvasStyle.buttonSize / 2;
