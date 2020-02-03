@@ -3,7 +3,7 @@
 <resources>
     <string name="app_name">M-TOOL</string>
 
-    <string name="home_explanation">Welcome to the Mental Model Mapping Tool!\n\nBelow you can choose to:\n - start uploading files to tailor the tool to your needs\n - start session to start mapping mental models, change settings or to download your data\n - show the manual if you want to learn more about how to use M-TOOL
+    <string name="home_explanation">Welcome to the Mental Model Mapping Tool!\n\nBelow you can choose to:\n - <i>upload files</i> to tailor the tool to your needs\n - <i>start session</i> to start mapping mental models, change settings or to download your data\n - <i>show manual</i> to learn more about how to use M-TOOL
 </string>
     <string name="upload_button">Upload Files</string>
     <string name="session_button">Start Session</string>

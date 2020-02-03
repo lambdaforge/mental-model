@@ -15,5 +15,5 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:background="@drawable/banner_gradient_small"
-                app:srcCompat="@drawable/banner_narrow_small" />
+                app:srcCompat="@drawable/banner_narrow_transparent" />
 </androidx.appcompat.widget.Toolbar>

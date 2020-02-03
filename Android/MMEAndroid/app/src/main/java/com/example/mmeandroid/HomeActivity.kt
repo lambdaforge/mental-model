@@ -37,7 +37,7 @@ class HomeActivity : AppCompatActivity() {
 
     private fun openPDF() {
 
-        val path = Uri.parse("content://com.example.mmeandroid.assetprovider/ManualNOMMET.pdf")
+        val path = Uri.parse("content://com.example.mmeandroid.assetprovider/manual.pdf")
 
         val pdfIntent = Intent(Intent.ACTION_VIEW)
         pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
