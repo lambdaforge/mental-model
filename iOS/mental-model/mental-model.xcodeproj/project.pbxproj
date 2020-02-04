@@ -11,7 +11,7 @@
 		BC30A2A9237B3006005F74C6 /* TextBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC30A2A8237B3006005F74C6 /* TextBox.swift */; };
 		BC30A2AB237C5DDD005F74C6 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC30A2AA237C5DDD005F74C6 /* Constants.swift */; };
 		BCABD85A23DA04C300060672 /* Banner.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCABD85923DA04C300060672 /* Banner.swift */; };
-		BCABD86623DB5D8200060672 /* iOS in Resources */ = {isa = PBXBuildFile; fileRef = BCABD86523DB5D8200060672 /* iOS */; };
+		BCABD86A23E9D71400060672 /* manual.pdf in Resources */ = {isa = PBXBuildFile; fileRef = BCABD86923E9D71400060672 /* manual.pdf */; };
 		BCD634CA2304682000144A31 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD634C92304682000144A31 /* AppDelegate.swift */; };
 		BCD634CF2304682000144A31 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BCD634CD2304682000144A31 /* Main.storyboard */; };
 		BCD634D12304682200144A31 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BCD634D02304682200144A31 /* Assets.xcassets */; };
@@ -23,7 +23,6 @@
 		BCD634FC230468A600144A31 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD634F9230468A600144A31 /* ViewController.swift */; };
 		BCE58B0C2327FBC700942D1F /* MediaListDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE58B0B2327FBC700942D1F /* MediaListDataSource.swift */; };
 		BCFA5B6F23735F1300B735B0 /* PdfViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCFA5B6E23735F1300B735B0 /* PdfViewController.swift */; };
-		BCFA5B7123735FB900B735B0 /* ManualNOMMET.pdf in Resources */ = {isa = PBXBuildFile; fileRef = BCFA5B7023735FB900B735B0 /* ManualNOMMET.pdf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,8 +47,8 @@
 		BC30A2A8237B3006005F74C6 /* TextBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextBox.swift; sourceTree = "<group>"; };
 		BC30A2AA237C5DDD005F74C6 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		BCABD85923DA04C300060672 /* Banner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Banner.swift; sourceTree = "<group>"; };
-		BCABD86523DB5D8200060672 /* iOS */ = {isa = PBXFileReference; lastKnownFileType = folder; name = iOS; path = ../../resources/icon/iOS; sourceTree = "<group>"; };
-		BCD634C62304682000144A31 /* NOMMET.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NOMMET.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BCABD86923E9D71400060672 /* manual.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = manual.pdf; path = ../../resources/manual.pdf; sourceTree = "<group>"; };
+		BCD634C62304682000144A31 /* M-TOOL.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "M-TOOL.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BCD634C92304682000144A31 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BCD634CE2304682000144A31 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		BCD634D02304682200144A31 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -66,7 +65,6 @@
 		BCD634F9230468A600144A31 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		BCE58B0B2327FBC700942D1F /* MediaListDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaListDataSource.swift; sourceTree = "<group>"; };
 		BCFA5B6E23735F1300B735B0 /* PdfViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PdfViewController.swift; sourceTree = "<group>"; };
-		BCFA5B7023735FB900B735B0 /* ManualNOMMET.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = ManualNOMMET.pdf; path = ../../resources/ManualNOMMET.pdf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,8 +95,7 @@
 		BCD634BD2304682000144A31 = {
 			isa = PBXGroup;
 			children = (
-				BCABD86523DB5D8200060672 /* iOS */,
-				BCFA5B7023735FB900B735B0 /* ManualNOMMET.pdf */,
+				BCABD86923E9D71400060672 /* manual.pdf */,
 				BC03DF93233A63EC00C77076 /* www */,
 				BCD634C82304682000144A31 /* mental-model */,
 				BCD634DD2304682200144A31 /* mental-modelTests */,
@@ -110,7 +107,7 @@
 		BCD634C72304682000144A31 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				BCD634C62304682000144A31 /* NOMMET.app */,
+				BCD634C62304682000144A31 /* M-TOOL.app */,
 				BCD634DA2304682200144A31 /* mental-modelTests.xctest */,
 				BCD634E52304682200144A31 /* mental-modelUITests.xctest */,
 			);
@@ -172,7 +169,7 @@
 			);
 			name = "mental-model";
 			productName = "mental-model";
-			productReference = BCD634C62304682000144A31 /* NOMMET.app */;
+			productReference = BCD634C62304682000144A31 /* M-TOOL.app */;
 			productType = "com.apple.product-type.application";
 		};
 		BCD634D92304682200144A31 /* mental-modelTests */ = {
@@ -259,11 +256,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BCFA5B7123735FB900B735B0 /* ManualNOMMET.pdf in Resources */,
 				BC03DF94233A63EC00C77076 /* www in Resources */,
+				BCABD86A23E9D71400060672 /* manual.pdf in Resources */,
 				BCD634D42304682200144A31 /* LaunchScreen.storyboard in Resources */,
 				BCD634D12304682200144A31 /* Assets.xcassets in Resources */,
-				BCABD86623DB5D8200060672 /* iOS in Resources */,
 				BCD634CF2304682000144A31 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -481,7 +477,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "de.uni-heidelberg.mmet";
-				PRODUCT_NAME = NOMMET;
+				PRODUCT_NAME = "M-TOOL";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -501,7 +497,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "de.uni-heidelberg.mmet";
-				PRODUCT_NAME = NOMMET;
+				PRODUCT_NAME = "M-TOOL";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

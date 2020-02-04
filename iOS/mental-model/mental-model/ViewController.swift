@@ -121,7 +121,7 @@ class ViewController: UIViewController {
 
         explanation = TextBox(frame: CGRect(x: leftBound, y: ScreenTop, width: w, height: h))
         explanation.text = Explanation.home
-        explanation.adjustSize(nLines: 6)
+        explanation.adjustSize(nLines: 5)
         
         view.addSubview(explanation)
     }

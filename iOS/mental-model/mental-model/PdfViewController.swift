@@ -38,7 +38,7 @@ class PdfViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
         webView.navigationDelegate = self
         view.addSubview(webView)
         
-        let url = Bundle.main.url(forResource: "ManualNOMMET", withExtension: "pdf")
+        let url = Bundle.main.url(forResource: "manual", withExtension: "pdf")
         webView.load(URLRequest(url: url!))
         
         

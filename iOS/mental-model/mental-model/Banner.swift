@@ -47,7 +47,7 @@ class Banner:  UIView {
          
          let imageView = UIImageView(frame: frame)
          imageView.contentMode = .scaleAspectFit
-         imageView.image = UIImage(named: "bannerImage")
+         imageView.image = UIImage(named: "bannerFG")
          self.addSubview(imageView)
     }
     
