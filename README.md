@@ -1,2 +1,2 @@
 # mental-model
-Research tool to communicate with illiterate people by drawing diagrams.
+Create visual diagrams depicting people’s mental model of any system. 

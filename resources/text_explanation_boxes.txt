@@ -1,0 +1,14 @@
+First screen:
+Welkom to the Mental Model Mapping Tool!
+Below you can choose to:
+- <i>upload files</i> to tailor the tool to your needs
+- <i>start a session</i> to start mapping mental models, change settings or down your data
+- <i>show manual</i> to learn more about how to use M-TOOL
+
+Upload files
+Here you can upload the relevant audio/video/image files to tailor M-TOOL to your needs.
+Once you have uploaded a file, it should show on this screen. Once you have uploaded all your files here, you can go to start session/settings to indicate where you want each file to operate within M-TOOL.
+
+Settings
+Here you can use the files you have uploaded to populate the tool. Select the file from the dropdown box for the respective M-TOOL parts.
+Select the factors you would like to use for the drivers mapping and consequences mapping by selecting the image and audio file for each factor and select if you would like these factors to show on the drivers mapping screen or the consequences mapping screen.
