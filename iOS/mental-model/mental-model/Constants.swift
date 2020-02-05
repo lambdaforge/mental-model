@@ -10,11 +10,11 @@ import Foundation
 
 import UIKit
 
-let BackgroundColor: UIColor = UIColor(red:0.93, green:0.93, blue:0.93, alpha:1.0)
+let BackgroundColor: UIColor = .white
 let BannerHeight: CGFloat = 120.0
 let BannerTop: CGFloat  = 0.0 //UIApplication.shared.statusBarFrame.height
 let ScreenTop: CGFloat = BannerHeight + BannerTop
-let DownloadFileName = "nommet_data.csv"
+let DownloadFileName = "mtool_data.csv"
 let Padding: CGFloat = 10.0
 
 struct ExplanationBox {
@@ -27,8 +27,8 @@ struct ExplanationBox {
 }
 
 struct Explanation {
-    static let home = "Welcome to the NOn-verbal Mental Model Elicitation Tool (NOMMET)!\n\nBelow you can choose to:\n - start uploading files to tailor the tool to your needs\n - start session to start mapping mental models, change settings or to download your data\n - view the manual if you want to learn more about how to use NOMMET"
-   static let upload = "Here you can upload the relevant audio/video/image files to tailor NOMMET to your needs.\n\nOnce you have uploaded a file, it should show on this screen. Once you have uploaded all your files here, you can go to start session/settings to indicate where you want each file to operate within NOMMET."
+    static let home = "Welcome to the Mental Model Mapping Tool!\nBelow you can choose to:\n- <i>upload files</i> to tailor the tool to your needs\n- <i>start a session</i> to start mapping mental models, change settings or down your data\n- <i>show manual</i> to learn more about how to use M-TOOL"
+   static let upload = "Here you can upload the relevant audio/video/image files to tailor M-TOOL to your needs.\nOnce you have uploaded a file, it should show on this screen. Once you have uploaded all your files here, you can go to start session/settings to indicate where you want each file to operate within M-TOOL."
 }
 
 struct Section {
@@ -43,7 +43,7 @@ struct UploadScreen {
 }
 
 struct Title {
-    static let importScreen = "File Import"
+    static let importScreen = "Upload Files"
     static let topPadding: CGFloat = 10.0
     static let height: CGFloat = 30.0
     static let color: UIColor = .gray
