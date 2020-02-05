@@ -12,7 +12,7 @@
             android:usesCleartextTraffic="true"
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
-            android:label="M-TOOL"
+            android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme.NoActionBar"
@@ -24,8 +24,9 @@
                 android:grantUriPermissions="true"
                 android:exported="true" />
 
+        <!-- Label here is used as name below launcher icon -->
         <activity
-                android:label="Mental Model Mapping"
+                android:label="@string/app_name"
                 android:name=".StartActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -34,7 +35,7 @@
         </activity>
 
         <activity
-                android:label="Mental Model Mapping"
+                android:label="@string/app_name"
                 android:name=".HomeActivity"
                 android:parentActivityName=".HomeActivity">
             <meta-data
@@ -54,9 +55,9 @@
 
         </activity>
 
-        <!-- Set config change to prevent webview from reloading on orientation change -->
+        <!-- Set config change to prevent webView from reloading on orientation change -->
         <activity
-                android:label="Model Mapping"
+                android:label="Mental Model Mapping"
                 android:name=".MainActivity"
                 android:screenOrientation="landscape"
                 android:configChanges="keyboardHidden|orientation|screenSize|layoutDirection|uiMode"

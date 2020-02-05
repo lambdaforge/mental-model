@@ -1,12 +1,12 @@
 package com.lambdaforge.mmeandroid
 
 import android.content.ActivityNotFoundException
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import android.content.Intent
 import android.net.Uri
+import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 
 
 class HomeActivity : AppCompatActivity() {
@@ -16,6 +16,16 @@ class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+    }
+
+    override fun onBackPressed() {
+        /*
+        * Do nothing!
+        * This method is needed, so the application doesn't go back
+        * to StartActivity even when parent activity is set to point
+        * back to HomeActivity in the manifest (on Lollipop)
+        *
+        */
     }
 
     fun changeToUpload(v: View) {
