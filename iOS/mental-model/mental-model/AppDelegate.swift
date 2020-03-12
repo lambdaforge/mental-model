@@ -3,7 +3,7 @@
 //  mental-model
 //
 //  Created by Judith on 14.08.19.
-//  Copyright © 2019 lambdaforge. All rights reserved.
+//  Copyright © 2019 lambdaforge UG. All rights reserved.
 //
 
 import UIKit
@@ -24,12 +24,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let window = window {
             let mainVC = ViewController()
             navigationController = UINavigationController(rootViewController: mainVC)
-       //     navigationController!.navigationBar.barStyle = .black
-            
-            if #available(iOS 11.0, *) {
-                //navigationController!.navigationBar.prefersLargeTitles = true
-            }
-        
             
             window.rootViewController = navigationController
             window.makeKeyAndVisible()
@@ -37,34 +31,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         return true
     }
-
-    
-  /*  func applyImageBackgroundToTheNavigationBar() {
-        /*  These background images contain a small pattern which is displayed
-         in the lower right corner of the navigation bar.
-         */
-        var backImageForDefaultBarMetrics = UIImage(named: "banner")
-      
-        /*  Both of the above images are smaller than the navigation bar's size.
-         To enable the images to resize gracefully while keeping their
-         content pinned to the bottom right corner of the bar, the images are
-         converted into resizable images width edge insets extending from the
-         bottom up to the second row of pixels from the top, and from the
-         right over to the second column of pixels from the left. This results
-         in the topmost and leftmost pixels being stretched when the images
-         are resized. Not coincidentally, the pixels in these rows/columns are empty.
-         */
-        backImageForDefaultBarMetrics =
-            backImageForDefaultBarMetrics!.resizableImage(
-                withCapInsets: UIEdgeInsets(top: 0,
-                                            left: 0,
-                                            bottom: backImageForDefaultBarMetrics!.size.height - 1,
-                                            right: backImageForDefaultBarMetrics!.size.width - 1))
-
-        
-        let navigationBarAppearance = navigationController!.navigationBar
-        navigationBarAppearance.setBackgroundImage(backImageForDefaultBarMetrics, for: .default)
-    }*/
     
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
@@ -87,7 +53,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-
-
 }
-

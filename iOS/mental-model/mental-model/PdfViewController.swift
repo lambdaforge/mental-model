@@ -19,7 +19,6 @@ class PdfViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
         self.navigationController?.popViewController(animated: true);
     }
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.isNavigationBarHidden = true
@@ -41,10 +40,5 @@ class PdfViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
         let url = Bundle.main.url(forResource: "manual", withExtension: "pdf")
         webView.load(URLRequest(url: url!))
         
-        
     }
-    
-  
-    
 }
-

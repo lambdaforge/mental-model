@@ -3,7 +3,7 @@
 //  mental-model
 //
 //  Created by Judith on 07.08.19.
-//  Copyright © 2019 lambdaforge. All rights reserved.
+//  Copyright © 2019 lambdaforge UG. All rights reserved.
 //
 
 import UIKit
@@ -28,6 +28,8 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
         view.addSubview(banner)
         
         let webConfiguration = WKWebViewConfiguration()
+        webConfiguration.mediaTypesRequiringUserActionForPlayback = [] // new
+        
         let h = view.frame.height - ScreenTop
         
         let wFrame = CGRect(x: 0.0, y: ScreenTop, width: view.frame.width, height: h)
@@ -37,10 +39,18 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
         webView.navigationDelegate = self
         view.addSubview(webView)
         
-        
-        let htmlURL = Bundle.main.url(forResource: "www/index", withExtension: "html")
-        let request = URLRequest(url: htmlURL!)
+        let htmlURL = WebDir.appendingPathComponent(HTMLFileName)
+        let request = URLRequest(url: htmlURL)
         webView.load(request)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        
+        // Stop all audio from playing after view has been closed
+        let stopVideoScript = "var videos = document.getElementsByTagName('video'); for( var i = 0; i < videos.length; i++ ){videos.item(i).pause()}"
+        self.webView.evaluateJavaScript(stopVideoScript, completionHandler:nil)
+        let stopAudioScript = "var audios = document.getElementsByTagName('audio'); for( var i = 0; i < audios.length; i++ ){audios.item(i).pause()}"
+        self.webView.evaluateJavaScript(stopAudioScript, completionHandler:nil)
     }
     
     // WK Navigation Delegate Method

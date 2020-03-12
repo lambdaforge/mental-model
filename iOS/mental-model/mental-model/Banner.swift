@@ -3,7 +3,7 @@
 //  mental-model
 //
 //  Created by Judith on 23.01.20.
-//  Copyright © 2020 lambdaforge. All rights reserved.
+//  Copyright © 2020 lambdaforge UG. All rights reserved.
 //
 
 import UIKit

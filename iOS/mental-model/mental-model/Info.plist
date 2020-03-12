@@ -21,19 +21,21 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>1.0.3</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>3</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<false/>
+	<key>kTCCServiceMediaLibrary</key>
+	<string>Used for explanations of symbols and app usage.</string>
 	<key>NSAppleMusicUsageDescription</key>
-	<string>ztutzu</string>
+	<string>Used for importing audio files. </string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>gregt</string>
+	<string>Used for importing images and videos.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>nbtrntz</string>
+	<string>Used for importing images and videos.</string>
 	<key>UIFileSharingEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

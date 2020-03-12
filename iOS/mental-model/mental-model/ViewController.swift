@@ -3,7 +3,7 @@
 //  mental-model
 //
 //  Created by Judith on 07.08.19.
-//  Copyright © 2019 lambdaforge. All rights reserved.
+//  Copyright © 2019 lambdaforge UG. All rights reserved.
 //
 
 import UIKit
@@ -62,9 +62,71 @@ class ViewController: UIViewController {
         self.navigationController?.isNavigationBarHidden = true
         view.backgroundColor = BackgroundColor
         view.addSubview(Banner(atTopOf: view))
+
+        let fileManager = FileManager.default
+
+        print("Copying web resources...")
+        let oldWebDir = Bundle.main.resourceURL!.appendingPathComponent("www")
+
+        do {
+            if (fileManager.fileExists(atPath: WebDir.path)) {
+                print(" Web directory already exists, copying content only")
+                try copyDirectoryFiles(sourceDir: oldWebDir.path, destinationDir: WebDir.path)
+            }
+            else {
+                print(" Web directory does not exists, copying entire directory")
+                try fileManager.copyItem(atPath: oldWebDir.path, toPath: WebDir.path)
+            }
+            
+            print(" Resources copied successfully")
+        }
+        catch {
+            print("Copying web directory failed.")
+        }
         
         addButtonRow()
         addExplanationBox()
+    }
+    
+    func copyDirectoryFiles(sourceDir: String, destinationDir: String) throws {
+        let fileManager = FileManager.default
+        
+        print("Copying content...")
+        do {
+            let filelist = try fileManager.contentsOfDirectory(atPath: sourceDir)
+
+            for filename in filelist {
+            
+                let sourceFile = "\(sourceDir)/\(filename)"
+                let destinationFile = "\(destinationDir)/\(filename)"
+                
+                var isDir : ObjCBool = false
+                if fileManager.fileExists(atPath: destinationFile, isDirectory: &isDir) {
+                    
+                    if isDir.boolValue {
+                        try copyDirectoryFiles(sourceDir: sourceFile, destinationDir: destinationFile)
+                    }
+                    else {
+                        print("File \(destinationFile) already exists")
+                        if !(filename == MediaSourcesFileName) {
+                            print("Overwriting file...")
+                            try fileManager.removeItem(atPath: destinationFile)
+                            try fileManager.copyItem(atPath: sourceFile, toPath: destinationFile)
+                        }
+                        else {
+                            print("Skipping media sources file")
+                        }
+                        
+                    }
+                }
+                else {
+                    print("Copying File: \(sourceFile) to \(destinationFile)")
+                    try fileManager.copyItem(atPath: sourceFile, toPath: destinationFile)
+                }
+            }
+        } catch {
+            print("Error copying web files")
+        }
     }
     
     
@@ -119,8 +181,16 @@ class ViewController: UIViewController {
         explanationView = UIView(frame: CGRect(x: leftBound, y: ScreenTop, width: w, height: h))
         view.addSubview(explanationView)
 
+        let italicFont = UIFont.italicSystemFont(ofSize: ExplanationBox.fontSize)
+        let explanationText = NSMutableAttributedString(string: Explanation.home)
+        explanationText.addAttribute(.font, value: UIFont.systemFont(ofSize: ExplanationBox.fontSize), range: NSRange(location: 0, length: Explanation.home.count))
+        explanationText.addAttribute(.font, value: italicFont, range: NSRange(location: 69, length: 12))
+        explanationText.addAttribute(.font, value: italicFont, range: NSRange(location: 117, length: 13))
+        explanationText.addAttribute(.font, value: italicFont, range: NSRange(location: 203, length: 11))
+        
         explanation = TextBox(frame: CGRect(x: leftBound, y: ScreenTop, width: w, height: h))
-        explanation.text = Explanation.home
+        explanation.attributedText = explanationText
+        explanation.textColor = ExplanationBox.textColor
         explanation.adjustSize(nLines: 5)
         
         view.addSubview(explanation)
