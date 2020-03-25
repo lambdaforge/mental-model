@@ -38,10 +38,10 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
         view.addSubview(webView)
         
         if (!FileManager.default.fileExists(atPath: WebDir.path)) {
-            Alert.missingResources(viewController: self)
+            Alert.missingResource(viewController: self, resource: WebDir.lastPathComponent)
         } else {
             let url = WebDir.appendingPathComponent(HTMLFileName)
-            webView.load(URLRequest(url: url))
+            webView.loadFileURL(url, allowingReadAccessTo: WebDir) // new
         }
     }
     

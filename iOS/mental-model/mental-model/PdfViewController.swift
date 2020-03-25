@@ -35,9 +35,9 @@ class PdfViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
         view.addSubview(webView)
     
         if let url = Bundle.main.url(forResource: "manual", withExtension: "pdf") {
-            webView.load(URLRequest(url: url))
+            webView.loadFileURL(url, allowingReadAccessTo: url)
         } else {
-            Alert.missingResources(viewController: self)
+            Alert.missingResource(viewController: self, resource: "manual.pdf")
         }
     }
     

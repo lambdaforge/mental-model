@@ -447,7 +447,7 @@ class UploadViewController: UIViewController,
     
     private func checkWebdirectory() {
         if (!FileManager.default.fileExists(atPath: WebDir.path)) {
-            Alert.missingResources(viewController: self)
+            Alert.missingResource(viewController: self, resource: WebDir.lastPathComponent)
         }
     }
     

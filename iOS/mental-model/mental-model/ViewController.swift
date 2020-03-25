@@ -45,7 +45,6 @@ class ViewController: UIViewController {
         middleButton.centerXAnchor.constraint(equalTo: middleColumn.centerXAnchor).isActive = true
         rightButton.centerYAnchor.constraint(equalTo: rightColumn.centerYAnchor).isActive = true
         rightButton.centerXAnchor.constraint(equalTo: rightColumn.centerXAnchor).isActive = true
-        
     }
     
     override func viewDidLayoutSubviews() {

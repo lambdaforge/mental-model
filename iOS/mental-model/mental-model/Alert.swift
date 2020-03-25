@@ -29,9 +29,9 @@ class Alert {
     }
     
     
-    static func missingResources(viewController: UIViewController) {
-        let alert = UIAlertController(title: "Missing web directory!",
-                                      message: "Try restarting the app. If this message still occurs, please contact the maintainer.", preferredStyle: .alert)
+    static func missingResource(viewController: UIViewController, resource: String) {
+        let alert = UIAlertController(title: "Missing app resource!",
+                                      message: "Missing: \(resource)\nTry restarting the app. If this message still occurs, please contact the maintainer.", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel){ action in
                 viewController.dismiss(animated: true)
             }

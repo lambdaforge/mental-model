@@ -32,7 +32,6 @@ struct ExplanationBox {
 
 struct Explanation {
     static let home: String = "Welcome to the Mental Model Mapping Tool!\nBelow you can choose to:\n- upload files to tailor the tool to your needs\n- start session to start mapping mental models, change settings or download your data\n- show manual to learn more about how to use M-TOOL"
-    //static let homeItalicRanges = []
     static let upload = "Here you can upload the relevant audio/video/image files to tailor M-TOOL to your needs.\nOnce you have uploaded a file, it should show on this screen. Once you have uploaded all your files here, you can go to start session/settings to indicate where you want each file to operate within M-TOOL."
 }
 
