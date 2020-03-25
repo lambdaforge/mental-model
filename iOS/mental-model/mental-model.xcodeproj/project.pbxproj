@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		BC03DF94233A63EC00C77076 /* www in Resources */ = {isa = PBXBuildFile; fileRef = BC03DF93233A63EC00C77076 /* www */; };
+		BC0C07062423CF1700883483 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0C07052423CF1700883483 /* Alert.swift */; };
 		BC30A2A9237B3006005F74C6 /* TextBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC30A2A8237B3006005F74C6 /* TextBox.swift */; };
 		BC30A2AB237C5DDD005F74C6 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC30A2AA237C5DDD005F74C6 /* Constants.swift */; };
 		BCABD85A23DA04C300060672 /* Banner.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCABD85923DA04C300060672 /* Banner.swift */; };
@@ -44,6 +45,7 @@
 
 /* Begin PBXFileReference section */
 		BC03DF93233A63EC00C77076 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = ../../www; sourceTree = "<group>"; };
+		BC0C07052423CF1700883483 /* Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
 		BC30A2A8237B3006005F74C6 /* TextBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextBox.swift; sourceTree = "<group>"; };
 		BC30A2AA237C5DDD005F74C6 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		BCABD85923DA04C300060672 /* Banner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Banner.swift; sourceTree = "<group>"; };
@@ -130,6 +132,7 @@
 				BC30A2A8237B3006005F74C6 /* TextBox.swift */,
 				BC30A2AA237C5DDD005F74C6 /* Constants.swift */,
 				BCABD85923DA04C300060672 /* Banner.swift */,
+				BC0C07052423CF1700883483 /* Alert.swift */,
 			);
 			path = "mental-model";
 			sourceTree = "<group>";
@@ -293,6 +296,7 @@
 				BCD634FA230468A600144A31 /* WebViewController.swift in Sources */,
 				BC30A2A9237B3006005F74C6 /* TextBox.swift in Sources */,
 				BCFA5B6F23735F1300B735B0 /* PdfViewController.swift in Sources */,
+				BC0C07062423CF1700883483 /* Alert.swift in Sources */,
 				BC30A2AB237C5DDD005F74C6 /* Constants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -472,6 +476,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5JMPL9BKD7;
 				INFOPLIST_FILE = "mental-model/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -492,6 +497,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5JMPL9BKD7;
 				INFOPLIST_FILE = "mental-model/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

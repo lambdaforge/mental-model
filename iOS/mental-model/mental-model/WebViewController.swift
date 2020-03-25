@@ -13,11 +13,10 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
     
     var webView: WKWebView!
     
-    @IBAction func goBack(sender: UIButton!) {
-        print("Load home view")
-        self.dismiss(animated: true, completion: {});
-        self.navigationController?.popViewController(animated: true);
-    }
+    
+    //
+    // UIViewControllerMethods
+    //
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,34 +26,52 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
         banner.addBackButton(target: self, action: #selector(goBack))
         view.addSubview(banner)
         
+        let h = view.frame.height - ScreenTop
+        let wFrame = CGRect(x: 0.0, y: ScreenTop, width: view.frame.width, height: h)
+        
         let webConfiguration = WKWebViewConfiguration()
         webConfiguration.mediaTypesRequiringUserActionForPlayback = [] // new
-        
-        let h = view.frame.height - ScreenTop
-        
-        let wFrame = CGRect(x: 0.0, y: ScreenTop, width: view.frame.width, height: h)
         
         webView = WKWebView(frame: wFrame, configuration: webConfiguration)
         webView.uiDelegate = self
         webView.navigationDelegate = self
         view.addSubview(webView)
         
-        let htmlURL = WebDir.appendingPathComponent(HTMLFileName)
-        let request = URLRequest(url: htmlURL)
-        webView.load(request)
+        if (!FileManager.default.fileExists(atPath: WebDir.path)) {
+            Alert.missingResources(viewController: self)
+        } else {
+            let url = WebDir.appendingPathComponent(HTMLFileName)
+            webView.load(URLRequest(url: url))
+        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         
         // Stop all audio from playing after view has been closed
         let stopVideoScript = "var videos = document.getElementsByTagName('video'); for( var i = 0; i < videos.length; i++ ){videos.item(i).pause()}"
-        self.webView.evaluateJavaScript(stopVideoScript, completionHandler:nil)
         let stopAudioScript = "var audios = document.getElementsByTagName('audio'); for( var i = 0; i < audios.length; i++ ){audios.item(i).pause()}"
-        self.webView.evaluateJavaScript(stopAudioScript, completionHandler:nil)
+        
+        if (webView != nil) {
+            webView.evaluateJavaScript(stopVideoScript, completionHandler:nil)
+            webView.evaluateJavaScript(stopAudioScript, completionHandler:nil)
+        }
+        else {
+            print("WebView has not bee initialized")
+        }
     }
     
-    // WK Navigation Delegate Method
-
+    // Button actions
+    
+    @IBAction func goBack(sender: UIButton!) {
+        print("Load home view")
+        self.dismiss(animated: true, completion: {});
+        self.navigationController?.popViewController(animated: true);
+    }
+    
+    //
+    // WKNavigationDelegate Method
+    //
+    
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
                                        decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         let url = navigationAction.request.url!.absoluteString;
@@ -64,7 +81,6 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
             let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
             let documentsDirectory = paths[0]
             let targetFile = documentsDirectory.appendingPathComponent(DownloadFileName)
-            
         
             decisionHandler(WKNavigationActionPolicy.cancel);
             let startIndex = url.index(after: url.firstIndex(of: ",") ?? url.endIndex)
@@ -72,10 +88,12 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
             
             do {
                 try dataString.write(to: targetFile, atomically: true, encoding: String.Encoding.utf8)
-                showMessage(message: "File \(DownloadFileName) was saved to Documents directory")
+                Alert.info(viewController: self, title: "Download",
+                           message: "File \(DownloadFileName) was saved to Documents directory")
                 
             } catch {
-                showMessage(message: "Data could not be downloaded")
+                Alert.info(viewController: self, title: "Download",
+                           message: "Data could not be downloaded")
                 print(error)
             }
             
@@ -84,12 +102,6 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
         decisionHandler(WKNavigationActionPolicy.allow);
     }
     
-    private func showMessage(message: String) {
-        let alert = UIAlertController(title: "Download", message: message, preferredStyle: .alert)
-        let button = UIAlertAction(title: "OK", style: .cancel, handler: nil)
-        alert.addAction(button)
-        self.present(alert, animated: true)
-    }
     
 }
 

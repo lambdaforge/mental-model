@@ -14,6 +14,74 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     var navigationController: UINavigationController?
+    
+    
+    func copyDirectoryFiles(sourceDir: String, destinationDir: String) throws {
+        let fileManager = FileManager.default
+        
+        print("Copying content...")
+        do {
+            let filelist = try fileManager.contentsOfDirectory(atPath: sourceDir)
+
+            for filename in filelist {
+            
+                let sourceFile = "\(sourceDir)/\(filename)"
+                let destinationFile = "\(destinationDir)/\(filename)"
+                
+                var isDir : ObjCBool = false
+                if fileManager.fileExists(atPath: destinationFile, isDirectory: &isDir) {
+                    
+                    if isDir.boolValue {
+                        try copyDirectoryFiles(sourceDir: sourceFile, destinationDir: destinationFile)
+                    }
+                    else {
+                        print("File \(destinationFile) already exists")
+                        if !(filename == MediaSourcesFileName) {
+                            print("Overwriting file...")
+                            try fileManager.removeItem(atPath: destinationFile)
+                            try fileManager.copyItem(atPath: sourceFile, toPath: destinationFile)
+                        }
+                        else {
+                            print("Skipping media sources file")
+                        }
+                        
+                    }
+                }
+                else {
+                    print("Copying File: \(sourceFile) to \(destinationFile)")
+                    try fileManager.copyItem(atPath: sourceFile, toPath: destinationFile)
+                }
+            }
+        } catch {
+            print("Error copying web files")
+        }
+    }
+    
+    func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        
+        print("Copying web resources...")
+        
+        let fileManager = FileManager.default
+        let oldWebDir = Bundle.main.resourceURL!.appendingPathComponent("www")
+
+        do {
+            if (fileManager.fileExists(atPath: WebDir.path)) {
+                print(" Web directory already exists, copying content only")
+                try copyDirectoryFiles(sourceDir: oldWebDir.path, destinationDir: WebDir.path)
+            }
+            else {
+                print(" Web directory does not exists, copying entire directory")
+                try fileManager.copyItem(atPath: oldWebDir.path, toPath: WebDir.path)
+            }
+            
+            print(" Resources copied successfully")
+        }
+        catch {
+            print("Copying web directory failed.")
+        }
+        
+        return true
+    }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
