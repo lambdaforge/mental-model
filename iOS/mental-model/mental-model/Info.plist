@@ -2,16 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>UIRequiresFullScreen</key>
-	<string>YES</string>
-	<key>LSApplicationCategoryType</key>
-	<string></string>
-	<key>CFBundleIconName</key>
-	<string>AppIcon</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIconName</key>
+	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -21,21 +17,29 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.4</string>
+	<string>1.0.3</string>
 	<key>CFBundleVersion</key>
-	<string> 4</string>
+	<string>3</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<false/>
-	<key>kTCCServiceMediaLibrary</key>
-	<string>Used for explanations of symbols and app usage.</string>
 	<key>NSAppleMusicUsageDescription</key>
 	<string>Used for importing audio files. </string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Used for importing images and videos.</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>Used for exporting your captured session data.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Used for importing images and videos.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Used for creating images and videos to use in M-TOOL.</string>
+	<key>NSFileProviderDomainUsageDescription</key>
+	<string>Used for saving session data.</string>
 	<key>UIFileSharingEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -46,6 +50,8 @@
 	<array>
 		<string>armv7</string>
 	</array>
+	<key>UIRequiresFullScreen</key>
+	<string>YES</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
@@ -56,5 +62,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>kTCCServiceMediaLibrary</key>
+	<string>Used for explanations of symbols and app usage.</string>
 </dict>
 </plist>

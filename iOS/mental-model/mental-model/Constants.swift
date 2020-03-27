@@ -12,11 +12,11 @@ import UIKit
 
 let BackgroundColor: UIColor = .white
 let BannerHeight: CGFloat = 120.0
-let BannerTop: CGFloat  = 0.0 //UIApplication.shared.statusBarFrame.height
+let BannerTop: CGFloat = 0.0 //UIApplication.shared.statusBarFrame.height
 let ScreenTop: CGFloat = BannerHeight + BannerTop
 let Padding: CGFloat = 10.0
 
-let WebDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("www")
+let WebDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("www")
 let HTMLFileName = "index.html"
 let MediaSourcesFileName = "mediaSources.js"
 let DownloadFileName = "mtool_data.csv"

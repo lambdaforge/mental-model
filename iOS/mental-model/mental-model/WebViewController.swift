@@ -9,9 +9,14 @@
 import UIKit
 import WebKit
 
-class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
+class WebViewController: UIViewController,
+        WKUIDelegate,
+        WKNavigationDelegate,
+        UIDocumentPickerDelegate {
     
     var webView: WKWebView!
+    let temporaryUserDataFileLocation = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    //let temporaryUserDataFileLocation = FileManager.default.temporaryDirectory
     
     
     //
@@ -78,28 +83,85 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
         print("Download \(url)")
         
         if (url.starts(with: "data"))  {
-            let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-            let documentsDirectory = paths[0]
-            let targetFile = documentsDirectory.appendingPathComponent(DownloadFileName)
+            let targetFile = temporaryUserDataFileLocation.appendingPathComponent(DownloadFileName)
         
             decisionHandler(WKNavigationActionPolicy.cancel);
             let startIndex = url.index(after: url.firstIndex(of: ",") ?? url.endIndex)
             let dataString = url.suffix(from: startIndex)
             
             do {
+
+                if FileManager.default.fileExists(atPath: targetFile.path) {
+                    try FileManager.default.removeItem(at: targetFile)
+                }
                 try dataString.write(to: targetFile, atomically: true, encoding: String.Encoding.utf8)
-                Alert.info(viewController: self, title: "Download",
-                           message: "File \(DownloadFileName) was saved to Documents directory")
+                print("Saved data to \(targetFile.path)")
+                print("Opening export dialog...")
+                openDocumentPicker(url: targetFile)
                 
             } catch {
-                Alert.info(viewController: self, title: "Download",
-                           message: "Data could not be downloaded")
+                Alert.info(viewController: self, title: "Data export failed!",
+                           message: "Data could not be saved on device.")
                 print(error)
             }
             
             return;
         }
         decisionHandler(WKNavigationActionPolicy.allow);
+    }
+    
+    
+    //
+    // UIDocumentViewControllerDelegate Methods
+    //
+       
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        controller.dismiss(animated: true, completion: nil)
+          
+        print("DocumentPicker started")
+        
+        let sourceFile = temporaryUserDataFileLocation.appendingPathComponent(DownloadFileName)
+
+        print("Source: \(sourceFile)")
+        for destinationURL in urls {
+            print("Chosen destination: \(destinationURL)")
+                
+            let fileCoordinator = NSFileCoordinator()
+            fileCoordinator.coordinate(writingItemAt: destinationURL, options: .forReplacing, error: nil, byAccessor: { url in
+                do {
+                    if url.startAccessingSecurityScopedResource() {
+                        
+                        if FileManager.default.fileExists(atPath: url.path) {
+                            try FileManager.default.removeItem(at: url)
+                        }
+                        try FileManager.default.copyItem(at: sourceFile, to: url)
+                        print("File copied")
+                    }
+                    else {
+                        Alert.info(viewController: self, title: "Destination could not be accessed!",
+                                   message: "Please choose a different location")
+                        print("File not copied")
+                    }
+                    
+                    url.stopAccessingSecurityScopedResource()
+                } catch {
+                    Alert.info(viewController: self, title: "File could not be copied!",
+                                 message: "Please choose a different location")
+                    print(error)
+                }
+            })
+       }
+    }
+    
+    
+    // Helper functions
+    
+    private func openDocumentPicker(url: URL) {
+        let pickerController = UIDocumentPickerViewController(url: url, in: UIDocumentPickerMode.exportToService)
+        pickerController.delegate = self
+        pickerController.allowsMultipleSelection = false
+        pickerController.modalPresentationStyle = .formSheet
+        present(pickerController, animated: true, completion: nil)
     }
     
     
