@@ -18,6 +18,7 @@ uistate = {
         weight: 0,
         state: ArrowDrawing.notStarted
     },
+    disabledIcon: "",
 
     iconPositions: [],
     highlight: "",
@@ -242,9 +243,18 @@ window.onload = function() {
     $("#thank-you").css("background-image", "url(" + url + ")");
     $("#btn-ty-back").on("click", onPreviousButtonClicked);
     $("#btn-ty-to-main").on("click", function() {
-        canvas[CanvasID.practice] = null;
-        canvas[CanvasID.drivers] = null;
-        canvas[CanvasID.consequences] = null;
+        if (canvas[CanvasID.practice] != null) {
+            canvas[CanvasID.practice].clear();
+            canvas[CanvasID.practice] = null;
+        }
+        if (canvas[CanvasID.drivers] != null) {
+            canvas[CanvasID.drivers].clear();
+            canvas[CanvasID.drivers] = null;
+        }
+        if (canvas[CanvasID.consequences] != null) {
+            canvas[CanvasID.consequences].clear();
+            canvas[CanvasID.consequences] = null;
+        }
         showScreen(ScreenID.menu);
     });
 

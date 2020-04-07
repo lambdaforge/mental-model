@@ -359,11 +359,13 @@ onCanvasClicked = function(event) {
 
     console.log("Canvas clicked");
 
+    var selectedIcon = uistate.highlight
+
     if (!event.target && uistate.newArrow.state === ArrowDrawing.notStarted) {
 
-        console.log("No object hit and no arrow selected, move factor: " + uistate.highlight);
+        console.log("No object hit and no arrow selected, move factor: " + selectedIcon);
 
-        var icon = getIconByName(uistate.highlight);
+        var icon = getIconByName(selectedIcon);
 
         removeHighlight();
 
@@ -385,6 +387,11 @@ onCanvasClicked = function(event) {
                 redrawConnections(icon);
             }
         }
+
+        // Necessary for iOS app, otherwise mousedown detected immediately over freshly moved icon
+        disableIconForShortTime(selectedIcon)
+
+
     } else {
         console.log("Object hit or arrow selected");
     }
@@ -501,6 +508,9 @@ onFactorIconClicked = function(options) {
         [icon.left, icon.top]
     ];
 
+    // Necessary for iOS
+    if (uistate.disabledIcon === icon.iconName) return;
+
     if (uistate.highlight === icon.iconName)    removeHighlight();
     else                                        drawHighlight(icon);
 
@@ -523,6 +533,7 @@ onFactorIconClicked = function(options) {
                 console.log("Select start for " + icon.iconName);
                 uistate.newArrow.state = ArrowDrawing.tailPositioned;
                 uistate.newArrow.startIcon = icon.iconName;
+
                 break;
             case ArrowDrawing.tailPositioned:
                 if (uistate.newArrow.startIcon === icon.iconName) {
@@ -543,6 +554,9 @@ onFactorIconClicked = function(options) {
     else {
         console.log("Factor is not on canvas");
     }
+
+    // Necessary for iOS app, otherwise mousedown detected sometimes immediately again
+    disableIconForShortTime(icon.iconName)
 };
 
 
@@ -551,6 +565,15 @@ onFactorIconClicked = function(options) {
 // Helper functions
 // ---------------------------------------------------------------------
 
+// 
+
+disableIconForShortTime = function(selectedIcon) {
+    uistate.disabledIcon = selectedIcon
+        setTimeout(function(){ 
+            uistate.disabledIcon = ""
+        }, 1000);
+
+}
 
 // Get color and line width from arrow weight
 arrowStyle = function(arrowWeight) {
