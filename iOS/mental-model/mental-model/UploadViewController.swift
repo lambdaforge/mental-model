@@ -13,6 +13,7 @@ import MobileCoreServices
 
 enum ImportError: Error {
     case failedWritingToMediaList
+    case mediaFileImportFailed
 }
 
 class UploadViewController: UIViewController,
@@ -313,9 +314,13 @@ class UploadViewController: UIViewController,
     private func getMediaLibraryMediaTypes(mediaType: String) -> MPMediaType? {
         var mpMediaTypes: MPMediaType?
         switch mediaType {
-            case "public.movie": mpMediaTypes = MPMediaType.anyVideo
+            case "public.movie": mpMediaTypes = MPMediaType.anyVideo // anyVideo, movie -> also shows music
+                break
             case "public.audio": mpMediaTypes = MPMediaType.anyAudio
-            default: print("Invalid media type for media library")
+                break
+            default:
+                Alert.info(viewController: self, title: "Picking media failed!", message: "Failed for media type '\(mediaType)'.")
+                print("Invalid media type for media library")
         }
         return mpMediaTypes
     }
@@ -330,7 +335,7 @@ class UploadViewController: UIViewController,
         
         let mediaType: String = info[UIImagePickerController.InfoKey.mediaType] as? String ?? "unknown"
         let data = getImageData(info: info)
-        let filename = getFilename(info: info, mediaType: mediaType)
+        let filename = filenameFromImageInfo(info: info, mediaType: mediaType)
 
         print("Media type: \(mediaType)")
         switch mediaType {
@@ -404,8 +409,9 @@ class UploadViewController: UIViewController,
         return originalFilename
     }
     
-    private func getFilename(info: [UIImagePickerController.InfoKey : Any], mediaType: String) -> String {
+    private func filenameFromImageInfo(info: [UIImagePickerController.InfoKey : Any], mediaType: String) -> String {
         var filename: String?
+        var ext: String?
         
         var currentFilename: String?
         if let url = getURL(info: info) {
@@ -413,6 +419,7 @@ class UploadViewController: UIViewController,
             currentFilename = url.lastPathComponent
             print(" Current file name: \(String(describing: currentFilename))")
             filename = currentFilename
+            ext = url.pathExtension
         }
         
         if let originalFilename = getOriginalFilename(info: info) {
@@ -421,8 +428,7 @@ class UploadViewController: UIViewController,
                 // Restore original file base name, but keep current file extension
                 // Reason: sometimes .MOV files instead of image extension
                 let basename = originalFilename.prefix(upTo: originalFilename.lastIndex(of: ".")!)
-                let ext = currentFilename!.suffix(from: (currentFilename!.lastIndex(of: "."))!)
-                filename = String(basename + ext)
+                filename = String(basename + "." + ext!)
                 print("Original file name: \(String(describing: originalFilename))")
                 print("Modified file name: \(String(describing: filename))")
             }
@@ -430,21 +436,37 @@ class UploadViewController: UIViewController,
                 filename = originalFilename
             }
         }
-               
+        
         if filename == nil {
-            var ext = ".jpeg" // public.image assumed
-            if mediaType == "public.movie" {
-                ext = ".MOV"
-            }
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
-            let basename = dateFormatter.string(from: Date())
-            
-            filename = String(basename + ext)
+            filename = createFileName(mediaType: mediaType, fileExtension: ext)
         }
         
         return filename! 
     }
+    
+    private func createFileName(mediaType: String, fileExtension: String?) -> String {
+        var ext: String
+        if (fileExtension == nil || fileExtension == "") {
+            ext = ".jpeg" // public.image assumed
+            switch mediaType   {
+                case "public.movie": ext = ".MOV"
+                case "public.image": ext = ".jpeg"
+                case "public.audio": ext = ".mp3"
+            default:
+                Alert.info(viewController: self, title: "Unknown media type!",
+                           message: "Using JPEG format for now, but errors could occur.")
+            }
+        }
+        else {
+            ext = fileExtension!
+        }
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
+        let basename = dateFormatter.string(from: Date())
+        
+        return String(basename + ext)
+    }
+    
     
     
     //
@@ -461,22 +483,31 @@ class UploadViewController: UIViewController,
             print("Title: \(item.title!)")
             print("Media type from item: \(item.mediaType)")
             
-            // Get image URL
+            if (item.isCloudItem) {
+                Alert.info(viewController: self, title: "File not on device!", message: "Please download the file before trying to import it here.")
+                continue
+            }
+            
+            if (item.hasProtectedAsset) {
+                Alert.info(viewController: self, title: "File is protected!", message: "Please download the file before trying to import it here.")
+                continue
+            }
+            
+            // Get audio URL
             if let url = item.assetURL {
                  print("Reading file at: \(String(describing: url.path))")
                                
                  // Determine file name
-                 let filename = url.lastPathComponent
+                 let filename = fileNameFromMediaItem(item: item, url: url)
                  print("File name: \(String(describing: filename))")
                  
-                 let data = try? Data(contentsOf: url)
                  let mediaType = urlToMediaType(url: url)
                  print("Media type from url: \(mediaType)")
                  switch mediaType {
                      case "public.movie":
-                         checkedImport(data: data, subdir: "video", filename: filename, listView: videoListView!, listData: videoList)
+                         checkedImportMediaItem(url: url, subdir: "video", filename: filename, listView: videoListView!, listData: videoList)
                      case "public.audio":
-                         checkedImport(data: data, subdir: "audio", filename: filename, listView: audioListView!, listData: audioList)
+                         checkedImportMediaItem(url: url, subdir: "audio", filename: filename, listView: audioListView!, listData: audioList)
                      default:
                          print(" Unknown media type")
                          let msg = "File name: \(filename)\nMedia type: \(mediaType)"
@@ -491,6 +522,104 @@ class UploadViewController: UIViewController,
     
     func mediaPickerDidCancel(_ mediaPicker: MPMediaPickerController) {
         mediaPicker.dismiss(animated: true, completion: nil)
+    }
+    
+    
+    // Helper functions
+    
+    private func checkedImportMediaItem(url: URL, subdir: String, filename: String, listView: UITableView, listData: MediaListDataSource) {
+        let targetDir = WebDir.appendingPathComponent(subdir)
+        let targetFile = targetDir.appendingPathComponent(filename)
+        
+        print("Checked file import...")
+        
+        if (FileManager.default.fileExists(atPath: targetFile.path)){
+            print(" File already exists")
+            let title = "Do you want to overwrite \(filename)?"
+            let message = "A file named \(filename) already exists in this application."
+                   
+            Alert.decision(viewController: self, title: title, message: message) { _ in
+                self.importMediaItem(url: url, subdir: subdir, filename: filename, listView: listView, listData: listData)
+            }
+        }
+        else {
+            print(" File does not yet exists")
+            importMediaItem(url: url, subdir: subdir, filename: filename, listView: listView, listData: listData)
+        }
+    }
+    
+    private func importMediaItem(url: URL, subdir: String, filename: String, listView: UITableView, listData: MediaListDataSource) {
+            
+        let targetDir = WebDir.appendingPathComponent(subdir)
+        let targetFile = targetDir.appendingPathComponent(filename)
+            
+        do {
+            print("Writing to \(targetFile.path)")
+            try copyMediaItem(assetUrl: url, targetUrl: targetFile, mediaType: subdir, onCompletion: {
+                do {
+                    try self.saveToMediaList(filename: filename, fileSubdir: subdir)
+                    
+                    if (!listData.labels.contains(filename)) {
+                        print("Item \(filename) added to shown list of imported files")
+                        listData.labels.append(filename)
+                        DispatchQueue.main.async {
+                            listView.reloadData()
+                        }
+                    }
+                    else {
+                        print("Item \(filename) is already shown in list of imported files")
+                    }
+                    
+                }
+                catch {
+                    print(error)
+                    Alert.info(viewController: self, title: "File import failed!", message: "Writing failed.")
+                    
+                }
+            })
+        } catch {
+            print(error)
+            Alert.info(viewController: self, title: "File import failed!", message: "Writing failed.")
+        }
+    }
+    
+    private func copyMediaItem(assetUrl: URL, targetUrl: URL, mediaType: String, onCompletion: @escaping () -> Void) throws {
+        
+        var presetName: String
+        var fileType: AVFileType
+        var ext: String?
+        switch mediaType {
+        case "audio":
+            presetName = AVAssetExportPresetAppleM4A
+            fileType = AVFileType.m4a
+            ext = "m4a"
+        case "video":
+            presetName = AVAssetExportPreset640x480
+            fileType = AVFileType.mov
+            ext = "MOV"
+        default:
+            throw ImportError.mediaFileImportFailed
+        }
+        
+        let newURL = targetUrl.deletingPathExtension().appendingPathExtension(ext!)
+        let exportSession = AVAssetExportSession(asset: AVAsset(url: assetUrl), presetName: presetName)
+        exportSession?.shouldOptimizeForNetworkUse = true
+        exportSession?.outputFileType = fileType
+        exportSession?.outputURL = newURL
+        exportSession?.exportAsynchronously(completionHandler: onCompletion )
+    }
+
+    private func fileNameFromMediaItem(item: MPMediaItem, url: URL) -> String {
+        var filename: String?
+        
+        if let title = item.title {
+            filename = title + "." + url.pathExtension
+        }
+        else {
+            filename = createFileName(mediaType: urlToMediaType(url: url), fileExtension: url.pathExtension)
+        }
+        
+        return filename!
     }
     
     

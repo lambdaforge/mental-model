@@ -15,9 +15,7 @@ class WebViewController: UIViewController,
         UIDocumentPickerDelegate {
     
     var webView: WKWebView!
-    let temporaryUserDataFileLocation = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-    //let temporaryUserDataFileLocation = FileManager.default.temporaryDirectory
-    
+    let temporaryUserDataFileLocation = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]    
     
     //
     // UIViewControllerMethods
