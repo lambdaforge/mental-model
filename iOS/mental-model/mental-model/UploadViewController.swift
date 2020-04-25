@@ -3,72 +3,37 @@
 //  mental-model
 //
 //  Created by Judith on 07.08.19.
-//  Copyright © 2019 lambdaforge. All rights reserved.
+//  Copyright © 2019 lambdaforge UG. All rights reserved.
 //
+
 import UIKit
 import Photos
 import MediaPlayer
+import MobileCoreServices
 
 enum ImportError: Error {
     case failedWritingToMediaList
+    case mediaFileImportFailed
 }
 
-class UploadViewController:  UIViewController,
-        UIImagePickerControllerDelegate, UINavigationControllerDelegate,
-        MPMediaPickerControllerDelegate {
-   
+class UploadViewController: UIViewController,
+        UINavigationControllerDelegate,
+        UIImagePickerControllerDelegate,
+        MPMediaPickerControllerDelegate,
+        UIDocumentPickerDelegate {
+    
     var explanationView: UIView!
     var explanation: TextBox!
     
     var imageListView: UITableView!
     var videoListView: UITableView!
-    var musicListView: UITableView!
+    var audioListView: UITableView!
     
     var imageList = MediaListDataSource(labels: [String]())
     var videoList = MediaListDataSource(labels: [String]())
-    var musicList = MediaListDataSource(labels: [String]())
-    
-    let webDir = Bundle.main.resourceURL!.appendingPathComponent("www")
+    var audioList = MediaListDataSource(labels: [String]())
 
-    
-    //
-    // Button actions
-    //
-    
-    @IBAction func uploadMusic(sender: UIButton!) {
-        print("Upload audio")
-        let myMediaPickerVC = MPMediaPickerController(mediaTypes: MPMediaType.music)
-        myMediaPickerVC.delegate = self
-        myMediaPickerVC.allowsPickingMultipleItems = true
-        myMediaPickerVC.popoverPresentationController?.sourceView = sender
-        present(myMediaPickerVC, animated: true, completion: nil)
-        
-    }
-    
-    @IBAction func uploadImage(sender: UIButton!) {
-        print("Upload image")
-        let pickerController = visualMediaPicker(mediaType: "public.image")
-        present(pickerController, animated: true, completion: nil)
-    }
-    
-    @IBAction func uploadVideo(sender: UIButton!) {
-        print("Upload video")
-        let pickerController = visualMediaPicker(mediaType: "public.movie")
-        present(pickerController, animated: true, completion: nil)
-    }
-    
-    @IBAction func startSession(sender: UIButton!) {
-        print("Start session")
-        let webView = WebViewController()
-        self.navigationController?.pushViewController(webView, animated: true)
-    }
-    
-    @IBAction func goBack(sender: UIButton!) {
-        print("Load home view")
-        self.dismiss(animated: true, completion: {});
-        self.navigationController?.popViewController(animated: true);
-    }
-    
+
     //
     // ViewController Methods
     //
@@ -79,13 +44,11 @@ class UploadViewController:  UIViewController,
         view.backgroundColor = BackgroundColor
         let banner = Banner(atTopOf: view)
         banner.addBackButton(target: self)
-        
         view.addSubview(banner)
         
         let hView = view.frame.height
         let explanationBoxOffset = ScreenTop + Title.height
         let sessionButtonRowOffset = hView - UploadScreen.buttonHeight - 2*Padding
-        
         let space = (sessionButtonRowOffset - ScreenTop) / 4.0
         let mediaViewOffset = ScreenTop + space
         
@@ -94,16 +57,29 @@ class UploadViewController:  UIViewController,
         addSessionButton(yOffset: sessionButtonRowOffset)
         
         videoListView = makeMediaView(row: 1, type: "Video", uploaded: videoList, addAction: #selector(uploadVideo), offset: mediaViewOffset, space: space)
-        musicListView = makeMediaView(row: 2, type: "Audio", uploaded: musicList, addAction: #selector(uploadMusic), offset: mediaViewOffset, space: space)
+        audioListView = makeMediaView(row: 2, type: "Audio", uploaded: audioList, addAction: #selector(uploadAudio), offset: mediaViewOffset, space: space)
         imageListView = makeMediaView(row: 0, type: "Image", uploaded: imageList, addAction: #selector(uploadImage), offset: mediaViewOffset, space: space)
         
+        checkWebdirectory()
+        checkPhotoLibraryAuthorization()
+        checkMediaLibraryAuthorization()
+        checkVideoCaptureAuthorization()
+
     }
     
-    func addSessionButton(yOffset: CGFloat) {
+    override func viewDidLayoutSubviews() {
+        explanation.center = explanationView.center
+    }
+    
+    
+    // Helper functions for view controller
+    
+    private func addSessionButton(yOffset: CGFloat) {
         let sessionButton = UIButton(type: .roundedRect)
         let wView = view.frame.width
         let x = wView - UploadScreen.buttonWidth - Padding
         let y = yOffset + Padding
+        
         sessionButton.frame = CGRect(x: x, y: y, width: UploadScreen.buttonWidth, height: UploadScreen.buttonHeight)
         sessionButton.layer.borderWidth = 1
         sessionButton.layer.borderColor = sessionButton.tintColor.cgColor
@@ -112,24 +88,20 @@ class UploadViewController:  UIViewController,
         sessionButton.addTarget(self, action: #selector(startSession), for: .touchUpInside)
         
         view.addSubview(sessionButton)
-        
-    }
-    
-    override func viewDidLayoutSubviews() {
-        explanation.center = explanationView.center
     }
     
     private func addTitle(offset: CGFloat, height: CGFloat) {
         let label = UILabel(frame: CGRect(x: 0, y: offset, width: view.frame.width, height: height))
+        
         label.text = Title.importScreen
         label.font = UIFont.boldSystemFont(ofSize: Title.fontSize)
         label.textColor = Title.color
         label.textAlignment = .center;
+        
         view.addSubview(label)
     }
     
     private func addExplanationBox(offset: CGFloat, maxHeight: CGFloat) {
-        
         let w: CGFloat = self.view.frame.width * CGFloat(ExplanationBox.widthFraction)
         let leftBound = (view.frame.width - w) / 2.0
         
@@ -138,7 +110,7 @@ class UploadViewController:  UIViewController,
         
         explanation = TextBox(frame: CGRect(x: 0, y: 0, width: w, height: maxHeight))
         explanation.text = Explanation.upload
-        explanation.adjustSize(nLines:4)
+        explanation.adjustSize(nLines: 3)
         
         view.addSubview(explanation)
     }
@@ -160,7 +132,7 @@ class UploadViewController:  UIViewController,
         titleBar.addSubview(table)
         
         table.translatesAutoresizingMaskIntoConstraints = false
-        table.topAnchor.constraint(equalTo: titleBar.topAnchor, constant: 50).isActive = true
+        table.topAnchor.constraint(equalTo: titleBar.topAnchor, constant: 30).isActive = true
         table.leftAnchor.constraint(equalTo: titleBar.leftAnchor, constant: 20).isActive = true
         table.bottomAnchor.constraint(equalTo: titleBar.bottomAnchor).isActive = true
         table.rightAnchor.constraint(equalTo: titleBar.rightAnchor).isActive = true
@@ -168,97 +140,6 @@ class UploadViewController:  UIViewController,
         view.addSubview(titleBar)
         
         return table
-    }
-    
-    //
-    // MPMediaPickerControllerDelegate Methods
-    //
-    
-    func mediaPicker(_ mediaPicker: MPMediaPickerController, didPickMediaItems mediaItemCollection: MPMediaItemCollection) {
-        print("Upload")
-        print(mediaItemCollection)
-        for item in mediaItemCollection.items {
-            
-            print(item.title!)
-            let audioURL = item.assetURL
-            let filename = audioURL!.lastPathComponent
-            
-            print("Reading \(String(describing: filename))")
-            print("at \(String(describing: audioURL?.path))")
- 
-            do {
-                let data = try Data(contentsOf: audioURL!)
-                importFile(data: data, subdir: "audio", filename: filename, listView: musicListView!, listData: musicList)
-
-            } catch {
-                print(error)
-                let message = "Audio file '\(filename)' could not be read."
-                let alert = UIAlertController(title: "Import Error", message: message, preferredStyle: .alert)
-                self.present(alert, animated: true)
-            }
-        }
-        mediaPicker.dismiss(animated: true, completion: nil)
-    }
-    
-    func mediaPickerDidCancel(_ mediaPicker: MPMediaPickerController) {
-        mediaPicker.dismiss(animated: true, completion: nil)
-    }
-    
-    
-    //
-    // UIImagePickerControllerDelegate Methods
-    //
-    
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) { // also for video?
-        
-        let url = info[UIImagePickerController.InfoKey.imageURL] as? URL
-        let filename = url?.lastPathComponent
-        
-        print("Reading \(String(describing: filename))")
-        print("at \(String(describing: url?.path))")
-        
-        print(info[UIImagePickerController.InfoKey.mediaType]!)
-        
-        if info[UIImagePickerController.InfoKey.mediaType] as! String == "public.image" {
-            let subdir = "images"
-            if let pickedImage = info[UIImagePickerController.InfoKey.editedImage] as? UIImage {
-                let data = pickedImage.pngData()
-                importFile(data: data!, subdir: subdir, filename: filename!, listView: imageListView!, listData: imageList)
-            }
-        }
-        else { // TODO: test!
-            let subdir = "video"
-            if let pickedImage = info[UIImagePickerController.InfoKey.editedImage] as? UIImage {
-                let data = pickedImage.pngData()
-                importFile(data: data!, subdir: subdir, filename: filename!, listView: imageListView!, listData: imageList)
-            }
-        }
-
-        dismiss(animated: true, completion: nil)
-    
-    }
-
-    //
-    // Helper Functions
-    //
-    
-    private func importFile(data: Data, subdir: String, filename: String, listView: UITableView, listData: MediaListDataSource) {
-        
-        let targetDir = webDir.appendingPathComponent(subdir)
-        let targetFile = targetDir.appendingPathComponent(filename)
-        
-        print("Writing to \(targetFile.path)")
-        
-        do {
-            try data.write(to: targetFile)
-            try saveToMediaList(filename: filename, fileSubdir: subdir)
-            listData.labels.append(filename)
-            listView.reloadData()
-            print(filename)
-        } catch {
-            print(error)
-            showImportError()
-        }
     }
     
     private func label(text: String!) -> UILabel {
@@ -280,45 +161,715 @@ class UploadViewController:  UIViewController,
         return button
     }
     
-    private func visualMediaPicker(mediaType: String) -> UIImagePickerController {
+    
+    // Button actions
+    
+    @IBAction func uploadImage(sender: UIButton!) {
+        print("Upload image button pressed")
+        openSourcePickerDialog(mediaType: "public.image", photoLibrary: true, savedPhotosAlbum: true, camera: true,
+                               mediaLibrary: false, externalDocuments: true)
+    }
+    
+    @IBAction func uploadVideo(sender: UIButton!) {
+        print("Upload video button pressed")
+        openSourcePickerDialog(mediaType: "public.movie", photoLibrary: true, savedPhotosAlbum: true, camera: false,
+                               mediaLibrary: true, externalDocuments: true)
+    }
+    
+    @IBAction func uploadAudio(sender: UIButton!) {
+        print("Upload audio button pressed")
+        openSourcePickerDialog(mediaType: "public.audio", photoLibrary: false, savedPhotosAlbum: false, camera: false,
+                               mediaLibrary: true, externalDocuments: true)
+    }
+    
+    @IBAction func startSession(sender: UIButton!) {
+        print("Start session")
+        let webView = WebViewController()
+        navigationController?.pushViewController(webView, animated: true)
+    }
+    
+    @IBAction func goBack(sender: UIButton!) {
+        print("Load home view")
+        dismiss(animated: true, completion: nil);
+        navigationController?.popViewController(animated: true);
+    }
+    
+    
+    // Helper functions for button actions
+    
+    private func openSourcePickerDialog(mediaType: String,
+                                        photoLibrary: Bool,
+                                        savedPhotosAlbum: Bool,
+                                        camera: Bool,
+                                        mediaLibrary: Bool,
+                                        externalDocuments: Bool) {
+        print("Open source dialog")
+        let alert = UIAlertController(title: "Choose file source", message: "", preferredStyle: .alert) // .actionsheet not working
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in
+            self.dismiss(animated: true)
+        })
+        if photoLibrary {
+            alert.addAction(UIAlertAction(title: "Photo Library", style: .default) { _ in
+                self.dismiss(animated: true)
+                self.openImagePicker(mediaType: mediaType, specific: "Photo Library")
+            })
+        }
+        if savedPhotosAlbum {
+            alert.addAction(UIAlertAction(title: "Saved Photos Album", style: .default) { _ in
+                self.dismiss(animated: true)
+                self.openImagePicker(mediaType: mediaType, specific: "Saved Photos Album")
+            })
+        }
+        if camera {
+            if (mediaType == "public.image") {
+                alert.addAction(UIAlertAction(title: "Camera", style: .default) { _ in
+                    self.dismiss(animated: true)
+                    self.openImagePicker(mediaType: mediaType, specific: "Camera")
+                })
+            }
+            else {
+                print("Camera only allowed for photos, not with \(mediaType)")
+            }
+        }
+        if mediaLibrary {
+            alert.addAction(UIAlertAction(title: "Media Library", style: .default) { _ in
+                self.dismiss(animated: true)
+                self.openMediaPicker(mediaType: mediaType)
+            })
+        }
+        if externalDocuments {
+            alert.addAction(UIAlertAction(title: "External Files", style: .default) { _ in
+                self.dismiss(animated: true)
+                self.openDocumentPicker(mediaType: mediaType)
+            })
+        }
+        present(alert, animated: true)
+    }
+    
+    private func openImagePicker(mediaType: String, specific: String) {
         let pickerController = UIImagePickerController()
         pickerController.delegate = self
         pickerController.allowsEditing = true
         pickerController.mediaTypes = [mediaType]
-        pickerController.sourceType = .photoLibrary
-        return pickerController
+        
+        switch specific {
+            case "Photo Library":
+                pickerController.sourceType = .photoLibrary
+                if (PHPhotoLibrary.authorizationStatus() == .authorized) {
+                    present(pickerController, animated: true, completion: nil)
+                }
+                else {
+                    print("Picking media not allowed")
+                    Alert.accessDenied(viewController: self, resource: specific)
+                }
+            case "Saved Photos Album":
+                pickerController.sourceType = .savedPhotosAlbum
+                if (PHPhotoLibrary.authorizationStatus() == .authorized) {
+                    present(pickerController, animated: true, completion: nil)
+                }
+                else {
+                    print("Picking media not allowed")
+                    Alert.accessDenied(viewController: self, resource: specific)
+                }
+            case "Camera":
+                pickerController.sourceType = .camera
+                if (AVCaptureDevice.authorizationStatus(for: AVMediaType.video) == .authorized) {
+                    present(pickerController, animated: true, completion: nil)
+                }
+                else {
+                    print("Picking media not allowed")
+                    Alert.accessDenied(viewController: self, resource: specific)
+                }
+            
+            default: print("Unknown image picker resource")
+        }
+    }
+    
+    private func openMediaPicker(mediaType: String){
+        if let mediaTypes = getMediaLibraryMediaTypes(mediaType: mediaType) {
+            let pickerController = MPMediaPickerController(mediaTypes: mediaTypes)
+            pickerController.delegate = self
+            pickerController.allowsPickingMultipleItems = true
+            if (MPMediaLibrary.authorizationStatus() == .authorized) {
+                present(pickerController, animated: true, completion: nil)
+            }
+            else {
+                print("Picking media not allowed")
+                Alert.accessDenied(viewController: self, resource: "Media Library")
+            }
+        } else {
+            let msg = "Media type '\(mediaType)' not allowed in media picker."
+            Alert.info(viewController: self, title: "Incompatible media type!", message: msg)
+        }
+    }
+    
+    private func openDocumentPicker(mediaType: String) {
+        let pickerController = UIDocumentPickerViewController(documentTypes: [mediaType], in: UIDocumentPickerMode.import)
+        pickerController.delegate = self
+        pickerController.allowsMultipleSelection = true
+        pickerController.modalPresentationStyle = .formSheet
+        present(pickerController, animated: true, completion: nil)
+    }
+    
+    private func getMediaLibraryMediaTypes(mediaType: String) -> MPMediaType? {
+        var mpMediaTypes: MPMediaType?
+        switch mediaType {
+            case "public.movie": mpMediaTypes = MPMediaType.anyVideo // anyVideo, movie -> also shows music
+                break
+            case "public.audio": mpMediaTypes = MPMediaType.anyAudio
+                break
+            default:
+                Alert.info(viewController: self, title: "Picking media failed!", message: "Failed for media type '\(mediaType)'.")
+                print("Invalid media type for media library")
+        }
+        return mpMediaTypes
+    }
+    
+    
+    //
+    // UIImagePickerControllerDelegate Methods
+    //
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        picker.dismiss(animated: true, completion: nil)
+        
+        let mediaType: String = info[UIImagePickerController.InfoKey.mediaType] as? String ?? "unknown"
+        let data = getImageData(info: info)
+        let filename = filenameFromImageInfo(info: info, mediaType: mediaType)
+
+        print("Media type: \(mediaType)")
+        switch mediaType {
+            case "public.image":
+                checkedImport(data: data, subdir: "images", filename: filename, listView: imageListView!, listData: imageList)
+            case "public.movie":
+                checkedImport(data: data, subdir: "video", filename: filename, listView: videoListView!, listData: videoList)
+            default:
+                let msg = "Media type: \(mediaType)"
+                Alert.info(viewController: self, title: "Incompatible media type!", message: msg)
+        }
+    }
+    
+    // Helper functions
+    
+    private func getURL(info: [UIImagePickerController.InfoKey : Any]) -> URL? {
+        var url: URL?
+        
+        if let imageUrl = info[UIImagePickerController.InfoKey.imageURL] as? URL {
+            url = imageUrl
+        }
+        else if let mediaUrl = info[UIImagePickerController.InfoKey.mediaURL] as? URL {
+            url = mediaUrl
+        }
+        else {
+            print(" No URL could be retrieved from info data")
+        }
+        return url
+    }
+    
+    private func getImageData(info: [UIImagePickerController.InfoKey : Any]) -> Data? {
+        var data: Data?
+        
+        if let image = info[UIImagePickerController.InfoKey.editedImage] as? UIImage {
+            data = image.pngData()
+        }
+        else if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            data = image.pngData()
+        }
+        else if let url = info[UIImagePickerController.InfoKey.imageURL] as? URL {
+            data = try? Data(contentsOf: url)
+        }
+        else if let url = info[UIImagePickerController.InfoKey.mediaURL] as? URL {
+            data = try? Data(contentsOf: url)
+        }
+        else {
+            print(" No content could be retrieved from info data")
+        }
+        return data
+    }
+    
+    private func getOriginalFilename(info: [UIImagePickerController.InfoKey : Any]) -> String? {
+        var originalFilename: String?
+        
+        var photoAsset: PHAsset? = nil
+        if #available(iOS 11.0, *) {
+            if let asset = info[UIImagePickerController.InfoKey.phAsset] as? PHAsset {
+                photoAsset = asset
+            }
+         } else {
+            if let assetURL = info[UIImagePickerController.InfoKey.referenceURL] as? URL {
+                let result = PHAsset.fetchAssets(withALAssetURLs: [assetURL], options: nil)
+                photoAsset = result.firstObject
+            }
+        }
+        
+        if (photoAsset != nil) {
+            let assetResources = PHAssetResource.assetResources(for: photoAsset!)
+            originalFilename = assetResources.first!.originalFilename
+        }
+        return originalFilename
+    }
+    
+    private func filenameFromImageInfo(info: [UIImagePickerController.InfoKey : Any], mediaType: String) -> String {
+        var filename: String?
+        var ext: String?
+        
+        var currentFilename: String?
+        if let url = getURL(info: info) {
+            print("Reading file at: \(String(describing: url.path))")
+            currentFilename = url.lastPathComponent
+            print(" Current file name: \(String(describing: currentFilename))")
+            filename = currentFilename
+            ext = url.pathExtension
+        }
+        
+        if let originalFilename = getOriginalFilename(info: info) {
+            
+            if currentFilename != nil {
+                // Restore original file base name, but keep current file extension
+                // Reason: sometimes .MOV files instead of image extension
+                let basename = originalFilename.prefix(upTo: originalFilename.lastIndex(of: ".")!)
+                filename = String(basename + "." + ext!)
+                print("Original file name: \(String(describing: originalFilename))")
+                print("Modified file name: \(String(describing: filename))")
+            }
+            else {
+                filename = originalFilename
+            }
+        }
+        
+        if filename == nil {
+            filename = createFileName(mediaType: mediaType, fileExtension: ext)
+        }
+        
+        return filename! 
+    }
+    
+    private func createFileName(mediaType: String, fileExtension: String?) -> String {
+        var ext: String
+        if (fileExtension == nil || fileExtension == "") {
+            ext = ".jpeg" // public.image assumed
+            switch mediaType   {
+                case "public.movie": ext = ".MOV"
+                case "public.image": ext = ".jpeg"
+                case "public.audio": ext = ".mp3"
+            default:
+                Alert.info(viewController: self, title: "Unknown media type!",
+                           message: "Using JPEG format for now, but errors could occur.")
+            }
+        }
+        else {
+            ext = fileExtension!
+        }
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
+        let basename = dateFormatter.string(from: Date())
+        
+        return String(basename + ext)
+    }
+    
+    
+    
+    //
+    // MPMediaPickerControllerDelegate Methods
+    //
+    
+    func mediaPicker(_ mediaPicker: MPMediaPickerController, didPickMediaItems mediaItemCollection: MPMediaItemCollection) {
+        mediaPicker.dismiss(animated: true, completion: nil)
+        
+        print("MPMediaPicker started")
+        print(mediaItemCollection)
+        for item in mediaItemCollection.items {
+            
+            print("Title: \(item.title!)")
+            print("Media type from item: \(item.mediaType)")
+            
+            if (item.isCloudItem) {
+                Alert.info(viewController: self, title: "File not on device!", message: "Please download the file before trying to import it here.")
+                continue
+            }
+            
+            if (item.hasProtectedAsset) {
+                Alert.info(viewController: self, title: "File is protected!", message: "Please download the file before trying to import it here.")
+                continue
+            }
+            
+            // Get audio URL
+            if let url = item.assetURL {
+                 print("Reading file at: \(String(describing: url.path))")
+                               
+                 // Determine file name
+                 let filename = fileNameFromMediaItem(item: item, url: url)
+                 print("File name: \(String(describing: filename))")
+                 
+                 let mediaType = urlToMediaType(url: url)
+                 print("Media type from url: \(mediaType)")
+                 switch mediaType {
+                     case "public.movie":
+                         checkedImportMediaItem(url: url, subdir: "video", filename: filename, listView: videoListView!, listData: videoList)
+                     case "public.audio":
+                         checkedImportMediaItem(url: url, subdir: "audio", filename: filename, listView: audioListView!, listData: audioList)
+                     default:
+                         print(" Unknown media type")
+                         let msg = "File name: \(filename)\nMedia type: \(mediaType)"
+                         Alert.info(viewController: self, title: "Incompatible media type!", message: msg)
+                 }
+            }
+            else {
+                Alert.info(viewController: self, title: "File import failed!", message: "Audio URL could not be established")
+            }
+        }
+    }
+    
+    func mediaPickerDidCancel(_ mediaPicker: MPMediaPickerController) {
+        mediaPicker.dismiss(animated: true, completion: nil)
+    }
+    
+    
+    // Helper functions
+    
+    private func checkedImportMediaItem(url: URL, subdir: String, filename: String, listView: UITableView, listData: MediaListDataSource) {
+        let targetDir = WebDir.appendingPathComponent(subdir)
+        let targetFile = targetDir.appendingPathComponent(filename)
+        
+        print("Checked file import...")
+        
+        if (FileManager.default.fileExists(atPath: targetFile.path)){
+            print(" File already exists")
+            let title = "Do you want to overwrite \(filename)?"
+            let message = "A file named \(filename) already exists in this application."
+                   
+            Alert.decision(viewController: self, title: title, message: message) { _ in
+                self.importMediaItem(url: url, subdir: subdir, filename: filename, listView: listView, listData: listData)
+            }
+        }
+        else {
+            print(" File does not yet exists")
+            importMediaItem(url: url, subdir: subdir, filename: filename, listView: listView, listData: listData)
+        }
+    }
+    
+    private func importMediaItem(url: URL, subdir: String, filename: String, listView: UITableView, listData: MediaListDataSource) {
+            
+        let targetDir = WebDir.appendingPathComponent(subdir)
+        let targetFile = targetDir.appendingPathComponent(filename)
+            
+        do {
+            print("Writing to \(targetFile.path)")
+            try copyMediaItem(assetUrl: url, targetUrl: targetFile, mediaType: subdir, onCompletion: {
+                do {
+                    try self.saveToMediaList(filename: filename, fileSubdir: subdir)
+                    
+                    if (!listData.labels.contains(filename)) {
+                        print("Item \(filename) added to shown list of imported files")
+                        listData.labels.append(filename)
+                        DispatchQueue.main.async {
+                            listView.reloadData()
+                        }
+                    }
+                    else {
+                        print("Item \(filename) is already shown in list of imported files")
+                    }
+                    
+                }
+                catch {
+                    print(error)
+                    Alert.info(viewController: self, title: "File import failed!", message: "Writing failed.")
+                    
+                }
+            })
+        } catch {
+            print(error)
+            Alert.info(viewController: self, title: "File import failed!", message: "Writing failed.")
+        }
+    }
+    
+    private func copyMediaItem(assetUrl: URL, targetUrl: URL, mediaType: String, onCompletion: @escaping () -> Void) throws {
+        
+        var presetName: String
+        var fileType: AVFileType
+        var ext: String?
+        switch mediaType {
+        case "audio":
+            presetName = AVAssetExportPresetAppleM4A
+            fileType = AVFileType.m4a
+            ext = "m4a"
+        case "video":
+            presetName = AVAssetExportPreset640x480
+            fileType = AVFileType.mov
+            ext = "MOV"
+        default:
+            throw ImportError.mediaFileImportFailed
+        }
+        
+        let newURL = targetUrl.deletingPathExtension().appendingPathExtension(ext!)
+        let exportSession = AVAssetExportSession(asset: AVAsset(url: assetUrl), presetName: presetName)
+        exportSession?.shouldOptimizeForNetworkUse = true
+        exportSession?.outputFileType = fileType
+        exportSession?.outputURL = newURL
+        exportSession?.exportAsynchronously(completionHandler: onCompletion )
+    }
+
+    private func fileNameFromMediaItem(item: MPMediaItem, url: URL) -> String {
+        var filename: String?
+        
+        if let title = item.title {
+            filename = title + "." + url.pathExtension
+        }
+        else {
+            filename = createFileName(mediaType: urlToMediaType(url: url), fileExtension: url.pathExtension)
+        }
+        
+        return filename!
+    }
+    
+    
+    //
+    // UIDocumentViewControllerDelegate Methods
+    //
+    
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+       controller.dismiss(animated: true, completion: nil)
+       
+       print("DocumentPicker started")
+       print(urls)
+       for url in urls {
+           
+            print("Reading file at: \(String(describing: url.path))")
+                          
+            // Determine file name
+            let filename = url.lastPathComponent
+            print("File name: \(String(describing: filename))")
+            
+            let data = try? Data(contentsOf: url)
+            let mediaType = urlToMediaType(url: url)
+            print("MediaType: \(mediaType)")
+            switch mediaType {
+                case "public.image":
+                    checkedImport(data: data, subdir: "images", filename: filename, listView: imageListView!, listData: imageList)
+                case "public.movie":
+                    checkedImport(data: data, subdir: "video", filename: filename, listView: videoListView!, listData: videoList)
+                case "public.audio":
+                    checkedImport(data: data, subdir: "audio", filename: filename, listView: audioListView!, listData: audioList)
+                default:
+                    print(" Unknown media type")
+                    let msg = "File name: \(filename)\nMedia type: \(mediaType)"
+                    Alert.info(viewController: self, title: "Incompatible media type!", message: msg)
+            }
+        }
+    }
+
+    //
+    // Helper functions for file pickers
+    //
+    
+    private func urlToMediaType(url: URL) -> String {
+        var mediaType = "unknown"
+        let rawExt = url.pathExtension as CFString
+        if let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, rawExt, nil) {
+            let fileUTI = uti.takeRetainedValue()
+            
+            if UTTypeConformsTo(fileUTI, kUTTypeImage) {
+                mediaType = "public.image"
+            }
+            else if UTTypeConformsTo(fileUTI, kUTTypeVideo) {
+                mediaType = "public.movie"
+            }
+            else if UTTypeConformsTo(fileUTI, kUTTypeAudio) {
+                mediaType = "public.audio"
+            }
+            else {
+                mediaType = fileUTI as String
+            }
+        }
+        
+        return mediaType
+    }
+    
+
+    private func checkedImport(data: Data?, subdir: String, filename: String, listView: UITableView, listData: MediaListDataSource) {
+        let targetDir = WebDir.appendingPathComponent(subdir)
+        let targetFile = targetDir.appendingPathComponent(filename)
+        
+        print("Checked file import...")
+        
+        if (data != nil) {
+            if (FileManager.default.fileExists(atPath: targetFile.path)){
+                print(" File already exists")
+                let title = "Do you want to overwrite \(filename)?"
+                let message = "A file named \(filename) already exists in this application."
+                
+                Alert.decision(viewController: self, title: title, message: message) { _ in
+                    self.importFile(data: data!, subdir: subdir, filename: filename, listView: listView, listData: listData)
+                }
+            }
+            else {
+                print(" File does not yet exists")
+                importFile(data: data!, subdir: subdir, filename: filename, listView: listView, listData: listData)
+            }
+        }
+        else {
+            Alert.info(viewController: self, title: "File import failed!", message: "Media content could not be read.")
+        }
+        
+    }
+    
+    private func importFile(data: Data, subdir: String, filename: String, listView: UITableView, listData: MediaListDataSource) {
+        
+        let targetDir = WebDir.appendingPathComponent(subdir)
+        let targetFile = targetDir.appendingPathComponent(filename)
+        
+        do {
+            print("Writing to \(targetFile.path)")
+            try data.write(to: targetFile)
+            
+            try saveToMediaList(filename: filename, fileSubdir: subdir)
+            
+            if (!listData.labels.contains(filename)) {
+                print("Item \(filename) added to shown list of imported files")
+                listData.labels.append(filename)
+                listView.reloadData()
+            }
+            else {
+                print("Item \(filename) is already shown in list of imported files")
+            }
+        } catch {
+            print(error)
+            Alert.info(viewController: self, title: "File import failed!", message: "Writing failed.")
+        }
     }
     
     private func saveToMediaList(filename: String, fileSubdir: String) throws {
-        let targetFile = Bundle.main.url(forResource: "www/mediaSources", withExtension: "js")
+        let targetFile = WebDir.appendingPathComponent(MediaSourcesFileName)
+        print("Updating media list...")
         do {
-            let content = try String(contentsOf: targetFile!, encoding: .utf8)
+            let content = try String(contentsOf: targetFile, encoding: .utf8)
+            
             let startIndex = content.firstIndex(of: "{") ?? content.endIndex
-            let jsonContent = content.suffix(from: startIndex).data(using: .utf8)!
+            let endIndex = content.lastIndex(of: ";") ?? content.endIndex
+            let jsonContent = content[startIndex..<endIndex].data(using: .utf8)!
             let jsPrefix = content.prefix(upTo: startIndex)
             
             let json = try JSONSerialization.jsonObject(with: jsonContent, options: [])
             var jsonArray = json as! [String: [String]]
-            jsonArray[fileSubdir]!.append(filename)
-            try FileManager.default.removeItem(at: targetFile!)
-
-            let data = try JSONSerialization.data(withJSONObject: jsonArray, options: JSONSerialization.WritingOptions.prettyPrinted)
-            let convertedString = String(data: data, encoding: String.Encoding.utf8)
-            let jsonOutput = jsPrefix + convertedString!
+            
+            if (!jsonArray[fileSubdir]!.contains(filename)) {
+                print(" Add value: \(filename)")
+                jsonArray[fileSubdir]!.append(filename)
                 
-            try jsonOutput.write(to: targetFile!, atomically: true, encoding: String.Encoding.utf8)
+                let data = try JSONSerialization.data(withJSONObject: jsonArray, options: JSONSerialization.WritingOptions.prettyPrinted)
+                
+                let convertedString = String(data: data, encoding: String.Encoding.utf8)
+                let jsonOutput = jsPrefix + convertedString!
+                
+                print(" Replacing \(targetFile.path) with new version")
+                try FileManager.default.removeItem(at: targetFile)
+                try jsonOutput.write(to: targetFile, atomically: true, encoding: String.Encoding.utf8)
+                
+            } else {
+                print(" \(filename) already in list of \(fileSubdir) - media list remains unchanged")
+            }
         }
         catch {
             print(error)
             throw ImportError.failedWritingToMediaList
         }
-
     }
     
     private func showImportError() {
+        let title = "Import Error"
         let message = "Something went wrong while importing the File. Please check if space is low and try again later."
-        let alert = UIAlertController(title: "Import Error", message: message, preferredStyle: .alert)
-        self.present(alert, animated: true)
+        Alert.info(viewController: self, title: title, message: message)
     }
     
+    // Checks on startup
+    
+    private func checkWebdirectory() {
+        if (!FileManager.default.fileExists(atPath: WebDir.path)) {
+            Alert.missingResource(viewController: self, resource: WebDir.lastPathComponent)
+        }
+    }
+    
+    private func checkPhotoLibraryAuthorization() {
+        print("Checking photo library authorization...")
+        let authorizationHint = "Please, use the 'Settings' app on your device to grant photo library access permissions to M-TOOL."
+        let status = PHPhotoLibrary.authorizationStatus()
+        
+        print(" Status: \(status.rawValue)")
+        switch status {
+            case .notDetermined:
+                print(" Permission not determined")
+                PHPhotoLibrary.requestAuthorization({ status in
+                    if status == .authorized {
+                        print("  Access to photos now granted")
+                    }
+                    else {
+                        print("  Access to photos still not granted")
+                    }
+                })
+            case .denied:
+                print(" Permission denied")
+                Alert.info(viewController: self, title: "No photo library access!", message: authorizationHint)
+            case .restricted:
+                print(" Permission restricted")
+                Alert.info(viewController: self, title: "Restricted library access!", message: authorizationHint)
+            default:
+                print(" Permission for photo library already granted")
+        }
+    }
+    
+    private func checkMediaLibraryAuthorization() {
+        print("Checking media library authorization...")
+        let authorizationHint = "Please, use the 'Settings' app on your device to grant media library access permissions to M-TOOL."
+        let status = MPMediaLibrary.authorizationStatus()
+        
+        print(" Status: \(status.rawValue)")
+        switch status {
+            case .notDetermined:
+                print(" Permission not determined")
+                MPMediaLibrary.requestAuthorization({ status in // might not appear due to known iOS bug
+                    if status == .authorized {
+                        print("  Access to media now granted")
+                    }
+                    else {
+                        print("  Access to media still not granted")
+                    }
+                })
+            case .denied:
+            print(" Permission denied")
+                Alert.info(viewController: self, title: "No media library access!", message: authorizationHint)
+            case .restricted:
+            print(" Permission restricted")
+                Alert.info(viewController: self, title: "Restricted media library access!", message: authorizationHint)
+            default:
+                print(" Permission for media library already granted")
+        }
+    }
+    
+    private func checkVideoCaptureAuthorization() { // TODO: delete
+        print("Checking camera library authorization...")
+        let authorizationHint = "Please, use the 'Settings' app on your device to grant video capture access permissions to M-TOOL."
+        let status = AVCaptureDevice.authorizationStatus(for: AVMediaType.video)
+        
+        print(" Status: \(status.rawValue)")
+        switch status {
+            case .notDetermined:
+                print(" Permission not determined")
+                MPMediaLibrary.requestAuthorization({ status in // might not appear due to known iOS bug
+                    if status == .authorized {
+                        print("  Access to capture now granted")
+                    }
+                    else {
+                        print("  Access to capture still not granted")
+                    }
+                })
+            case .denied:
+            print(" Permission denied")
+                Alert.info(viewController: self, title: "No capture access!", message: authorizationHint)
+            case .restricted:
+            print(" Permission restricted")
+                Alert.info(viewController: self, title: "Restricted capture access!", message: authorizationHint)
+            default:
+                print(" Permission for capture already granted")
+        }
+    }
 }

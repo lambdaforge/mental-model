@@ -3,7 +3,7 @@
 //  mental-model
 //
 //  Created by Judith on 07.08.19.
-//  Copyright © 2019 lambdaforge. All rights reserved.
+//  Copyright © 2019 lambdaforge UG. All rights reserved.
 //
 
 import UIKit
@@ -24,49 +24,35 @@ class ViewController: UIViewController {
     var rightColumn: UIView!
     
     
-    @IBAction func changeToUpload(sender: UIButton!) {
-        print("upload")
-        let uploadView = UploadViewController()
-        self.navigationController?.pushViewController(uploadView, animated: true)
-    }
-    
-    @IBAction func changeToWebApp(sender: UIButton!) {
-        print("webapp")
-        let webView = WebViewController()
-        self.navigationController?.pushViewController(webView, animated: true)
-    }
-    
-    @IBAction func showManual(sender: UIButton!) {
-        print("manual")
-        let pdfView = PdfViewController()
-        self.navigationController?.pushViewController(pdfView, animated: true)
-    }
-    
-    override func viewWillLayoutSubviews() {
-        
-        leftButton.centerYAnchor.constraint(equalTo: leftColumn.centerYAnchor).isActive = true
-        leftButton.centerXAnchor.constraint(equalTo: leftColumn.centerXAnchor).isActive = true
-        middleButton.centerYAnchor.constraint(equalTo: middleColumn.centerYAnchor).isActive = true
-        middleButton.centerXAnchor.constraint(equalTo: middleColumn.centerXAnchor).isActive = true
-        rightButton.centerYAnchor.constraint(equalTo: rightColumn.centerYAnchor).isActive = true
-        rightButton.centerXAnchor.constraint(equalTo: rightColumn.centerXAnchor).isActive = true
-        
-    }
-    
-    override func viewDidLayoutSubviews() {
-        explanation.center = explanationView.center
-    }
+    //
+    // UIViewController Methods
+    //
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.isNavigationBarHidden = true
         view.backgroundColor = BackgroundColor
         view.addSubview(Banner(atTopOf: view))
-        
+
         addButtonRow()
         addExplanationBox()
     }
     
+    override func viewWillLayoutSubviews() {
+        leftButton.centerYAnchor.constraint(equalTo: leftColumn.centerYAnchor).isActive = true
+        leftButton.centerXAnchor.constraint(equalTo: leftColumn.centerXAnchor).isActive = true
+        middleButton.centerYAnchor.constraint(equalTo: middleColumn.centerYAnchor).isActive = true
+        middleButton.centerXAnchor.constraint(equalTo: middleColumn.centerXAnchor).isActive = true
+        rightButton.centerYAnchor.constraint(equalTo: rightColumn.centerYAnchor).isActive = true
+        rightButton.centerXAnchor.constraint(equalTo: rightColumn.centerXAnchor).isActive = true
+    }
+    
+    override func viewDidLayoutSubviews() {
+        explanation.center = explanationView.center
+    }
+    
+    
+    // Helper functions for view controller
     
     private func addButtonRow() {
          let thirdWidth = view.frame.width / 3.0
@@ -119,13 +105,40 @@ class ViewController: UIViewController {
         explanationView = UIView(frame: CGRect(x: leftBound, y: ScreenTop, width: w, height: h))
         view.addSubview(explanationView)
 
+        let italicFont = UIFont.italicSystemFont(ofSize: ExplanationBox.fontSize)
+        let explanationText = NSMutableAttributedString(string: Explanation.home)
+        explanationText.addAttribute(.font, value: UIFont.systemFont(ofSize: ExplanationBox.fontSize), range: NSRange(location: 0, length: Explanation.home.count))
+        explanationText.addAttribute(.font, value: italicFont, range: NSRange(location: 69, length: 12))
+        explanationText.addAttribute(.font, value: italicFont, range: NSRange(location: 117, length: 13))
+        explanationText.addAttribute(.font, value: italicFont, range: NSRange(location: 203, length: 11))
+        
         explanation = TextBox(frame: CGRect(x: leftBound, y: ScreenTop, width: w, height: h))
-        explanation.text = Explanation.home
+        explanation.attributedText = explanationText
+        explanation.textColor = ExplanationBox.textColor
         explanation.adjustSize(nLines: 5)
         
         view.addSubview(explanation)
     }
     
  
+    // Button actions
+       
+    @IBAction func changeToUpload(sender: UIButton!) {
+        print("upload")
+        let uploadView = UploadViewController()
+        self.navigationController?.pushViewController(uploadView, animated: true)
+    }
+       
+    @IBAction func changeToWebApp(sender: UIButton!) {
+        print("webapp")
+        let webView = WebViewController()
+           self.navigationController?.pushViewController(webView, animated: true)
+       }
+       
+    @IBAction func showManual(sender: UIButton!) {
+        print("manual")
+        let pdfView = PdfViewController()
+        self.navigationController?.pushViewController(pdfView, animated: true)
+    }
+       
 }
-

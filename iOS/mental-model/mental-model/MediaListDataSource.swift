@@ -3,7 +3,7 @@
 //  mental-model
 //
 //  Created by Judith on 10.09.19.
-//  Copyright © 2019 lambdaforge. All rights reserved.
+//  Copyright © 2019 lambdaforge UG. All rights reserved.
 //
 import UIKit
 
@@ -23,7 +23,10 @@ class MediaListDataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
         let cell = tableView.dequeueReusableCell(withIdentifier: "label", for: indexPath)
         
         cell.textLabel?.text = labels[indexPath.row]
-        
+        cell.backgroundColor = .white
+        cell.textLabel?.textColor = .black
+        cell.selectionStyle = .none
+         
         return cell
     }
     
