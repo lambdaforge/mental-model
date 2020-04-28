@@ -11,7 +11,7 @@ nextSessionState = function() {
         case State.consequencesMapping: return State.thankYouScreen;
         default:
             console.log("Unknown session state");
-            return State.none
+            return State.none;
     }
 };
 
@@ -20,6 +20,6 @@ previousMappingState = function() {
     switch (uistate.session.state) {
         case State.consequencesMapping: return (settings.useMappings === MappingSetting.all)? State.driversMapping: State.none;
         case State.thankYouScreen: return (settings.useMappings === MappingSetting.drivers)? State.driversMapping: State.consequencesMapping;
-        default: return State.none
+        default: return State.none;
     }
 };

@@ -7,7 +7,7 @@ factorPositions = function(leftSideLineHeight, leftSideWidth, nFactors, factorsP
         var x = horizontalIconSpace * ((i % factorsPerRow) + 0.5);
         var row = 1 + Math.floor(i/factorsPerRow);
         var y = leftSideLineHeight * (row + 0.5);
-        positions.push({x: x, y: y})
+        positions.push({x: x, y: y});
     }
     return positions;
 };
@@ -21,7 +21,7 @@ arrowPositions = function(h, w, rightSideWidth, leftSideLineHeight, nArrows) {
     var verticalIconSpace = (h - 2*leftSideLineHeight) / nArrows;
     for (var i = 0; i < nArrows; i++) {
         var y = yOffset + verticalIconSpace * (i + 0.5);
-        positions.push({x: x, y: y})
+        positions.push({x: x, y: y});
     }
     return positions;
 };
@@ -31,7 +31,7 @@ arrowPositions = function(h, w, rightSideWidth, leftSideLineHeight, nArrows) {
 getUsedArrows = function(weights, negativeUsed, mappingType) {
     var arrows = [];
     for (var i = 0; i < weights.length; i++) {
-        if (weights[i] > 0 || (negativeUsed && !(mappingType === "practice")) ) {
+        if (weights[i] > 0 || (negativeUsed && (mappingType !== "practice")) ) {
             arrows.push(weights[i]);
         }
     }

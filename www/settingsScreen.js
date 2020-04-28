@@ -100,7 +100,7 @@ createInputCell = function(tag, className, name, additionalSettings, inputCallba
 
     var keys = Object.keys(additionalSettings);
     for (var i=0; i<keys.length; i++) {
-        input[keys[i]] = additionalSettings[keys[i]]
+        input[keys[i]] = additionalSettings[keys[i]];
     }
 
     if (inputCallback) {
@@ -108,7 +108,7 @@ createInputCell = function(tag, className, name, additionalSettings, inputCallba
     }
     td.appendChild(input);
 
-    return td
+    return td;
 };
 
 
@@ -166,7 +166,7 @@ listFactors = function(mappingType) {
 
         if (!factor.practice) {
             var used = (settings.factors[mappingType].dynamic.indexOf(factorKey) !== -1);
-            var tr = factorRow(factorKey, used, factor["name"], factor["img"], factor["audio"]);
+            var tr = factorRow(factorKey, used, factor.name, factor.img, factor.audio);
 
             factorTable.appendChild(tr);
         }
@@ -298,7 +298,7 @@ saveFactorMedia = function(mappingType) {
             var audio = row.querySelector("select.factorAudio[name=" + factorKey + "]").value;
 
             settings.factorMedia[factorKey] = {"name": name, "img": img};
-            if (audio) settings.factorMedia[factorKey]["audio"] = audio;
+            if (audio) settings.factorMedia[factorKey].audio = audio;
         }
         else {
             delete settings.factorMedia[factorKey];

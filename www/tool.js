@@ -208,12 +208,12 @@ window.onload = function() {
             case State.introduction:              displayMapping(nextState); break;
             case State.driversInstructions:       displayMapping(nextState); break;
             case State.consequencesInstructions:  displayMapping(nextState); break;
-            default: console.log("Unknown or non-video session state: ", uistate.session.state)
+            default: console.log("Unknown or non-video session state: ", uistate.session.state);
         }
     });
 
     $("#audio").on("click", function(a) {
-        a.target.play()
+        a.target.play();
     });
 
     // On menu screen
@@ -243,15 +243,15 @@ window.onload = function() {
     $("#thank-you").css("background-image", "url(" + url + ")");
     $("#btn-ty-back").on("click", onPreviousButtonClicked);
     $("#btn-ty-to-main").on("click", function() {
-        if (canvas[CanvasID.practice] != null) {
+        if (canvas[CanvasID.practice] !== null) {
             canvas[CanvasID.practice].clear();
             canvas[CanvasID.practice] = null;
         }
-        if (canvas[CanvasID.drivers] != null) {
+        if (canvas[CanvasID.drivers] !== null) {
             canvas[CanvasID.drivers].clear();
             canvas[CanvasID.drivers] = null;
         }
-        if (canvas[CanvasID.consequences] != null) {
+        if (canvas[CanvasID.consequences] !== null) {
             canvas[CanvasID.consequences].clear();
             canvas[CanvasID.consequences] = null;
         }

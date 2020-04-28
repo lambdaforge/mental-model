@@ -48,7 +48,7 @@ setupMapping = function(mappingType) {
     setupArrows();
     setupFactorMenu(dynamicFactors);
 
-    if (fixedFactor != "") {
+    if (fixedFactor !== "") {
         var xFixed = canvasStyle.xFixedFactor[factors.fixedPosition];
         var yFixed = canvasStyle.yFixedFactor;
 
@@ -80,7 +80,7 @@ setupMapping = function(mappingType) {
             image.opacity = 0.5;
             canvas[uistate.activeCanvas].add(image);
             canvas[uistate.activeCanvas].bringToFront(image);
-        })
+        });
     }
 
     canvas[uistate.activeCanvas].renderAll();
@@ -208,7 +208,7 @@ drawButton = function(name, xLeft, yTop, onmousedown) {
         icon.on("mousedown", onmousedown);
         canvas[uistate.activeCanvas].add(icon);
         canvas[uistate.activeCanvas].bringToFront(icon);
-    })
+    });
 };
 
 
@@ -224,7 +224,7 @@ drawFactorIcon = function(iconName, xLeft, yTop, fixed) {
     if (fixed) {
         factorImage = "images/" + iconName;
     } else {
-        factorImage = "images/" + settings.factorMedia[iconName]["img"];
+        factorImage = "images/" + settings.factorMedia[iconName].img;
     }
 
     fabric.Image.fromURL( factorImage, function(icon) {
@@ -359,7 +359,7 @@ onCanvasClicked = function(event) {
 
     console.log("Canvas clicked");
 
-    var selectedIcon = uistate.highlight
+    var selectedIcon = uistate.highlight;
 
     if (!event.target && uistate.newArrow.state === ArrowDrawing.notStarted) {
 
@@ -389,7 +389,7 @@ onCanvasClicked = function(event) {
         }
 
         // Necessary for iOS app, otherwise mousedown detected immediately over freshly moved icon
-        disableIconForShortTime(selectedIcon)
+        disableIconForShortTime(selectedIcon);
 
 
     } else {
@@ -438,11 +438,12 @@ onBinButtonClicked = function() {
 // Behaviour when next is clicked; change to respective video instruction for next mapping
 onNextButtonClicked = function() {
     console.log("Next clicked");
+    var nextState;
     if (uistate.session.state === State.practiceMapping) {
         if (practiceSolutionCorrect()) {
             console.log("Practice solution is correct");
 
-            var nextState = nextSessionState();
+            nextState = nextSessionState();
             displayVideo(nextState);
 
         } else {
@@ -452,7 +453,7 @@ onNextButtonClicked = function() {
     } else {
         saveResult(uistate.session.state);
 
-        var nextState = nextSessionState();
+        nextState = nextSessionState();
         if (nextState === State.thankYouScreen) displayThankYouScreen();
         else                                    displayVideo(nextState);
 
@@ -627,7 +628,7 @@ getConnectionStrings = function() {
         var name1 = (icon1.iconFixed)? names[0].substring(3) : settings.factorMedia[names[0]].name;
         var name2 = (icon2.iconFixed)? names[1].substring(3) : settings.factorMedia[names[1]].name;
         var infoArray = [name1, name2, icon.connectionWeight];
-        arrows.push(infoArray.join("\t"));
+        arrows.push(infoArray.join(","));
     }
     return arrows;
 };
@@ -767,11 +768,11 @@ saveResult = function(mappingState) {
     var mappingType = (mappingState === State.driversMapping)? MappingType.drivers : MappingType.consequences;
     var duration = Math.round((new Date() -  uistate.session.start[mappingType]) / 100) / 10;
 
-    var newInfo = "session\t" + uistate.session.name +
-                  "\ncomment\t" + uistate.session.comment +
-                  "\nstart\t" +  uistate.session.start[mappingType] +
-                  "\nduration\t" + duration +
-                  "\nmapping type\t" + mappingType +
+    var newInfo = "session,\"" + uistate.session.name + "\"" +
+                  "\ncomment,\"" + uistate.session.comment + "\"" +
+                  "\nstart,\"" +  uistate.session.start[mappingType] + "\"" +
+                  "\nduration,\"" + duration + "\"" +
+                  "\nmapping type,\"" + mappingType + "\"" +
                   "\nconnections\n" +
                   getConnectionStrings().join("\n");
 
