@@ -10,57 +10,55 @@ import UIKit
 
 class Popup {
     
-    static func queueController(viewController: UIViewController, alert: UIAlertController) {
+    static func enqueue(presenting: UIViewController, presented: UIViewController) {
         DispatchQueue.main.async(execute: {
-            showOrWait(viewController: viewController, alert: alert)
+            showOrWait(presenting: presenting, presented: presented)
         })
     }
     
-    static func showOrWait(viewController: UIViewController, alert: UIAlertController) {
-        if viewController.presentedViewController == nil {
-            viewController.present(alert, animated: true)
+    static func showOrWait(presenting: UIViewController, presented: UIViewController) {
+        if presenting.presentedViewController == nil {
+            presenting.present(presented, animated: true)
         }
         else {
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(200), execute: {
-                showOrWait(viewController: viewController, alert: alert)
+                showOrWait(presenting: presenting, presented: presented)
             })
         }
     }
     
-    static func info(viewController: UIViewController, title: String, message: String) {
+    static func info(presenting: UIViewController, title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .cancel){ action in
-                viewController.dismiss(animated: true)
+                presenting.dismiss(animated: true)
             }
         )
-        
-        queueController(viewController: viewController, alert: alert)
+        enqueue(presenting: presenting, presented: alert)
     }
     
-    static func decision(viewController: UIViewController, title: String, message: String, actionOnYes: ((UIAlertAction) -> Void)?) {
+    static func decision(presenting: UIViewController, title: String, message: String, actionOnYes: ((UIAlertAction) -> Void)?) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: actionOnYes))
         alert.addAction(UIAlertAction(title: "No", style: .cancel){ action in
-                viewController.dismiss(animated: true)
+                presenting.dismiss(animated: true)
             }
         )
-        queueController(viewController: viewController, alert: alert)
+        enqueue(presenting: presenting, presented: alert)
     }
     
     
     // Specific alerts used across classes
     
-    static func missingResource(viewController: UIViewController, resource: String) {
+    static func missingResource(presenting: UIViewController, resource: String) {
         let title = "Missing app resource!"
         let msg = "Missing: \(resource)\nTry restarting the app. If this message still occurs, please contact the maintainer."
-        Popup.info(viewController: viewController, title: title, message: msg)
+        Popup.info(presenting: presenting, title: title, message: msg)
     }
     
-    static func accessDenied(viewController: UIViewController, resource: String) {
-        let title = ""
-        let msg = ""
+    static func accessDenied(presenting: UIViewController, resource: String) {
+        let title = "Access denied for \(resource)!"
+        let msg = "Use the 'Settings' app of your device to allow M-TOOL access to \(resource)."
         
-        Popup.info(viewController: viewController, title: title, message: msg)
+        Popup.info(presenting: presenting, title: title, message: msg)
     }
-    
 }

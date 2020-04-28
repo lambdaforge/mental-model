@@ -41,7 +41,7 @@ class WebViewController: UIViewController,
         view.addSubview(webView)
         
         if (!FileManager.default.fileExists(atPath: WebDir.path)) {
-            Alert.missingResource(viewController: self, resource: WebDir.lastPathComponent)
+            Popup.missingResource(presenting: self, resource: WebDir.lastPathComponent)
         } else {
             let url = WebDir.appendingPathComponent(HTMLFileName)
             webView.loadFileURL(url, allowingReadAccessTo: WebDir) // new
@@ -85,20 +85,26 @@ class WebViewController: UIViewController,
         
             decisionHandler(WKNavigationActionPolicy.cancel);
             let startIndex = url.index(after: url.firstIndex(of: ",") ?? url.endIndex)
-            let dataString = url.suffix(from: startIndex)
+            let dataString = String(url.suffix(from: startIndex))
+            
+            let decoded = dataString.removingPercentEncoding
             
             do {
 
                 if FileManager.default.fileExists(atPath: targetFile.path) {
                     try FileManager.default.removeItem(at: targetFile)
                 }
-                try dataString.write(to: targetFile, atomically: true, encoding: String.Encoding.utf8)
+                try decoded!.write(to: targetFile, atomically: true, encoding: String.Encoding.utf8)
                 print("Saved data to \(targetFile.path)")
                 print("Opening export dialog...")
-                openDocumentPicker(url: targetFile)
+                Popup.decision(presenting: self, title: "Save data externally?", message: "Pick a location in the cloud or another application. If you decide not to save the data externally, it will be saved in the M-Tool directory only.") { _ in
+                    self.openDocumentPicker(url: targetFile)
+                }
+                
+                
                 
             } catch {
-                Alert.info(viewController: self, title: "Data export failed!",
+                Popup.info(presenting: self, title: "Data export failed!",
                            message: "Data could not be saved on device.")
                 print(error)
             }
@@ -109,49 +115,6 @@ class WebViewController: UIViewController,
     }
     
     
-    //
-    // UIDocumentViewControllerDelegate Methods
-    //
-       
-    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-        controller.dismiss(animated: true, completion: nil)
-          
-        print("DocumentPicker started")
-        
-        let sourceFile = temporaryUserDataFileLocation.appendingPathComponent(DownloadFileName)
-
-        print("Source: \(sourceFile)")
-        for destinationURL in urls {
-            print("Chosen destination: \(destinationURL)")
-                
-            let fileCoordinator = NSFileCoordinator()
-            fileCoordinator.coordinate(writingItemAt: destinationURL, options: .forReplacing, error: nil, byAccessor: { url in
-                do {
-                    if url.startAccessingSecurityScopedResource() {
-                        
-                        if FileManager.default.fileExists(atPath: url.path) {
-                            try FileManager.default.removeItem(at: url)
-                        }
-                        try FileManager.default.copyItem(at: sourceFile, to: url)
-                        print("File copied")
-                    }
-                    else {
-                        Alert.info(viewController: self, title: "Destination could not be accessed!",
-                                   message: "Please choose a different location")
-                        print("File not copied")
-                    }
-                    
-                    url.stopAccessingSecurityScopedResource()
-                } catch {
-                    Alert.info(viewController: self, title: "File could not be copied!",
-                                 message: "Please choose a different location")
-                    print(error)
-                }
-            })
-       }
-    }
-    
-    
     // Helper functions
     
     private func openDocumentPicker(url: URL) {
@@ -159,7 +122,7 @@ class WebViewController: UIViewController,
         pickerController.delegate = self
         pickerController.allowsMultipleSelection = false
         pickerController.modalPresentationStyle = .formSheet
-        present(pickerController, animated: true, completion: nil)
+        present(pickerController, animated: true, completion: nil) // completion of building dialog, not download
     }
     
     

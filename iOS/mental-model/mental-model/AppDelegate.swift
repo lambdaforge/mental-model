@@ -12,17 +12,17 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
     var navigationController: UINavigationController?
-    
     
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         
         print("Copying web resources...")
         
         let oldWebDir = Bundle.main.resourceURL!.appendingPathComponent("www")
-
+        
         do {
+            try? FileManager.default.copyItem(atPath: oldWebDir.path, toPath: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("www").path) // TODO: delete
+
             if (FileManager.default.fileExists(atPath: WebDir.path)) {
                 print(" Web directory already exists, copying content only")
                 try copyDirectoryFiles(sourceDir: oldWebDir.path, destinationDir: WebDir.path)
@@ -30,6 +30,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             else {
                 print(" Web directory does not exists, copying entire directory")
                 try FileManager.default.copyItem(atPath: oldWebDir.path, toPath: WebDir.path)
+                
             }
             
             print(" Resources copied successfully")

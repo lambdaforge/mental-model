@@ -243,7 +243,7 @@ class UploadViewController: UIViewController,
                 self.openDocumentPicker(mediaType: mediaType)
             })
         }
-        present(alert, animated: true)
+        Popup.enqueue(presenting: self, presented: alert)
     }
     
     private func openImagePicker(mediaType: String, specific: String) {
@@ -256,29 +256,29 @@ class UploadViewController: UIViewController,
             case "Photo Library":
                 pickerController.sourceType = .photoLibrary
                 if (PHPhotoLibrary.authorizationStatus() == .authorized) {
-                    present(pickerController, animated: true, completion: nil)
+                    Popup.enqueue(presenting: self, presented: pickerController)
                 }
                 else {
                     print("Picking media not allowed")
-                    Alert.accessDenied(viewController: self, resource: specific)
+                    Popup.accessDenied(presenting: self, resource: specific)
                 }
             case "Saved Photos Album":
                 pickerController.sourceType = .savedPhotosAlbum
                 if (PHPhotoLibrary.authorizationStatus() == .authorized) {
-                    present(pickerController, animated: true, completion: nil)
+                    Popup.enqueue(presenting: self, presented: pickerController)
                 }
                 else {
                     print("Picking media not allowed")
-                    Alert.accessDenied(viewController: self, resource: specific)
+                    Popup.accessDenied(presenting: self, resource: specific)
                 }
             case "Camera":
                 pickerController.sourceType = .camera
                 if (AVCaptureDevice.authorizationStatus(for: AVMediaType.video) == .authorized) {
-                    present(pickerController, animated: true, completion: nil)
+                    Popup.enqueue(presenting: self, presented: pickerController)
                 }
                 else {
                     print("Picking media not allowed")
-                    Alert.accessDenied(viewController: self, resource: specific)
+                    Popup.accessDenied(presenting: self, resource: specific)
                 }
             
             default: print("Unknown image picker resource")
@@ -286,20 +286,22 @@ class UploadViewController: UIViewController,
     }
     
     private func openMediaPicker(mediaType: String){
+        print("Open Mediapicker for type: \(mediaType)")
         if let mediaTypes = getMediaLibraryMediaTypes(mediaType: mediaType) {
+            print("MPMediaType \(mediaTypes)")
             let pickerController = MPMediaPickerController(mediaTypes: mediaTypes)
             pickerController.delegate = self
             pickerController.allowsPickingMultipleItems = true
             if (MPMediaLibrary.authorizationStatus() == .authorized) {
-                present(pickerController, animated: true, completion: nil)
+                Popup.enqueue(presenting: self, presented: pickerController)
             }
             else {
                 print("Picking media not allowed")
-                Alert.accessDenied(viewController: self, resource: "Media Library")
+                Popup.accessDenied(presenting: self, resource: "Media Library")
             }
         } else {
             let msg = "Media type '\(mediaType)' not allowed in media picker."
-            Alert.info(viewController: self, title: "Incompatible media type!", message: msg)
+            Popup.info(presenting: self, title: "Incompatible media type!", message: msg)
         }
     }
     
@@ -319,7 +321,8 @@ class UploadViewController: UIViewController,
             case "public.audio": mpMediaTypes = MPMediaType.anyAudio
                 break
             default:
-                Alert.info(viewController: self, title: "Picking media failed!", message: "Failed for media type '\(mediaType)'.")
+                Popup.info(presenting: self, title: "Picking media failed!",
+                           message: "Failed for media type '\(mediaType)'.")
                 print("Invalid media type for media library")
         }
         return mpMediaTypes
@@ -336,16 +339,16 @@ class UploadViewController: UIViewController,
         let mediaType: String = info[UIImagePickerController.InfoKey.mediaType] as? String ?? "unknown"
         let data = getImageData(info: info)
         let filename = filenameFromImageInfo(info: info, mediaType: mediaType)
-
-        print("Media type: \(mediaType)")
-        switch mediaType {
-            case "public.image":
-                checkedImport(data: data, subdir: "images", filename: filename, listView: imageListView!, listData: imageList)
-            case "public.movie":
-                checkedImport(data: data, subdir: "video", filename: filename, listView: videoListView!, listData: videoList)
-            default:
-                let msg = "Media type: \(mediaType)"
-                Alert.info(viewController: self, title: "Incompatible media type!", message: msg)
+        
+        if UTTypeConformsTo(mediaType as CFString, kUTTypeMovie) {
+            checkedImport(data: data, subdir: "video", filename: filename, listView: videoListView!, listData: videoList)
+        }
+        else if UTTypeConformsTo(mediaType as CFString, kUTTypeImage) {
+            checkedImport(data: data, subdir: "images", filename: filename, listView: imageListView!, listData: imageList)
+        }
+        else {
+            let msg = "Media type: \(mediaType)"
+            Popup.info(presenting: self, title: "Incompatible media type!", message: msg)
         }
     }
     
@@ -453,7 +456,7 @@ class UploadViewController: UIViewController,
                 case "public.image": ext = ".jpeg"
                 case "public.audio": ext = ".mp3"
             default:
-                Alert.info(viewController: self, title: "Unknown media type!",
+                Popup.info(presenting: self, title: "Unknown media type!",
                            message: "Using JPEG format for now, but errors could occur.")
             }
         }
@@ -480,16 +483,17 @@ class UploadViewController: UIViewController,
         print(mediaItemCollection)
         for item in mediaItemCollection.items {
             
+            
             print("Title: \(item.title!)")
             print("Media type from item: \(item.mediaType)")
             
             if (item.isCloudItem) {
-                Alert.info(viewController: self, title: "File not on device!", message: "Please download the file before trying to import it here.")
+                Popup.info(presenting: self, title: "File not on device!", message: "Please download the file before trying to import it here.")
                 continue
             }
             
             if (item.hasProtectedAsset) {
-                Alert.info(viewController: self, title: "File is protected!", message: "Please download the file before trying to import it here.")
+                Popup.info(presenting: self, title: "File is protected!", message: "Please download the file before trying to import it here.")
                 continue
             }
             
@@ -502,6 +506,17 @@ class UploadViewController: UIViewController,
                  print("File name: \(String(describing: filename))")
                  
                  let mediaType = urlToMediaType(url: url)
+                
+
+                
+                print("Media type: \(mediaType)")
+                print("Media type1: \(mediaType as CFString)")
+                print("Media type2: \(UTTypeConformsTo(mediaType as CFString, kUTTypeMovie) )")
+                print("Media type3: \(UTTypeConformsTo(kUTTypeMPEG4, kUTTypeMovie) )")
+                print("Media type4: \(UTTypeConformsTo(kUTTypeMPEG4, kUTTypeVideo) )")
+                
+                
+                
                  print("Media type from url: \(mediaType)")
                  switch mediaType {
                      case "public.movie":
@@ -511,13 +526,16 @@ class UploadViewController: UIViewController,
                      default:
                          print(" Unknown media type")
                          let msg = "File name: \(filename)\nMedia type: \(mediaType)"
-                         Alert.info(viewController: self, title: "Incompatible media type!", message: msg)
+                         Popup.info(presenting: getTopViewController(), title: "Incompatible media type!", message: msg)
                  }
             }
             else {
-                Alert.info(viewController: self, title: "File import failed!", message: "Audio URL could not be established")
+                Popup.info(presenting: getTopViewController(), title: "File import failed!", message: "Audio URL could not be established")
             }
+            
+            
         }
+        
     }
     
     func mediaPickerDidCancel(_ mediaPicker: MPMediaPickerController) {
@@ -538,7 +556,7 @@ class UploadViewController: UIViewController,
             let title = "Do you want to overwrite \(filename)?"
             let message = "A file named \(filename) already exists in this application."
                    
-            Alert.decision(viewController: self, title: title, message: message) { _ in
+            Popup.decision(presenting: self, title: title, message: message) { _ in
                 self.importMediaItem(url: url, subdir: subdir, filename: filename, listView: listView, listData: listData)
             }
         }
@@ -573,13 +591,13 @@ class UploadViewController: UIViewController,
                 }
                 catch {
                     print(error)
-                    Alert.info(viewController: self, title: "File import failed!", message: "Writing failed.")
+                    Popup.info(presenting: self, title: "File import failed!", message: "Writing failed.")
                     
                 }
             })
         } catch {
             print(error)
-            Alert.info(viewController: self, title: "File import failed!", message: "Writing failed.")
+            Popup.info(presenting: self, title: "File import failed!", message: "Writing failed.")
         }
     }
     
@@ -643,6 +661,7 @@ class UploadViewController: UIViewController,
             let data = try? Data(contentsOf: url)
             let mediaType = urlToMediaType(url: url)
             print("MediaType: \(mediaType)")
+        
             switch mediaType {
                 case "public.image":
                     checkedImport(data: data, subdir: "images", filename: filename, listView: imageListView!, listData: imageList)
@@ -653,9 +672,24 @@ class UploadViewController: UIViewController,
                 default:
                     print(" Unknown media type")
                     let msg = "File name: \(filename)\nMedia type: \(mediaType)"
-                    Alert.info(viewController: self, title: "Incompatible media type!", message: msg)
+                    Popup.info(presenting: self, title: "Incompatible media type!", message: msg)
             }
         }
+    }
+    
+    
+    private func getMainMediaType(mediaType: String) -> String {
+        var type = "unknown"
+        if UTTypeConformsTo(mediaType as CFString, kUTTypeMovie) { // neq kUTTypeVideo
+            type = "public.movie"
+        }
+        else if UTTypeConformsTo(mediaType as CFString, kUTTypeImage) {
+            type = "public.image"
+        }
+        else if UTTypeConformsTo(mediaType as CFString, kUTTypeAudio) {
+            type = "public.audio"
+        }
+        return type
     }
 
     //
@@ -671,7 +705,7 @@ class UploadViewController: UIViewController,
             if UTTypeConformsTo(fileUTI, kUTTypeImage) {
                 mediaType = "public.image"
             }
-            else if UTTypeConformsTo(fileUTI, kUTTypeVideo) {
+            else if UTTypeConformsTo(fileUTI, kUTTypeMovie) {
                 mediaType = "public.movie"
             }
             else if UTTypeConformsTo(fileUTI, kUTTypeAudio) {
@@ -681,7 +715,6 @@ class UploadViewController: UIViewController,
                 mediaType = fileUTI as String
             }
         }
-        
         return mediaType
     }
     
@@ -697,8 +730,7 @@ class UploadViewController: UIViewController,
                 print(" File already exists")
                 let title = "Do you want to overwrite \(filename)?"
                 let message = "A file named \(filename) already exists in this application."
-                
-                Alert.decision(viewController: self, title: title, message: message) { _ in
+                Popup.decision(presenting: self, title: title, message: message) { _ in
                     self.importFile(data: data!, subdir: subdir, filename: filename, listView: listView, listData: listData)
                 }
             }
@@ -708,7 +740,7 @@ class UploadViewController: UIViewController,
             }
         }
         else {
-            Alert.info(viewController: self, title: "File import failed!", message: "Media content could not be read.")
+            Popup.info(presenting: self, title: "File import failed!", message: "Media content could not be read.")
         }
         
     }
@@ -734,7 +766,7 @@ class UploadViewController: UIViewController,
             }
         } catch {
             print(error)
-            Alert.info(viewController: self, title: "File import failed!", message: "Writing failed.")
+            Popup.info(presenting: self, title: "File import failed!", message: "Writing failed.")
         }
     }
     
@@ -778,14 +810,23 @@ class UploadViewController: UIViewController,
     private func showImportError() {
         let title = "Import Error"
         let message = "Something went wrong while importing the File. Please check if space is low and try again later."
-        Alert.info(viewController: self, title: title, message: message)
+        Popup.info(presenting: self, title: title, message: message)
+    }
+    
+    private func getTopViewController() -> UIViewController {
+        var parentController: UIViewController = self
+        
+        while( parentController.presentedViewController != nil && parentController != parentController.presentedViewController ){
+            parentController = parentController.presentedViewController!
+        }
+        return parentController
     }
     
     // Checks on startup
     
     private func checkWebdirectory() {
         if (!FileManager.default.fileExists(atPath: WebDir.path)) {
-            Alert.missingResource(viewController: self, resource: WebDir.lastPathComponent)
+            Popup.missingResource(presenting: self, resource: WebDir.lastPathComponent)
         }
     }
     
@@ -808,10 +849,10 @@ class UploadViewController: UIViewController,
                 })
             case .denied:
                 print(" Permission denied")
-                Alert.info(viewController: self, title: "No photo library access!", message: authorizationHint)
+                Popup.info(presenting: self, title: "No photo library access!", message: authorizationHint)
             case .restricted:
                 print(" Permission restricted")
-                Alert.info(viewController: self, title: "Restricted library access!", message: authorizationHint)
+                Popup.info(presenting: self, title: "Restricted library access!", message: authorizationHint)
             default:
                 print(" Permission for photo library already granted")
         }
@@ -836,10 +877,10 @@ class UploadViewController: UIViewController,
                 })
             case .denied:
             print(" Permission denied")
-                Alert.info(viewController: self, title: "No media library access!", message: authorizationHint)
+                Popup.info(presenting: self, title: "No media library access!", message: authorizationHint)
             case .restricted:
             print(" Permission restricted")
-                Alert.info(viewController: self, title: "Restricted media library access!", message: authorizationHint)
+                Popup.info(presenting: self, title: "Restricted media library access!", message: authorizationHint)
             default:
                 print(" Permission for media library already granted")
         }
@@ -864,10 +905,10 @@ class UploadViewController: UIViewController,
                 })
             case .denied:
             print(" Permission denied")
-                Alert.info(viewController: self, title: "No capture access!", message: authorizationHint)
+                Popup.info(presenting: self, title: "No capture access!", message: authorizationHint)
             case .restricted:
             print(" Permission restricted")
-                Alert.info(viewController: self, title: "Restricted capture access!", message: authorizationHint)
+                Popup.info(presenting: self, title: "Restricted capture access!", message: authorizationHint)
             default:
                 print(" Permission for capture already granted")
         }
