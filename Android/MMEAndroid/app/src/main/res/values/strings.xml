@@ -19,5 +19,6 @@
 
     <string name="name_downloaded_file">mtool_data.csv</string>
     <string name="mediastore_display_name_downloaded_file">M-TOOL Data</string>
+    <string name="toolbar_image_description">M-TOOL symbol and title</string>
 
 </resources>

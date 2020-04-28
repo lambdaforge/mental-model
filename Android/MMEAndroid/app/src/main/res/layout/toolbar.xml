@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"
         android:minHeight="120dp"
@@ -15,5 +13,6 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:background="@drawable/banner_gradient_small"
-                app:srcCompat="@drawable/banner_narrow_transparent" />
+                app:srcCompat="@drawable/banner_narrow_transparent"
+                android:contentDescription="@string/toolbar_image_description" />
 </androidx.appcompat.widget.Toolbar>
