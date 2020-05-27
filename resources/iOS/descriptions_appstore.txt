@@ -1,0 +1,46 @@
+
+1. Promotional Text (max. 170 chars)
+
+(See short description in Playstore:)
+
+Create visual diagrams depicting people’s mental model of any system.
+
+
+2. Description (max. 4000 chars)
+
+(See long description in Playstore:)
+
+M-TOOL, the Mental Model Mapping Tool, allows you to capture stakeholders' mental models. Mental models are internal representations of an external system or environment. Mental models are highly relevant as they shape how stakeholders explain events, predict future developments, and ultimately how they act in their environment. The environment can be virtually any type of system that consists of factors and causal links between those factors. For example, M-TOOL could create fishermen's mental models of an ecosystem, policymakers’ mental models of their regions' economy, or children's mental models of the climate.
+
+M-TOOL creates mental models of the environment by having the stakeholders organizing relevant factors and linking them. In contrast to previous mental model elicitation methods, M-TOOL:
+    • uses a fully computerized approach that allows rapid collection of large samples;
+    • can be fully tailored to your research needs in that it allows assessing mental models describing virtually any type of system;
+    • is fully standardized, allowing you to compare mental models between stakeholder groups, and also to track changes in mental models over time;
+    • is suited for offline use, allowing you to assess rural communities around the world;
+    • relies solely on intuitive icons to display the factors, allowing you to assess populations that cannot read or write, such as low educated populations or children.
+
+To get started using M-TOOL for your research, follow nine simple steps.
+    1. Generate a list of relevant factors for the relevant system.
+    2. Turn these factors, as well as your 'target variable' (if applicable) into images (e.g. through a freelance designer platform like Fiverr or use images with text).
+    3. Create a video that explain the meaning of each image (e.g. with PowerPoint)
+    4. Extract the audio files from this video for each image (e.g. using PowerPoint)
+    5. Upload these files under upload files.
+    6. Set-up the files under settings
+    7. Enter a session number/comment as desired
+    8. Press start and hand-over the tool to your respondent.
+    9. Download your participants data under start session/download data.
+
+
+M-TOOL has been scientifically tested in two studies with Tanzanian fishermen (van den Broek, Luomba, van den Broek & Fischer, forthcoming). These studies demonstrated that M-TOOL produces (1) valid mental models, adequately capturing stakeholders' mental models; (2) fuller mental models compared to straining interview techniques; (3) captures meaningful differences in mental models between different stakeholders; and (4) demonstrated M-TOOL’s usability in the field, and with less literate populations.
+
+In sum, M-TOOL can be used to elicit mental models among less literate populations in a fully standardized and computerized approach that is suitable for offline use. M-TOOL's validity has been proven in two studies demonstrating that, compared to traditional mental model elicitation methods, M-TOOL produces fuller mental models allowing in-depth analyses and deeper insights into how stakeholders mentally represent their environment.
+
+
+3. Keywords
+
+Mental models, Cognitive mapping, System thinking, System dynamics, Mental maps, Causal diagrams, Concept mapping
+
+
+4. Support URL
+
+www.m-tool.org
