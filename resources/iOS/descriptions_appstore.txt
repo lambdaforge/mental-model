@@ -1,12 +1,15 @@
 
-1. Promotional Text (max. 170 chars)
+Appstore
+
+
+1. Promotional Text (max. 170 characters)
 
 (See short description in Playstore:)
 
 Create visual diagrams depicting people’s mental model of any system.
 
 
-2. Description (max. 4000 chars)
+2. Description (max. 4000 characters)
 
 (See long description in Playstore:)
 
@@ -36,7 +39,7 @@ M-TOOL has been scientifically tested in two studies with Tanzanian fishermen (v
 In sum, M-TOOL can be used to elicit mental models among less literate populations in a fully standardized and computerized approach that is suitable for offline use. M-TOOL's validity has been proven in two studies demonstrating that, compared to traditional mental model elicitation methods, M-TOOL produces fuller mental models allowing in-depth analyses and deeper insights into how stakeholders mentally represent their environment.
 
 
-3. Keywords
+3. Keywords (max. 100 characters)
 
 Mental models, Cognitive mapping, System thinking, System dynamics, Mental maps, Causal diagrams, Concept mapping
 
@@ -44,3 +47,8 @@ Mental models, Cognitive mapping, System thinking, System dynamics, Mental maps,
 4. Support URL
 
 www.m-tool.org
+
+
+5. Marketing URL
+
+N/A
