@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "705049792892",
+    "firebase_url": "https://m-tool-8c8aa.firebaseio.com",
+    "project_id": "m-tool-8c8aa",
+    "storage_bucket": "m-tool-8c8aa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:705049792892:android:0161c91580bc5ac92714f9",
+        "android_client_info": {
+          "package_name": "com.lambdaforge.mmeandroid"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "705049792892-k6o3t4vo493gafdks5isg7nva311ongj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-yumyGyNhuHSASeWFg2GzLuus9uxTISU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "705049792892-k6o3t4vo493gafdks5isg7nva311ongj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
