@@ -1,12 +1,17 @@
 
 Appstore
 
-1. Promotional Text
+
+1. Promotional Text (max. 170 characters)
+
+(See short description in Playstore:)
 
 Create visual diagrams depicting people’s mental model of any system.
 
 
 2. Description (max. 4000 characters)
+
+(See long description in Playstore:)
 
 M-TOOL, the Mental Model Mapping Tool, allows you to capture stakeholders' mental models. Mental models are internal representations of an external system or environment. Mental models are highly relevant as they shape how stakeholders explain events, predict future developments, and ultimately how they act in their environment. The environment can be virtually any type of system that consists of factors and causal links between those factors. For example, M-TOOL could create fishermen's mental models of an ecosystem, policymakers’ mental models of their regions' economy, or children's mental models of the climate.
 
@@ -36,7 +41,7 @@ In sum, M-TOOL can be used to elicit mental models among less literate populatio
 
 3. Keywords (max. 100 characters)
 
-Mental models; Cognitive mapping; System thinking; System dynamics; Mental maps; Causal diagrams; Concept mapping.
+Mental models, Cognitive mapping, System thinking, System dynamics, Mental maps, Causal diagrams, Concept mapping
 
 
 4. Support URL
