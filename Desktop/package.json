@@ -1,0 +1,16 @@
+{
+  "name": "mm2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Judith Massa",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^9.0.0",
+    "electron-packager": "^14.2.1"
+  },
+  "dependencies": {
+    "yargs-parser": "^18.1.3"
+  }
+}

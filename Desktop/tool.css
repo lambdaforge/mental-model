@@ -1,0 +1,187 @@
+
+
+html,body {
+    font-family: Roboto, sans-serif;
+    font-size: 16px;
+    background-color: #FFFFFF;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+* {
+    box-sizing: border-box
+}
+
+div#mme-tool {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+}
+
+.screen {
+    margin: 0;
+    display: none;
+    background-repeat: no-repeat;
+    background-color: #FFFFFF;
+}
+
+#thank-you {
+    height: 100vh;
+    background-size: auto 50%;
+    background-position: center;
+}
+
+#settings {
+    padding: 0.6rem 50px;
+    flex-flow: column;
+}
+
+h2 {
+    font-size: 26px;
+    font-weight: normal;
+}
+
+#menu {
+    height: 100vh;
+}
+
+#session, #comment {
+    size: 20px;
+}
+
+#wrapper {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+
+#options {
+    text-align: center;
+}
+
+.filler {
+  flex-grow : 1
+}
+
+.inline {
+    display: inline-block;
+    height: 300px;
+    vertical-align: bottom;
+    padding: 30px;
+}
+
+#video {
+    height: 100vh;
+    width: 100%;
+}
+video {
+    object-fit: contain;
+}
+
+button {
+    font-size: 16px;
+    height: 30px;
+}
+
+#btn-introduction {
+    width: 100%;
+}
+
+.stepButtons {
+    width: 230px;
+    margin: 10px;
+}
+
+.otherBtn {
+    width: 160px;
+    margin: 10px;
+}
+
+.explanation {
+    font-size: 16px;
+}
+
+ /* Style the tab */
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabContent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+  overflow-x:scroll;
+}
+
+td {
+    padding: 5px;
+}
+
+.mappingTypesTable {
+    padding: 20px;
+}
+
+.hCentered {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.toolTip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.toolTip .toolTipText {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.toolTip:hover .toolTipText {
+  visibility: visible;
+}
+
+.box {
+  border: 1px solid black;
+  margin: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
