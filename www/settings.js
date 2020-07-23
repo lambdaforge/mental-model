@@ -30,14 +30,20 @@ defaultSettings = {
     //
 
     solutionImage: "solution.png",
-    practiceSolution:  ["food\tsmile\t3", "work\tmoney\t2", "money\tsmile\t2",  "sleep\tsmile\t1"],
+    practiceSolution:  ["food\tsmile\t3", "work\tmoney\t2", "money\tsmile\t2",  "sleep\tsmile\t1"], // deprecated
+    practiceSolutionArray:  [["food", "smile", "3"],
+                             ["work", "money", "2"],
+                             ["money", "smile", "2"],
+                             ["sleep", "smile", "1"]],
 
     audioBlock: true,
     arrowWeights: [3, 2, 1, -1, -2, -3],
     arrowColor: { positive: "blue", negative: "red", neutral: "black"},
     highlightColor: "lightskyblue",
     customFactorNumber: 0,
+
     dataFileName: "mtool_data.csv",
+    separator: ",",
 
 
     //
