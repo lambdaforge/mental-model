@@ -566,11 +566,11 @@ onFactorIconClicked = function(options) {
 // Helper functions
 // ---------------------------------------------------------------------
 
-// 
+//
 
 disableIconForShortTime = function(selectedIcon) {
     uistate.disabledIcon = selectedIcon
-        setTimeout(function(){ 
+        setTimeout(function(){
             uistate.disabledIcon = ""
         }, 1000);
 
@@ -616,6 +616,7 @@ getIconsOfType = function(type) {
 
 
 // Get arrow objects from canvas
+/*
 getConnectionStrings = function() {
     var icons = getIconsOfType(IconType.connection);
 
@@ -628,7 +629,25 @@ getConnectionStrings = function() {
         var name1 = (icon1.iconFixed)? names[0].substring(3) : settings.factorMedia[names[0]].name;
         var name2 = (icon2.iconFixed)? names[1].substring(3) : settings.factorMedia[names[1]].name;
         var infoArray = [name1, name2, icon.connectionWeight];
-        arrows.push(infoArray.join(","));
+        arrows.push(infoArray.join(settings.separator));
+    }
+    return arrows;
+};*/
+
+// Get arrow objects from canvas
+getConnectionArrays = function() {
+    var icons = getIconsOfType(IconType.connection);
+
+    var arrows = [];
+    for (var arrowInd = 0; arrowInd < icons.length; arrowInd++) {
+        var icon = icons[arrowInd];
+        var names = icon.iconName.split("-");
+        var icon1 = getIconByName(names[0]);
+        var icon2 = getIconByName(names[1]);
+        var name1 = (icon1.iconFixed)? names[0].substring(3) : settings.factorMedia[names[0]].name;
+        var name2 = (icon2.iconFixed)? names[1].substring(3) : settings.factorMedia[names[1]].name;
+        var infoArray = [name1, name2, icon.connectionWeight];
+        arrows.push(infoArray);
     }
     return arrows;
 };
@@ -744,9 +763,9 @@ leftRightArrow = function(arrowStart, arrowLength, lineWidth) {
 
 // Compares practice solution with drawn diagram
 practiceSolutionCorrect = function() {
-    var diagramDrawn = getConnectionStrings().sort().join("");
+    var diagramDrawn = listOfLists2csv(getConnectionArrays().sort());
     console.log(diagramDrawn);
-    var correctDiagram = settings.practiceSolution.sort().join("");
+    var correctDiagram = listOfLists2csv(settings.practiceSolutionArray.sort());
     console.log(correctDiagram);
 
     return diagramDrawn === correctDiagram;
@@ -763,18 +782,35 @@ resetUIstate = function() {
 };
 
 
+// Turn every list of the collection into a csv row and every item of a list into a csv cell
+listOfLists2csv = function(list) {
+    var res = "";
+    for (var i = 0; i < list.length; i++) {
+        res = res + list[i].join(settings.separator) + "\n";
+    }
+    return res;
+};
+
+
+// Return string with surrounding double quotes
+quoted = function(string) {
+    return "\"" + string + "\"";
+};
+
 // Save drawing and info to local storage
 saveResult = function(mappingState) {
     var mappingType = (mappingState === State.driversMapping)? MappingType.drivers : MappingType.consequences;
     var duration = Math.round((new Date() -  uistate.session.start[mappingType]) / 100) / 10;
 
-    var newInfo = "session,\"" + uistate.session.name + "\"" +
-                  "\ncomment,\"" + uistate.session.comment + "\"" +
-                  "\nstart,\"" +  uistate.session.start[mappingType] + "\"" +
-                  "\nduration,\"" + duration + "\"" +
-                  "\nmapping type,\"" + mappingType + "\"" +
-                  "\nconnections\n" +
-                  getConnectionStrings().join("\n");
+    var newInfoArray = [["session", quoted( uistate.session.name )],
+                        ["comment", quoted( uistate.session.comment )],
+                        ["start", quoted( uistate.session.start[mappingType] ) ],
+                        ["duration", quoted( duration ) ],
+                        ["mapping type", quoted( mappingType ) ],
+                        ["connections"]].concat( getConnectionArrays() );
+
+    console.log(newInfoArray)
+    var newInfo = listOfLists2csv(newInfoArray)
 
     console.log(newInfo);
 

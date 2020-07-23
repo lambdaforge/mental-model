@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>271673333935-utv7repc2qsf29egkib3nuhf60na3dc3.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.271673333935-utv7repc2qsf29egkib3nuhf60na3dc3</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCMJwaxdhQWruaDSjwzIYC711tMs0vllck</string>
+	<key>GCM_SENDER_ID</key>
+	<string>271673333935</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>de.uni-heidelberg.mmet</string>
+	<key>PROJECT_ID</key>
+	<string>m-tool-1d19e</string>
+	<key>STORAGE_BUCKET</key>
+	<string>m-tool-1d19e.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:271673333935:ios:b552ac391726556dee1c5a</string>
+	<key>DATABASE_URL</key>
+	<string>https://m-tool-1d19e.firebaseio.com</string>
+</dict>
+</plist>

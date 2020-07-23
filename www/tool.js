@@ -34,8 +34,13 @@ settings = defaultSettings;
 var data = localStorage.getItem(BrowserStorageKey.settings);
 
 if( data ) {
-    settings = JSON.parse(data);
-    console.log("Use stored settings");
+    storedSettings = JSON.parse(data);
+    for (key in storedSettings) {
+        if(storedSettings.hasOwnProperty(key)){
+            settings[key] = storedSettings[key];
+        }
+    }
+    console.log("Overwrite defaults with stored settings");
 }
 else {
     console.log("Default settings used");
