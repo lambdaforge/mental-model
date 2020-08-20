@@ -13,11 +13,11 @@ var canvas = {
 // ---------------------------------------------------------------------
 
 // Set up canvas according to current window size
-setupCanvas = function() {
+setupCanvas = function(w, h) {
 
     canvas[uistate.activeCanvas] = new fabric.Canvas(uistate.activeCanvas, {
-        width: $(window).width(),
-        height: $(window).height()
+        width: w,
+        height: h
     });
     canvas[uistate.activeCanvas].on("mouse:down", onCanvasClicked);
     canvas[uistate.activeCanvas].selection = false;
@@ -25,12 +25,12 @@ setupCanvas = function() {
 };
 
 // Layout and behaviour of drawing screen
-setupMapping = function(mappingType) {
+setupMapping = function(mappingType, w, h) {
     console.log("Setting up: " + mappingType);
     console.log("Use mappings: " + settings.useMappings);
 
     if (!canvas[uistate.activeCanvas]) { // using new fabric canvas is not possible
-        setupCanvas();
+        setupCanvas(w, h);
     }
     canvas[uistate.activeCanvas].clear();
 
@@ -39,8 +39,6 @@ setupMapping = function(mappingType) {
     var fixedFactor = factors.fixed;
 
     // Adjust Sizes
-    var h = $(window).height();
-    var w = $(window).width();
     canvasStyle = getPixelSizes(w, h, mappingType, settings);
 
     // Set up arrows and factors

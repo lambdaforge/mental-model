@@ -120,7 +120,7 @@ displayThankYouScreen = function() {
 
 
 // Prepare and show mapping screen
-displayMapping = function(mappingState) {
+displayMapping = function(mappingState, w, h) {
 
     uistate.session.state = mappingState;
 
@@ -152,7 +152,7 @@ displayMapping = function(mappingState) {
     console.log("Start mapping: " + mappingType);
     if (!canvas[uistate.activeCanvas]) {
         startSession(mappingType);
-        setupMapping(mappingType);
+        setupMapping(mappingType, w, h);
     }
 
     resetUIstate();
@@ -204,15 +204,18 @@ leaveAndSaveSettings = function() {
 // Behaviour on start up
 window.onload = function() {
 
+    w = window.innerWidth;
+    h = window.innerHeight;
+
     $("#video")[0].src = "video/" + settings.introductionVideo;
     $("#audio")[0].src = "audio/" + settings.mappingAudioConsequences;
 
     $("#video").on("ended", function() {
         var nextState = nextSessionState();
         switch (uistate.session.state) {
-            case State.introduction:              displayMapping(nextState); break;
-            case State.driversInstructions:       displayMapping(nextState); break;
-            case State.consequencesInstructions:  displayMapping(nextState); break;
+            case State.introduction:              displayMapping(nextState, w, h); break;
+            case State.driversInstructions:       displayMapping(nextState, w, h); break;
+            case State.consequencesInstructions:  displayMapping(nextState, w, h); break;
             default: console.log("Unknown or non-video session state: ", uistate.session.state);
         }
     });
@@ -226,19 +229,19 @@ window.onload = function() {
         displayVideo(State.introduction);
     });
     $("#btn-practice").on("click", function() {
-        displayMapping(State.practiceMapping);
+        displayMapping(State.practiceMapping, w, h);
     });
     $("#btn-instructions-drivers").on("click", function() {
         displayVideo(State.driversInstructions);
     });
     $("#btn-mapping-drivers").on("click", function() {
-        displayMapping(State.driversMapping);
+        displayMapping(State.driversMapping, w, h);
     });
     $("#btn-instructions-consequences").on("click", function() {
         displayVideo(State.consequencesInstructions);
     });
     $("#btn-mapping-consequences").on("click", function() {
-        displayMapping(State.consequencesMapping);
+        displayMapping(State.consequencesMapping, w, h);
     });
     $("#btn-download").on("click", downloadData);
     $("#btn-settings").on("click", displaySettings);
